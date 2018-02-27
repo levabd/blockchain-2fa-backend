@@ -1,0 +1,55 @@
+extends ../layout
+
+block content
+  form.form-signin(_lpchecked='1', method='POST', action='register')
+    .text-center.mb-4
+      img.mb-4(src='https://docs.opnsense.org/_images/two_factor_authentication.png', alt='', width='300')
+      h1.h3.mb-3.font-weight-normal 2FA Registration
+    .form-label-group
+      input#phoneNumber.form-control(type='text', name='phoneNumber', placeholder='Номер телефона', required='', autofocus='', autocomplete='off')
+      label(for='phoneNumber') Номер телефона
+    .form-label-group
+      input#inputName.form-control(type='text', name='inputName', placeholder='Фамилия Имя Отчество', required='', autofocus='', autocomplete='off')
+      label(for='inputName') Имя
+    .form-label-group
+      input#inputService.form-control(type='hidden', name='inputService', value='kazahtelecom')
+    .form-label-group
+      input#method.form-control(type='hidden', name='method', value='sms')
+    .form-label-group
+      input#inputIsVerified.form-control(type='hidden', name='inputIsVerified', value='false')
+    .form-label-group
+      input#uin.form-control(type='text', name='uin', placeholder='ИИН')
+      label(for='uin') ИИН
+    .form-group
+      label(for='sexRadioGroup') Вы
+      #sexRadioGroup.form-check
+        input#male.form-check-input(type='radio', name='sex', value='male', checked='')
+        label.form-check-label(for='male')
+          | Мужчина
+      .form-check
+        input#female.form-check-input(type='radio', name='sex', value='female')
+        label.form-check-label(for='female')
+          | Женщина
+    .form-group
+      #birthdate.input-group.date(data-target-input='nearest')
+        input.form-control.datetimepicker-input(type='text', name='birthdate', data-target='#birthdate')
+        .input-group-append(data-target='#birthdate', data-toggle='datetimepicker')
+          .input-group-text
+            i.fa.fa-calendar
+    .form-label-group
+      input#inputEmail.form-control(type='email', name='email', placeholder='Email address', required='', autofocus='', autocomplete='off')
+      label(for='inputEmail') Email address
+    .form-label-group
+      input#inputPassword.form-control(type='password', placeholder='Password', required='', autocomplete='off')
+      label(for='inputPassword') Password
+    .checkbox.mb-3
+      label
+        input(type='checkbox', value='remember-me')
+        |  Remember me
+    button.btn.btn-lg.btn-primary.btn-block(type='submit') Register
+    p.mt-5.mb-3.text-muted.text-center © 2017-2018
+
+block javascript
+  script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js')
+  script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.0-alpha14/js/tempusdominus-bootstrap-4.min.js')
+  script(src="/javascripts/kazahtelecom.js")

@@ -4,6 +4,8 @@ import { ApplicationModule } from './modules/app.module';
 import { Log } from 'hlf-node-utils';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { config as awsConfig } from 'aws-sdk';
+import * as express from 'express';
+import * as path from 'path';
 import * as bodyParser from 'body-parser';
 
 /**
@@ -41,13 +43,17 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, options);
     SwaggerModule.setup('/api', app, document);
 
+    // Set up static files
+    app.use(express.static(path.join(__dirname, 'public')));
+    app.set('views', __dirname + '/views');
+    app.set('view engine', 'pug');
+
     /**
      * Start Chainservice API
      */
     await app.listen(+EnvConfig.PORT, () => {
         Log.config.info(`Started Chain-service on PORT ${EnvConfig.PORT}`);
     });
-
 }
 
 bootstrap();

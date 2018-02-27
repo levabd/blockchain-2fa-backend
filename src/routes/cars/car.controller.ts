@@ -1,4 +1,4 @@
-import {Controller, Get, Post, Body, Headers} from '@nestjs/common';
+import {Controller, Get, Post, Body, Headers, Res} from '@nestjs/common';
 import {CarService} from './car.service';
 import {CarDto} from './car.model';
 import {InvokeResult} from '../invokeresult.model';
@@ -41,9 +41,10 @@ export class CarController {
      * @memberof CarController
      */
     @Get()
-    getAll(@Headers('authorization') auth): Promise<CarDto[]> {
+    getAll(@Res() res):void {
         this.codeQueueListenerService.queueSMS.add({phone_number: '454257844'});
-        return this.carService.getAll(this.getUserId(auth));
+        // return ;
+        res.render('kazahtelecom/index', { message: 'Hello world!' });
     }
 
     /**

@@ -1,27 +1,26 @@
-
-import { Component, InternalServerErrorException, BadRequestException } from '@nestjs/common';
+import {Component, InternalServerErrorException, BadRequestException} from '@nestjs/common';
 import * as Yup from 'yup';
-import { ChainMethod } from '../chainmethods.enum';
-import { CarDto } from './car.model';
-import { InvokeResult } from '../invokeresult.model';
-import { RequestHelper } from '../../services/chain/requesthelper';
+import {ChainMethod} from '../chainmethods.enum';
+import {CarDto} from './car.model';
+import {InvokeResult} from '../invokeresult.model';
+import {RequestHelper} from '../../services/chain/requesthelper';
 
 @Component()
 export class CarService {
 
-/**
- * Creates an instance of CarService.
- * @param {RequestHelper} requestHelper 
- * @memberof CarService
- */
-constructor(
-        private requestHelper: RequestHelper) { }
+    /**
+     * Creates an instance of CarService.
+     * @param {RequestHelper} requestHelper
+     * @memberof CarService
+     */
+    constructor(private requestHelper: RequestHelper) {
+    }
 
     /**
      * get all cars
-     * 
-     * @param {string} userId 
-     * @returns {Promise<CarDto[]>} 
+     *
+     * @param {string} userId
+     * @returns {Promise<CarDto[]>}
      * @memberof AssetsService
      */
     getAll(userId: string): Promise<CarDto[]> {
@@ -38,10 +37,10 @@ constructor(
 
     /**
      * create new car
-     * 
-     * @param {CarDto} carDto 
-     * @param {string} userId 
-     * @returns {Promise<InvokeResult>} 
+     *
+     * @param {CarDto} carDto
+     * @param {string} userId
+     * @returns {Promise<InvokeResult>}
      * @memberof AssetsService
      */
     create(carDto: CarDto, userId: string): Promise<InvokeResult> {
