@@ -2,9 +2,17 @@
 # Before running `make`, config this files
 # Define some global variables for usage. Will be included by func.sh.
 
+#Prerequisites version, use in env_setup.sh
+GOLANG_VER=1.9.4
+NODEJS_VER=8.x
+DOCKER_COMPOSE_VER=1.19.0
+
+
 # Name of app channel, need to align with the gen_artifacts.sh
 SYS_CHANNEL="testchainid"
 APP_CHANNEL="businesschannel"
+MAIN_CHANNEL="mainchannel"
+KAZAKTELEKOM_CHANNEL="kaztelchannel"
 
 # Client cmd execute timeout and retry times
 TIMEOUT="30"
@@ -55,6 +63,22 @@ CC_MAP_INIT_ARGS='{"Args":["init",""]}'
 CC_MAP_UPGRADE_ARGS='{"Args":["upgrade",""]}'
 CC_MAP_INVOKE_ARGS='{"Args":["invoke","put","key","value"]}'
 CC_MAP_QUERY_ARGS='{"Args":["get","key"]}'
+
+# Chaincode maincode related
+CC_02_NAME="maincode"
+CC_02_PATH="examples/chaincode/go/maincode"
+CC_02_INIT_ARGS='{"Args":["init","a","100","b","200"]}'
+CC_02_UPGRADE_ARGS='{"Args":["upgrade","a","100","b","200"]}'
+CC_02_INVOKE_ARGS='{"Args":["invoke","a","b","10"]}'
+CC_02_QUERY_ARGS='{"Args":["query","a"]}'
+
+# Chaincode kaztel related
+CC_02_NAME="kaztel"
+CC_02_PATH="examples/chaincode/go/kaztel"
+CC_02_INIT_ARGS='{"Args":["init","a","100","b","200"]}'
+CC_02_UPGRADE_ARGS='{"Args":["upgrade","a","100","b","200"]}'
+CC_02_INVOKE_ARGS='{"Args":["invoke","a","b","10"]}'
+CC_02_QUERY_ARGS='{"Args":["query","a"]}'
 
 # unique chaincode params
 CC_NAME=${CC_02_NAME}
