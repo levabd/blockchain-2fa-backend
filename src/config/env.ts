@@ -15,7 +15,7 @@ export class EnvConfig {
 
     // NODE
     public static NODE_ENV = process.env['NODE_ENV'] || 'LOCAL';
-    public static PORT = process.env['PORT'] || 3000;
+    public static PORT = process.env['PORT'] || 4001;
 
     // AWS
     public static AWS_ACCESS_KEY = process.env['AWS_ACCESS_KEY'] || '';
@@ -43,4 +43,9 @@ export class EnvConfig {
     // Redis configuration
     public static REDIS_HOST = process.env['REDIS_HOST'];
     public static REDIS_PORT = process.env['REDIS_PORT'];
+
+    // Redis configuration
+    public static SMS_USERNAME = process.env['SMS_USERNAME'];
+    public static SMS_PASSWORD = process.env['SMS_PASSWORD'];
+    public static SMS_CALLBACK_TOKEN = process.env['SMS_CALLBACK_TOKEN'];
 }

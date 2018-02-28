@@ -13,12 +13,16 @@ import { NestModule } from '@nestjs/common/interfaces';
 import { AuthenticationMiddleware } from '../middleware/authentication.middleware';
 import { CarController } from '../routes/cars/car.controller';
 import * as path from 'path';
-import {CodeQueueListenerService} from '../services/queue/code_queue/queue.listener.service';
+import {CodeQueueListenerService} from '../services/code_sender/queue.service';
+import {SmsCallbackController} from '../routes/sms/sms.callback.controller';
+import {UserController} from '../routes/users/user.controller';
 
 @Module({
     controllers: [
         PingController,
         CarController,
+        SmsCallbackController,
+        UserController
     ],
     components: [
         PingService,
@@ -31,7 +35,6 @@ import {CodeQueueListenerService} from '../services/queue/code_queue/queue.liste
     ],
 })
 export class ApplicationModule implements NestModule {
-
 
     /**
      * Creates an instance of ApplicationModule.

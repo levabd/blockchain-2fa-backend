@@ -58,6 +58,11 @@ Install dependencies
 - Static page generator using [pug](https://pugjs.org/api/getting-started.html)
 - Makefile generator to choose between static pages or headless api.
 
+### Start redis docker container:
+
+`docker run -p 0.0.0.0:6379:6379 --name redis -d redis`
+
+
 ** Feel free to contribute or make suggestions. **
 
 

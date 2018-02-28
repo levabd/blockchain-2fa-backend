@@ -3,7 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { ApplicationModule } from './modules/app.module';
 import { Log } from 'hlf-node-utils';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { config as awsConfig } from 'aws-sdk';
+// import { config as awsConfig } from 'aws-sdk';
 import * as express from 'express';
 import * as path from 'path';
 import * as bodyParser from 'body-parser';
@@ -11,11 +11,11 @@ import * as bodyParser from 'body-parser';
 /**
  * Set AWS Credentials
  */
-awsConfig.update({
-    accessKeyId: EnvConfig.AWS_ACCESS_KEY,
-    secretAccessKey: EnvConfig.AWS_SECRET_ACCESS_KEY,
-    region: EnvConfig.AWS_REGION
-});
+// awsConfig.update({
+//     accessKeyId: EnvConfig.AWS_ACCESS_KEY,
+//     secretAccessKey: EnvConfig.AWS_SECRET_ACCESS_KEY,
+//     region: EnvConfig.AWS_REGION
+// });
 
 async function bootstrap() {
 
@@ -43,7 +43,9 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, options);
     SwaggerModule.setup('/api', app, document);
 
-    // Set up static files
+    /**
+     *  Set up static files
+     */
     app.use(express.static(path.join(__dirname, 'public')));
     app.set('views', __dirname + '/views');
     app.set('view engine', 'pug');

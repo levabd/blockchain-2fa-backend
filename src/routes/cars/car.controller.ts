@@ -5,7 +5,7 @@ import {InvokeResult} from '../invokeresult.model';
 import * as jwtDecode from 'jwt-decode';
 import {JwtToken} from 'auth0';
 import {ApiUseTags, ApiBearerAuth} from '@nestjs/swagger';
-import {CodeQueueListenerService} from '../../services/queue/code_queue/queue.listener.service';
+import {CodeQueueListenerService} from '../../services/code_sender/queue.service';
 import {Log} from 'hlf-node-utils';
 
 @ApiBearerAuth()
