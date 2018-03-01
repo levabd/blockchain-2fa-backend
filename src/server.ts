@@ -7,6 +7,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as express from 'express';
 import * as path from 'path';
 import * as bodyParser from 'body-parser';
+import {ValidationPipe} from '@nestjs/common';
 
 /**
  * Set AWS Credentials
@@ -48,6 +49,9 @@ async function bootstrap() {
      */
     app.use(express.static(path.join(__dirname, 'public')));
     app.set('views', __dirname + '/views');
+    app.set('view engine', 'pug');
+
+    app.useGlobalPipes(new ValidationPipe());
     app.set('view engine', 'pug');
 
     /**

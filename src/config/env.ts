@@ -48,4 +48,7 @@ export class EnvConfig {
     public static SMS_USERNAME = process.env['SMS_USERNAME'];
     public static SMS_PASSWORD = process.env['SMS_PASSWORD'];
     public static SMS_CALLBACK_TOKEN = process.env['SMS_CALLBACK_TOKEN'];
+
+    // ClientService env variables
+    public static KAZAHTELECOM_KEY = process.env['KAZAHTELECOM_KEY'];
 }

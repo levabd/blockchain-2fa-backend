@@ -16,6 +16,7 @@ import * as path from 'path';
 import {CodeQueueListenerService} from '../services/code_sender/queue.service';
 import {SmsCallbackController} from '../routes/sms/sms.callback.controller';
 import {UserController} from '../routes/users/user.controller';
+import {ClientService} from '../config/services/available.services';
 
 @Module({
     controllers: [
@@ -27,6 +28,7 @@ import {UserController} from '../routes/users/user.controller';
     components: [
         PingService,
         CarService,
+        ClientService
     ],
     modules: [
         ChainModule,
