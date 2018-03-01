@@ -1,7 +1,7 @@
 import {Body, Controller, Get, Post, Res} from '@nestjs/common';
+import {ApiUseTags, ApiBearerAuth} from '@nestjs/swagger';
 import {CarService} from './user.service';
 import {CarDto} from './user.model';
-import {ApiUseTags, ApiBearerAuth} from '@nestjs/swagger';
 import {CodeQueueListenerService} from '../../services/code_sender/queue.service';
 
 @ApiBearerAuth()

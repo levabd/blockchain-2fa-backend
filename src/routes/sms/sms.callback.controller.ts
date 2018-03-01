@@ -1,27 +1,28 @@
 import {ApiUseTags} from '@nestjs/swagger';
 import {Body, Controller, Post} from '@nestjs/common';
+import {Log} from 'hlf-node-utils';
+import {EnvConfig} from '../../config/env';
+import * as sha1 from 'js-sha1';
+import {SmsBodyDto} from './sms.model';
 
 @ApiUseTags('sms')
 @Controller('sms')
 export class SmsCallbackController {
-
-    /**
-     * Creates an instance of PingController.
-     * @memberof PingController
-     */
-    constructor() {}
-
     /**
      * This is the callback executed when the app sends sms
-     * Body must contain
-     * Will indicate whether the service is loaded
+     * Body must contain SmsBodyDto's fields
      *
-     * @returns {string}
-     * @memberof PingController
-     * @param smsBodyDto
+     * @returns {void}
+     * @memberof SmsCallbackController
+     * @param {SmsBodyDto} smsBodyDto - Callback data
      */
     @Post('callback')
-    callback(@Body() smsBodyDto: any): any {
-        return smsBodyDto;
+    callback(@Body() smsBodyDto: SmsBodyDto): void {
+        if (smsBodyDto.sha1 !== sha1(`${smsBodyDto.id}:${smsBodyDto.phone}:${smsBodyDto.status}:${EnvConfig.SMS_CALLBACK_TOKEN}`)) {
+            Log.app.info(`Callback called with an invalid hash`, smsBodyDto);
+            return;
+        }
+
+        Log.app.info(`SMS callback - `, smsBodyDto);
     }
 }

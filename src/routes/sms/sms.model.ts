@@ -2,9 +2,19 @@ import { ApiModelProperty } from '@nestjs/swagger';
 
 export class SmsBodyDto {
     @ApiModelProperty()
-    readonly Id: string;
+    readonly id: string;
     @ApiModelProperty()
-    readonly Phone: string;
+    readonly phone: string;
     @ApiModelProperty()
-    readonly Status: string;
+    readonly charset: string;
+    @ApiModelProperty()
+    readonly status: string;
+    @ApiModelProperty()
+    readonly time: string;
+    @ApiModelProperty()
+    readonly ts: string;
+    @ApiModelProperty()
+    readonly snt: string;
+    @ApiModelProperty()
+    readonly sha1: string;
 }
