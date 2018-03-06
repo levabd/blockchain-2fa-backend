@@ -20,7 +20,7 @@ export class QueueListenerService {
      * @memberof QueueService
      */
     constructor(
-        private webSocketService: WebSocketService,
+        // private webSocketService: WebSocketService,
         private hlfClient: HlfClient,
     ) { }
 
@@ -61,13 +61,13 @@ export class QueueListenerService {
                     .then(result => {
                         Log.awssqs.info('HLF Transaction successful, pushing result to frontend...');
                         // notify frontend of succesful transaction
-                        this.webSocketService.triggerSuccess(pusherChannel, chainMethod, payload);
+                        // this.webSocketService.triggerSuccess(pusherChannel, chainMethod, payload);
                         done();
                     })
                     .catch(error => {
                         Log.awssqs.error('HLF Transaction failed:', error);
                         // notify frontend of failed transaction
-                        this.webSocketService.triggerError(pusherChannel, chainMethod, { success: false });
+                        // this.webSocketService.triggerError(pusherChannel, chainMethod, { success: false });
                         done(error);
                     });
             }

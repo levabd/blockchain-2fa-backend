@@ -2,7 +2,6 @@ import { HlfErrors, HlfInfo } from './logging.enum';
 import { Component } from '@nestjs/common';
 import { ChainService } from './chain.service';
 import { FabricOptions, Log } from 'hlf-node-utils';
-import { ChainMethod } from '../../routes/chainmethods.enum';
 const fabricClient = require('fabric-client');
 
 @Component()
@@ -18,6 +17,20 @@ export class HlfClient extends ChainService {
      */
     setOptions(fabricoptions: FabricOptions) {
         this.options = fabricoptions;
+    }
+
+    getOptions() :FabricOptions {
+        return this.options;
+    }
+
+    /**
+     * set hlf channel
+     *
+     * @memberof HlfClient
+     * @param channel
+     */
+    setChannel(channel: string) :void{
+        this.options.channelId = channel;
     }
 
     /**
@@ -67,14 +80,13 @@ export class HlfClient extends ChainService {
     /**
      * Query hlf
      * 
-     * @param {ChainMethod} chainMethod 
+     * @param {ChainMethod} chainMethod
      * @param {string[]} params 
      * @param {string} [chaincodeId='fabcar']
      * @returns {Promise<any>} 
      * @memberof HlfClient
      */
-    query(chainMethod: ChainMethod, params: string[], chaincodeId = 'fabcar'): Promise<any> {
-        Log.hlf.info(chainMethod, params);
+    query(chainMethod: string, params: string[], chaincodeId = 'fabcar'): Promise<any> {
         return this.newQuery(chainMethod, params, chaincodeId)
             .then((queryResponses: Buffer[]) => {
                 return Promise.resolve(this.getQueryResponse(queryResponses));
@@ -88,13 +100,13 @@ export class HlfClient extends ChainService {
     /**
      * invoke 
      * 
-     * @param {ChainMethod} chainMethod 
+     * @param {string} chainMethod
      * @param { string[]} params 
      * @param {string} channelId 
      * @returns 
      * @memberof ChainService
      */
-    invoke(chainMethod: ChainMethod, params: string[], channelId = 'mycc'): Promise<any> {
+    invoke(chainMethod: string, params: string[], channelId = 'mycc'): Promise<any> {
         Log.hlf.info(chainMethod, params);
         return this.sendTransactionProposal(chainMethod, params, channelId)
             .then((results: ProposalResponseObject) => {

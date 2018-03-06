@@ -15,6 +15,7 @@ export class EnvConfig {
 
     // NODE
     public static NODE_ENV = process.env['NODE_ENV'] || 'LOCAL';
+    public static API_KEY = process.env['API_KEY'] || 'sgdfhdmgdkfgjk';
     public static PORT = process.env['PORT'] || 4001;
 
     // AWS
@@ -51,4 +52,12 @@ export class EnvConfig {
 
     // ClientService env variables
     public static KAZAHTELECOM_KEY = process.env['KAZAHTELECOM_KEY'];
+
+    // Channels config
+    public static TWOFA_CHANNEL = process.env['TWOFA_CHANNEL'];
+    public static TWOFA_CHAINCODE = process.env['TWOFA_CHAINCODE'];
+    public static KAZTEL_CHANNEL = process.env['KAZTEL_CHANNEL'];
+    public static KAZTEL_CHAINCODE = process.env['KAZTEL_CHAINCODE'];
+
+    public static GOOGLE_API_KEY = process.env['GOOGLE_API_KEY'];
 }

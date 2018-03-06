@@ -3,7 +3,6 @@ import {Component} from '@nestjs/common';
 import {Log} from 'hlf-node-utils';
 import * as Queue from 'bull';
 import * as request from 'request-promise-native';
-import {isValidNumber} from 'libphonenumber-js';
 import {Services} from './services';
 
 @Component()
@@ -95,8 +94,8 @@ export class CodeQueueListenerService {
                     login: EnvConfig.SMS_USERNAME,
                     psw: EnvConfig.SMS_PASSWORD,
                     phones: job.data.phone_number,
-                    sender:'TwoFA_S',
-                    mes: 'Ваш код подтверждения для сервиса "'+Services[job.data.service]+'": ' +job.data.code,
+                    sender: 'TwoFA_S',
+                    mes: 'Ваш код подтверждения для сервиса "' + Services[job.data.service] + '": ' + job.data.code,
                     charset: 'utf-8'
                 }
             };

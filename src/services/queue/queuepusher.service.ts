@@ -4,9 +4,8 @@ import { Component } from '@nestjs/common';
 import { Log, Utils } from 'hlf-node-utils';
 import { SQS, AWSError } from 'aws-sdk';
 import * as ObjectHash from 'object-hash';
-import { InvokeResult } from '../../routes/invokeresult.model';
-import { ChainMethod } from '../../routes/chainmethods.enum';
 import { MessageBody } from './messagebody.model';
+import {InvokeResult} from '../../modules/api/routes/invokeresult.model';
 
 @Component()
 export class QueuePusherService {
@@ -26,7 +25,7 @@ export class QueuePusherService {
      * @param {string} userId 
      * @memberof TransactionService
      */
-    public add(chainMethod: ChainMethod, params: any[], userId: string): Promise<InvokeResult> {
+    public add(chainMethod: string, params: any[], userId: string): Promise<InvokeResult> {
 
         const message: MessageBody = {
             chainMethod: chainMethod,

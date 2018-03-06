@@ -1,22 +1,12 @@
-import { EnvConfig } from './config/env';
-import { NestFactory } from '@nestjs/core';
-import { ApplicationModule } from './modules/app.module';
-import { Log } from 'hlf-node-utils';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-// import { config as awsConfig } from 'aws-sdk';
+import {EnvConfig} from './config/env';
+import {NestFactory} from '@nestjs/core';
+import {ApplicationModule} from './modules/app.module';
+import {Log} from 'hlf-node-utils';
+import {SwaggerModule, DocumentBuilder} from '@nestjs/swagger';
+
 import * as express from 'express';
 import * as path from 'path';
 import * as bodyParser from 'body-parser';
-import {ValidationPipe} from '@nestjs/common';
-
-/**
- * Set AWS Credentials
- */
-// awsConfig.update({
-//     accessKeyId: EnvConfig.AWS_ACCESS_KEY,
-//     secretAccessKey: EnvConfig.AWS_SECRET_ACCESS_KEY,
-//     region: EnvConfig.AWS_REGION
-// });
 
 async function bootstrap() {
 
@@ -41,18 +31,17 @@ async function bootstrap() {
         .setVersion('1.0')
         .addTag('Chainservice')
         .build();
+
     const document = SwaggerModule.createDocument(app, options);
-    SwaggerModule.setup('/api', app, document);
+    SwaggerModule.setup('/api-wsg', app, document);
 
     /**
      *  Set up static files
      */
     app.use(express.static(path.join(__dirname, 'public')));
-    app.set('views', __dirname + '/views');
+    app.set('views', __dirname + '/modules/web/views');
     app.set('view engine', 'pug');
-
-    app.useGlobalPipes(new ValidationPipe());
-    app.set('view engine', 'pug');
+    app.use(express.static(__dirname + '/modules/web/public'));
 
     /**
      * Start Chainservice API

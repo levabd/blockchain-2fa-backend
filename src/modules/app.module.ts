@@ -1,40 +1,28 @@
-import { CarService } from './../routes/cars/car.service';
-import { EventsModule } from './events.module';
-import { ChainModule } from './chain.module';
-import { QueueModule } from './queue.module';
-import { EnvConfig } from './../config/env';
-import { FabricOptions, Log } from 'hlf-node-utils';
-import { MiddlewaresConsumer, Module, RequestMethod } from '@nestjs/common';
-import { PingService } from '../routes/ping/ping.service';
-import { PingController } from '../routes/ping/ping.controller';
-import { HlfClient } from '../services/chain/hlfclient';
-import { QueueListenerService } from '../services/queue/queuelistener.service';
-import { NestModule } from '@nestjs/common/interfaces';
-import { AuthenticationMiddleware } from '../middleware/authentication.middleware';
-import { CarController } from '../routes/cars/car.controller';
+import {EnvConfig} from '../config/env';
+import {FabricOptions, Log} from 'hlf-node-utils';
+import {MiddlewaresConsumer, Module} from '@nestjs/common';
+import {HlfClient} from '../services/chain/hlfclient';
+import {QueueListenerService} from '../services/queue/queuelistener.service';
+import {NestModule} from '@nestjs/common/interfaces';
 import * as path from 'path';
+
 import {CodeQueueListenerService} from '../services/code_sender/queue.service';
-import {SmsCallbackController} from '../routes/sms/sms.callback.controller';
-import {UserController} from '../routes/users/user.controller';
-import {ClientService} from '../config/services/available.services';
+import {LoggerMiddleware} from './api/middleware/logger.middleware';
+import {ApiKeyCheckerMiddleware} from './api/middleware/api.key.checker.middleware';
+import {WebModule} from './web/web.module';
+import {ApiModule} from './api/api.module';
+import {UserController as ApiUserController} from './api/routes/users/user.controller';
+import {SharedModule} from './shared/shared.module';
 
 @Module({
-    controllers: [
-        PingController,
-        CarController,
-        SmsCallbackController,
-        UserController
-    ],
-    components: [
-        PingService,
-        CarService,
-        ClientService
-    ],
     modules: [
-        ChainModule,
-        QueueModule,
-        EventsModule,
+        WebModule,
+        ApiModule,
+        SharedModule
     ],
+    exports: [
+        SharedModule
+    ]
 })
 export class ApplicationModule implements NestModule {
 
@@ -47,8 +35,7 @@ export class ApplicationModule implements NestModule {
      */
     constructor(private hlfClient: HlfClient,
                 private queueListenerService: QueueListenerService,
-                private codeQueueListenerService: CodeQueueListenerService,
-    ) {
+                private codeQueueListenerService: CodeQueueListenerService,) {
         // list env keys in cli
         for (let propName of Object.keys(EnvConfig)) {
             Log.config.debug(`${propName}:  ${EnvConfig[propName]}`);
@@ -58,7 +45,7 @@ export class ApplicationModule implements NestModule {
         this.hlfClient.setOptions(<FabricOptions>{
             walletPath: path.resolve(__dirname, '..', 'config', `creds`),
             userId: 'user1',
-            channelId: 'mychannel',
+            channelId: EnvConfig.TWOFA_CHANNEL,
             networkUrl: `grpc://${EnvConfig.PEER_HOST}:7051`,
             eventUrl: `grpc://${EnvConfig.PEER_HOST}:7053`,
             ordererUrl: `grpc://${EnvConfig.ORDERER_HOST}:7050`
@@ -83,9 +70,7 @@ export class ApplicationModule implements NestModule {
      * @memberof ApplicationModule
      */
     configure(consumer: MiddlewaresConsumer): void {
-        consumer.apply(AuthenticationMiddleware).forRoutes(
-            { path: '/protectedroute', method: RequestMethod.ALL },
-            // {path: '/cars', method: RequestMethod.ALL}
-        );
+        consumer.apply(LoggerMiddleware).forRoutes(ApiUserController);
+        consumer.apply(ApiKeyCheckerMiddleware).forRoutes(ApiUserController);
     }
 }

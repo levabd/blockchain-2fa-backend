@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/spark-md5/3.0.0/spark-md5.js"></script>
+<script src="js-crc32-1.2.0/crc32.js"></script>
+<script>
+    // var makeCRCTable = function(){
+    //     var c;
+    //     var crcTable = [];
+    //     for(var n =0; n < 256; n++){
+    //         c = n;
+    //         for(var k =0; k < 8; k++){
+    //             c = ((c&1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
+    //         }
+    //         crcTable[n] = c;
+    //     }
+    //     return crcTable;
+    // };
+    //
+    // function Utf8Encode(string) {
+    //     string = string.replace(/\r\n/g,"\n");
+    //     var utftext = "";
+    //     for (var n = 0; n < string.length; n++) {
+    //         var c = string.charCodeAt(n);
+    //         if (c < 128) {
+    //             utftext += String.fromCharCode(c);
+    //         } else if((c > 127) && (c < 2048)) {
+    //             utftext += String.fromCharCode((c >> 6) | 192);
+    //             utftext += String.fromCharCode((c & 63) | 128);
+    //         } else {
+    //             utftext += String.fromCharCode((c >> 12) | 224);
+    //             utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+    //             utftext += String.fromCharCode((c & 63) | 128);
+    //         }
+    //     }
+    //     return utftext;
+    // }
+    //
+    // var crc32 = function(str) {
+    //     if (typeof str != 'string'){
+    //         str = str ? JSON.stringify(str) : '';
+    //     }
+    //     str = Utf8Encode(str);
+    //     var crcTable = crcTable || (crcTable = makeCRCTable());
+    //     var crc = 0 ^ (-1);
+    //     for (var i = 0; i < str.length; i++ ) {
+    //         crc = (crc >>> 8) ^ crcTable[(crc ^ str.charCodeAt(i)) & 0xFF];
+    //     }
+    //
+    //     return ((crc ^ (-1)) >>> 0).toString(16);
+    // };
+
+    function makeRandomHexString()
+    {
+        var text = "";
+        var possible = "1234567890abcdef";
+        for( var i=0; i < 17; i++ )
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+        return text;
+    }
+
+
+    var request_url = '/v1/users/verify-number';
+    var request_phone = '+77476944868';
+    var request_body = 'method:sms;phone_number:+77476944868;code:282425';
+    var secret = 'xg74JjM1j5200vK';
+
+    var apiKey = SparkMD5.hash(request_url + '::body::' + CRC32.str (request_body) + '::key::' + secret + '::phone_number::' + request_phone).toString(CryptoJS.enc.Hex) + makeRandomHexString();
+
+    console.log(apiKey);
+    console.log(encodeURIComponent(request_phone));
+
+</script>
+</body>
+</html>

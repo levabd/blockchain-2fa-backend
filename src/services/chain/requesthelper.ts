@@ -2,10 +2,9 @@ import { Log } from 'hlf-node-utils';
 import { Component } from '@nestjs/common';
 import { HlfClient } from './hlfclient';
 import { QueuePusherService } from '../queue/queuepusher.service';
-import { ChainMethod } from '../../routes/chainmethods.enum';
-import { InvokeResult } from '../../routes/invokeresult.model';
 import { EnvConfig } from '../../config/env';
-import { WebSocketService } from '../events/websocket.service';
+// import { WebSocketService } from '../events/websocket.service';
+import {InvokeResult} from '../../modules/api/routes/invokeresult.model';
 
 @Component()
 export class RequestHelper {
@@ -14,13 +13,13 @@ export class RequestHelper {
 
     /**
      * Creates an instance of RequestHelper.
-     * @param {HlfClient} hlfClient 
-     * @param {QueuePusherService} queuePusherService 
+     * @param {HlfClient} hlfClient
+     * @param {QueuePusherService} queuePusherService
      * @memberof RequestHelper
      */
     constructor(
         private hlfClient: HlfClient,
-        private webSocketService: WebSocketService,
+        // private webSocketService: WebSocketService,
         private queuePusherService: QueuePusherService) { }
 
     /**
@@ -32,17 +31,17 @@ export class RequestHelper {
      * @returns {Promise<InvokeResult>} 
      * @memberof RequestHelper
      */
-    public invokeRequest(chainMethod: ChainMethod, params: string[], userId: string): Promise<InvokeResult | any> {
+    public invokeRequest(chainMethod: string, params: string[], userId: string): Promise<InvokeResult | any> {
         if (EnvConfig.BYPASS_QUEUE) {
             return this.hlfClient.invoke(chainMethod, params)
                 .then((response) => {
                     Log.hlf.debug('Invoke successfully executed: ', response);
-                    this.webSocketService.triggerSuccess(userId, chainMethod, params);
+                    // this.webSocketService.triggerSuccess(userId, chainMethod, params);
                     return Promise.resolve({ txHash: response });
                 })
                 .catch(error => {
                     Log.hlf.error(`${chainMethod}`, error);
-                    this.webSocketService.triggerError(userId, chainMethod, params);
+                    // this.webSocketService.triggerError(userId, chainMethod, params);
                     return Promise.reject(error);
                 });
         } else {
@@ -61,13 +60,14 @@ export class RequestHelper {
     /**
      * Query hlf chain and return response
      * 
-     * @param {ChainMethod} chainMethod 
+     * @param {string} chainMethod
      * @param {string[]} params 
-     * @returns {Promise<any>} 
+     * @param chaincodeId
+     * @returns {Promise<any>}
      * @memberof RequestHelper
      */
-    public queryRequest(chainMethod: ChainMethod, params: string[]): Promise<any> {
-        return this.hlfClient.query(chainMethod, params)
+    public queryRequest(chainMethod: string, params: string[], chaincodeId :string): Promise<any> {
+        return this.hlfClient.query(chainMethod, params, chaincodeId)
             .then((response) => {
                 // Log.hlf.debug('Query successfully executed: ', response);
                 return Promise.resolve(response);
