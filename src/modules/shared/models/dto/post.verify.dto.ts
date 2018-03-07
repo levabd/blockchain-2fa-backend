@@ -1,14 +1,9 @@
 import {ApiModelProperty} from '@nestjs/swagger';
+import {PostCodeDTO} from './post.code.dto';
 
-export class PostVerifyDTO {
+export class PostVerifyCodeDTO extends PostCodeDTO{
     @ApiModelProperty()
-    readonly code: string;
-    // noinspection TsLint
+    readonly code: number;
     @ApiModelProperty()
-    readonly phone_number: string;
-    @ApiModelProperty()
-    service: string;
-    // noinspection TsLint
-    @ApiModelProperty()
-    readonly push_token: string;
+    readonly remember: boolean;
 }

@@ -1,6 +1,8 @@
 import {Controller, Get, Post, Req, Res} from '@nestjs/common';
 import {Log} from 'hlf-node-utils';
+import {ApiUseTags} from '@nestjs/swagger';
 
+@ApiUseTags('v1/web')
 @Controller('v1/web')
 export class HomeController {
 

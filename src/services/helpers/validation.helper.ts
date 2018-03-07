@@ -1,4 +1,5 @@
 import {Log} from 'hlf-node-utils';
+import * as  changeCase from 'change-case';
 
 /***
  * Validator class
@@ -6,18 +7,18 @@ import {Log} from 'hlf-node-utils';
 export class Validator {
 
     private errors = {};
+    private dataTransformed = {};
     private RULE_VALUE_DELIMITER = ',';
     private RULE_VERSUS_VALUE_DELIMITER = ':';
     private RULES_DELIMITER = '|';
 
     constructor(private data?: any, private rules?: any, private messages?: any) {
         const fieldsToHandle = Object.keys(this.data);
+        for (let f of fieldsToHandle) {
+            this.dataTransformed[changeCase.snakeCase(f)] = this.data[f];
+        }
 
         Object.keys(this.rules).forEach(fieldNameToCheck => {
-            if (fieldsToHandle.indexOf(fieldNameToCheck) === -1) {
-                Log.app.warn(`Validator@constructor: Try to use rule name: ${fieldNameToCheck}, but it does not exists in body`);
-                return;
-            }
             const fieldRules = this.rules[fieldNameToCheck].split(this.RULES_DELIMITER);
             for (const rule of fieldRules) {
                 try {
@@ -32,7 +33,11 @@ export class Validator {
                     // in, max lenght, date, requiredIfNot
                     if (splitted.length) {
                         const funcName = this.capitalizeFirstLetter(splitted.shift());
-                        this[`check${funcName}`](fieldNameToCheck, splitted);
+                        try {
+                            this[`check${funcName}`](fieldNameToCheck, splitted);
+                        } catch (E) {
+                            Log.app.warn(`Validator@constructor: funcName`, funcName, fieldNameToCheck);
+                        }
                         continue;
                     }
 
@@ -40,7 +45,7 @@ export class Validator {
                     this['check' + this.capitalizeFirstLetter(splitted[0])](fieldNameToCheck);
 
                 } catch (e) {
-                    Log.app.warn(`Validator@constructor: validation type is not suported`, e);
+                    Log.app.warn(`Validator@constructor: validation type is not supported`, e);
                 }
             }
         });
@@ -58,54 +63,72 @@ export class Validator {
         return !this.isEmpty();
     }
 
-    addError(fieldName: string, mesage: string, checkType: string): void {
+    addError(fieldName: string, mesage: string, checkType?: string): void {
         if (!this.errors[fieldName]) {
             this.errors[fieldName] = [];
         }
 
-        const checkMessage = this.messages[`${fieldName}.${checkType}`];
+        let checkMessage;
+        if (checkType && this.messages) {
+            checkMessage = this.messages[`${fieldName}.${checkType}`];
+        }
 
         this.errors[fieldName].push(checkMessage || mesage);
     }
 
     // noinspection TsLint
     private checkRequired(field: string): void {
-        if (!this.data[field] || this.data[field] === '') {
+        if (!this.dataTransformed[field] || this.dataTransformed[field] === '') {
             this.addError(field, `The field '${field}' is required.`, 'required');
         }
     }
 
     // noinspection TsLint
+    private checkBoolean(field: string): void {
+        if (typeof(this.dataTransformed[field]) == typeof(true)) {
+            this.addError(field, `The field '${field}' must be a boolean.`, 'number');
+        }
+    }
+
+    // noinspection TsLint
     private checkIn(field: string, list: string): void {
-        if (list[0].split(this.RULE_VALUE_DELIMITER).indexOf(this.data[field]) === -1) {
+        if (list[0].split(this.RULE_VALUE_DELIMITER).indexOf(this.dataTransformed[field]) === -1) {
             this.addError(field, `The field '${field}' must be one of the: ${list}.`, 'in');
         }
     }
 
     // noinspection TsLint
     private checkMaxStringLength(field: string, value: string): void {
-        if (this.data[field].length >= parseInt(value, 10)) {
+        if (this.dataTransformed[field].length >= parseInt(value, 10)) {
+            this.addError(field, `The field '${field}' must be less than: ${value[0]}.`, 'maxStringLength');
+        }
+    }
+
+    // noinspection TsLint
+    private checkMaxNumber(field: string, value: string): void {
+        if (parseInt(this.dataTransformed[field], 10) >= parseInt(value[0], 10)) {
             this.addError(field, `The field '${field}' must be less than: ${value[0]}.`, 'maxStringLength');
         }
     }
 
     // noinspection TsLint
     private checkNumber(field: string): void {
-        if (typeof this.data[field] !== 'number') {
+        if (typeof this.dataTransformed[field] !== 'number') {
             this.addError(field, `The field '${field}' must be a number.`, 'number');
         }
     }
 
     // noinspection TsLint
     private checkString(field: string): void {
-        if (typeof this.data[field] !== 'string') {
+        if (typeof this.dataTransformed[field] !== 'string') {
             this.addError(field, `The field '${field}' must be a string.`, 'string');
         }
     }
 
+    // todo add format checking
     // noinspection TsLint
-    private checkDate(field: string, format: string) {
-        if (!this.isValidDate(this.data[field])) {
+    private checkDate(field: string) {
+        if (!this.isValidDate(this.dataTransformed[field])) {
             this.addError(field, `The field '${field}' must be a valid date format: MM/DD/YYYY.`, 'date');
         }
     }
@@ -117,17 +140,34 @@ export class Validator {
 
     // noinspection TsLint
     private checkRegex(field: string, pattern: RegExp): void {
-        const found =  this.data[field].match(pattern);
+        if (!this.dataTransformed[field]) {
+            return;
+        }
+
+        const found = this.dataTransformed[field].match(pattern);
         if (!found) {
             this.addError(field, `The '${field}' format is invalid.`, 'regex');
         }
     }
 
     // noinspection TsLint
-    private checkRequiredIfNot(field: string, dependField: string[]): void {
-        if (!this.data[dependField[0]]) {
-            if (!this.data[field]) {
-                this.addError(field, `The field '${field}' is required when ${dependField[0]} is empty.`, 'requiredIfNot');
+    private checkRequiredIfNot(field: string, dependFields: string[]): void {
+        for (const dependField of  dependFields) {
+            if (!this.dataTransformed[dependField]) {
+                if (!this.dataTransformed[field]) {
+                    this.addError(field, `The field '${field}' is required when ${dependField} is empty.`, 'requiredIfNot');
+                }
+            }
+        }
+    }
+
+    // noinspection TsLint
+    private checkRequiredIf(field: string, dependFields: string[]): void {
+        for (const dependField of  dependFields) {
+            if (this.dataTransformed[dependField]) {
+                if (!this.dataTransformed[dependField]) {
+                    this.addError(field, `The field '${field}' is required when '${dependField}' is not empty.`, 'requiredIf');
+                }
             }
         }
     }

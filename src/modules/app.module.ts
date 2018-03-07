@@ -7,11 +7,8 @@ import {NestModule} from '@nestjs/common/interfaces';
 import * as path from 'path';
 
 import {CodeQueueListenerService} from '../services/code_sender/queue.service';
-import {LoggerMiddleware} from './api/middleware/logger.middleware';
-import {ApiKeyCheckerMiddleware} from './api/middleware/api.key.checker.middleware';
 import {WebModule} from './web/web.module';
 import {ApiModule} from './api/api.module';
-import {UserController as ApiUserController} from './api/controllsers/users/user.controller';
 import {SharedModule} from './shared/shared.module';
 
 @Module({
@@ -70,7 +67,6 @@ export class ApplicationModule implements NestModule {
      * @memberof ApplicationModule
      */
     configure(consumer: MiddlewaresConsumer): void {
-        // consumer.apply(LoggerMiddleware).forRoutes(ApiUserController);
-        // consumer.apply(ApiKeyCheckerMiddleware).forRoutes(ApiUserController);
+
     }
 }

@@ -7,6 +7,7 @@ import {SwaggerModule, DocumentBuilder} from '@nestjs/swagger';
 import * as express from 'express';
 import * as path from 'path';
 import * as bodyParser from 'body-parser';
+import {AppExceptionFilter} from './modules/shared/filters/app.exception.filter';
 
 async function bootstrap() {
 
@@ -21,6 +22,7 @@ async function bootstrap() {
         res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
         next();
     });
+    app.useGlobalFilters(new AppExceptionFilter());
 
     /**
      * Swagger implementation
@@ -41,6 +43,7 @@ async function bootstrap() {
     app.use(express.static(__dirname + '/modules/web/public'));
     app.set('views', __dirname + '/modules/web/views');
     app.set('view engine', 'pug');
+
 
     /**
      * Start Chainservice API
