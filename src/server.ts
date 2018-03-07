@@ -33,15 +33,14 @@ async function bootstrap() {
         .build();
 
     const document = SwaggerModule.createDocument(app, options);
-    SwaggerModule.setup('/api-wsg', app, document);
+    SwaggerModule.setup('/api-swg', app, document);
 
     /**
      *  Set up static files
      */
-    app.use(express.static(path.join(__dirname, 'public')));
+    app.use(express.static(__dirname + '/modules/web/public'));
     app.set('views', __dirname + '/modules/web/views');
     app.set('view engine', 'pug');
-    app.use(express.static(__dirname + '/modules/web/public'));
 
     /**
      * Start Chainservice API

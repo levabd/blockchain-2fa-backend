@@ -5,7 +5,7 @@ import { Log, Utils } from 'hlf-node-utils';
 import { SQS, AWSError } from 'aws-sdk';
 import * as ObjectHash from 'object-hash';
 import { MessageBody } from './messagebody.model';
-import {InvokeResult} from '../../modules/api/routes/invokeresult.model';
+import {InvokeResult} from '../../modules/api/controllsers/invokeresult.model';
 
 @Component()
 export class QueuePusherService {

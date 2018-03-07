@@ -4,7 +4,7 @@ import { HlfClient } from './hlfclient';
 import { QueuePusherService } from '../queue/queuepusher.service';
 import { EnvConfig } from '../../config/env';
 // import { WebSocketService } from '../events/websocket.service';
-import {InvokeResult} from '../../modules/api/routes/invokeresult.model';
+import {InvokeResult} from '../../modules/api/controllsers/invokeresult.model';
 
 @Component()
 export class RequestHelper {

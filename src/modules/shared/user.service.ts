@@ -4,7 +4,8 @@ import {RequestHelper} from '../../services/chain/requesthelper';
 import {TwoFACCMethods} from './models/chaincode/twofa/chaincode.methods.enum';
 import {TwoFaUser} from './models/chaincode/twofa/user.model';
 import {EnvConfig} from '../../config/env';
-import {InvokeResult} from '../api/routes/invokeresult.model';
+import {InvokeResult} from '../api/controllsers/invokeresult.model';
+import {Log} from 'hlf-node-utils';
 
 @Component()
 export class TwoFaUserService {
@@ -24,6 +25,7 @@ export class TwoFaUserService {
      * @param phoneNumber
      */
     queryUser(phoneNumber: string): Promise<TwoFaUser> {
+        Log.app.debug('phoneNumber', phoneNumber);
         // this is a query, query chaincode directly
         return this.requestHelper.queryRequest(TwoFACCMethods.queryUser, [phoneNumber], EnvConfig.TWOFA_CHAINCODE)
             .then(result => {

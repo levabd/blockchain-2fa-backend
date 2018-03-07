@@ -1,15 +1,15 @@
-extends ../layout
+extends ../layouts/main
 
 block content
-  form.form-signin(_lpchecked='1', method='POST', action='register')
+  form.form-signin(_lpchecked='1', method='POST', action='v1/web/users/register')
     .text-center.mb-4
       img.mb-4(src='https://docs.opnsense.org/_images/two_factor_authentication.png', alt='', width='300')
       h1.h3.mb-3.font-weight-normal 2FA Registration
     .form-label-group
-      input#phoneNumber.form-control(type='text', name='phoneNumber', placeholder='Номер телефона', required='', autofocus='', autocomplete='off')
+      input#phoneNumber.form-control(type='text', name='phone_number', placeholder='Номер телефона', required='', autofocus='', autocomplete='off')
       label(for='phoneNumber') Номер телефона
     .form-label-group
-      input#inputName.form-control(type='text', name='inputName', placeholder='Фамилия Имя Отчество', required='', autofocus='', autocomplete='off')
+      input#inputName.form-control(type='text', name='name', placeholder='Фамилия Имя Отчество', required='', autofocus='', autocomplete='off')
       label(for='inputName') Имя
     .form-label-group
       input#inputService.form-control(type='hidden', name='inputService', value='kazahtelecom')

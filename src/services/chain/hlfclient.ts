@@ -87,6 +87,8 @@ export class HlfClient extends ChainService {
      * @memberof HlfClient
      */
     query(chainMethod: string, params: string[], chaincodeId = 'fabcar'): Promise<any> {
+
+        Log.app.info('query', [chainMethod, params, chaincodeId]);
         return this.newQuery(chainMethod, params, chaincodeId)
             .then((queryResponses: Buffer[]) => {
                 return Promise.resolve(this.getQueryResponse(queryResponses));
