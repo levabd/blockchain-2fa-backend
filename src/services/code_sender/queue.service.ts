@@ -4,6 +4,7 @@ import {Log} from 'hlf-node-utils';
 import * as Queue from 'bull';
 import * as request from 'request-promise-native';
 import {Services} from './services';
+import * as gcm from 'node-gcm';
 
 @Component()
 export class CodeQueueListenerService {
@@ -114,11 +115,31 @@ export class CodeQueueListenerService {
      * @memberof CodeQueueListenerService
      */
     private processPUSHJob(job, done): void {
-        {
-            // job.data contains the custom data passed when the job was created
-            // job.id contains id of this job.
-            Log.config.info(`processPUSHJob`, job.data);
-            done();
+
+        const fcm = new gcm.Sender(EnvConfig.FIREBASE_CLOUD_KEY);
+
+        if (!job.data.title || !job.data.message) {
+            Log.app.warn(`CodeQueueListenerService@processPUSHJob: Can not send push notification- not title or message provided.`);
+            return;
         }
+
+        if (!job.data.push_token) {
+            Log.app.warn(`CodeQueueListenerService@processPUSHJob: Can not send push notification- not push_token provided.`);
+            return;
+        }
+        let message = new gcm.Message({
+            notification: {
+                title: job.data.title,
+                icon: '2FA',
+                body: job.data.message
+            },
+        });
+
+        fcm.sendNoRetry(message, [job.data.push_token], (err, response) => {
+            Log.app.info(`CodeQueueListenerService@processPUSHJob@sendNoRetry: Firebase response`, [err, response]);
+        });
+
+        Log.config.info(`CodeQueueListenerService@processPUSHJob: processed`);
+        done();
     }
 }

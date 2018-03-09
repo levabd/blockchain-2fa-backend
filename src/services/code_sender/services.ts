@@ -1,3 +1,3 @@
 export const Services = {
-    kazahtelecom: 'Казахелеком'
+    kazakhtelecom: 'Казахелеком'
 };

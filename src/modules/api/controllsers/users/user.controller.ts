@@ -14,6 +14,7 @@ import {TwoFaUserService} from '../../../shared/user.service';
 import {PostUserDTO} from '../../../shared/models/dto/post.user.dto';
 import {PostCodeDTO} from '../../../shared/models/dto/post.code.dto';
 import {PostVerifyCodeDTO} from '../../../shared/models/dto/post.verify.dto';
+import {Services} from '../../../../services/code_sender/services';
 
 @ApiUseTags('v1/api/users')
 @Controller('v1/api/users')
@@ -178,6 +179,14 @@ export class UserController {
             return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json(v.getErrors());
         }
 
+        const code = this.genCode();
+        this.codeQueueListenerService.queuePUSH.add({
+            push_token: body.push_token,
+            message: 'Проверка',
+            title: `Подтвердите вход на сервис '${Services['kazakhtelecom']}'`,
+            code: code,
+        });
+
         if (body.embeded) {
             return res.status(HttpStatus.OK).json({
                 'name': 'Гвендолин',                    // Имя пользователя
@@ -246,12 +255,11 @@ export class UserController {
 
     private sendSMS(phoneNumber: string, service: string): number {
         const code = this.genCode();
-        this.codeQueueListenerService.queueSMS.add(
-            {
-                phone_number: phoneNumber,
-                service: service ? service : 'kazahtelecom',
-                code: code,
-            });
+        this.codeQueueListenerService.queueSMS.add({
+            phone_number: phoneNumber,
+            service: service ? service : 'kazahtelecom',
+            code: code,
+        });
 
         return code;
     }
@@ -259,7 +267,6 @@ export class UserController {
     private genCode(): number {
         // todo check code length
         const code = Math.floor(Math.random() * 999999);
-        Log.app.info(`Code sent: `, code);
         return code;
     }
 

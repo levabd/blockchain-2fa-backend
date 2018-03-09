@@ -50,8 +50,7 @@ export class UserController {
     }
 
     @Post('register')
-    async postRegister(@Body() body,
-                 @Res() res,
+    async postRegister(@Body() body, @Res() res,
                  @Query('phone_number') phoneNumber: string,
                  @Query('service') service?: string): Promise<any[]> {
 
@@ -114,7 +113,6 @@ export class UserController {
     private getCode(): number {
         // todo check code length
         const code = Math.floor(Math.random() * 999999);
-        Log.app.info(`Code sent: `, code);
         return code;
     }
 

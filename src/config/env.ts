@@ -59,5 +59,6 @@ export class EnvConfig {
     public static KAZTEL_CHANNEL = process.env['KAZTEL_CHANNEL'];
     public static KAZTEL_CHAINCODE = process.env['KAZTEL_CHAINCODE'];
 
-    public static GOOGLE_API_KEY = process.env['GOOGLE_API_KEY'];
+    public static FIREBASE_CLOUD_KEY = process.env['FIREBASE_CLOUD_KEY'];
+    public static FIREBASE_CLOUD_ID = process.env['FIREBASE_CLOUD_ID'];
 }

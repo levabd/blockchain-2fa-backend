@@ -11,6 +11,9 @@ export class PostCodeDTO {
     readonly phone_number: string;
     // noinspection TsLint
     @ApiModelProperty()
+    readonly push_token: string;
+    // noinspection TsLint
+    @ApiModelProperty()
     readonly embeded: boolean;
     // noinspection TsLint
     @ApiModelProperty()
