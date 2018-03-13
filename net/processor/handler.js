@@ -31,8 +31,6 @@ const MAX_NAME_LENGTH = 20
 const INT_KEY_FAMILY = 'tfa'
 const _hash = (x) => crypto.createHash('sha512').update(x).digest('hex').toLowerCase()
 const INT_KEY_NAMESPACE = _hash(INT_KEY_FAMILY).substring(0, 6)
-const encode = obj => Buffer.from(JSON.stringify(obj, Object.keys(obj).sort()))
-const decode = buf => JSON.parse(buf.toString())
 
 const _decodeCbor = (buffer) => new Promise((resolve, reject) =>
     cbor.decodeFirst(buffer, (err, obj) => (err ? reject(err) : resolve(obj)))
@@ -45,7 +43,7 @@ const _toInternalError = (err) => {
 
 const _setEntry = (context, address, stateValue) => {
     let entries = {
-        [address]: encode(stateValue)
+        [address]: cbor.encode(stateValue)
     }
     return context.setState(entries)
 }
@@ -56,12 +54,12 @@ const _applyRegister = (context, address, user) => (possibleAddressValues) => {
     let stateValueRep = possibleAddressValues[address]
     let stateValue;
     if (stateValueRep && stateValueRep.length > 0) {
-        stateValue = decode(stateValueRep)
+        stateValue = cbor.decode(stateValueRep)
     }
 
     // 'set' passes checks so store it in the state
     if (stateValue){
-        cosole.log(`User with uin ${user.Uin} and phone number ${user.PhoneNumber} already in state`)
+        console.log(`User with uin ${user.Uin} and phone number ${user.PhoneNumber} already in state`)
     }
 
     if (!stateValue) {
@@ -82,8 +80,6 @@ class IntegerKeyHandler extends TransactionHandler {
         return _decodeCbor(transactionProcessRequest.payload)
             .catch(_toInternalError)
             .then((data) => {
-                console.log(data);
-
                 let action = data.Verb
                 if (!action) {
                     throw new InvalidTransaction('Verb is required')
@@ -134,7 +130,10 @@ class IntegerKeyHandler extends TransactionHandler {
                     throw new InvalidTransaction(`Verb must be set, inc, dec not ${action}`)
                 }
 
-                let address = INT_KEY_NAMESPACE + _hash(uin + phoneNumber).slice(-64)
+                const uinPart = _hash(uin.toString()).slice(-32)
+                const phoneNumberPart = _hash(phoneNumber.toString()).slice(-32)
+
+                let address = INT_KEY_NAMESPACE + uinPart + phoneNumberPart
 
                 // Get the current state, for the key's address:
                 let getPromise = context.getState([address])
@@ -149,7 +148,7 @@ class IntegerKeyHandler extends TransactionHandler {
                     if (addresses.length === 0) {
                         throw new InternalError('State Error!')
                     }
-                    console.log(data.User)
+                    console.log(`Write user with name: ${data.User.Name}`)
                 })
             });
     }

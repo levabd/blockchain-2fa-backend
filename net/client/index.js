@@ -12,11 +12,11 @@ const FAMILY_NAMESPACE = _hash(FAMILY_NAME).substring(0, 6)
 const FAMILY_VERSION = '0.1';
 
 const payload = {
-    Verb: 'register', // update | delete
+    Verb: 'register', // register | update | delete
     User: {
-        PhoneNumber: '77056564072',
+        PhoneNumber: '77056564077',
         Uin: 125468416843,
-        Name: 'Peshkov Maxim',
+        Name: 'Peshkov Maxim 4',
         IsVerified: false,
         Email: 'ss@ee.ru',
         Sex: 'male',
@@ -30,8 +30,9 @@ const uinPart = _hash(payload.User.Uin.toString()).slice(-32)
 const phoneNumberPart = _hash(payload.User.PhoneNumber.toString()).slice(-32)
 
 
-let address = FAMILY_NAMESPACE + uinPart + phoneNumberPart
-console.log('address', address)
+// let address = FAMILY_NAMESPACE + _hash(payload.User.Uin +payload.User.PhoneNumber).slice(-64)
+let address = FAMILY_NAMESPACE + uinPart+ phoneNumberPart
+console.log(address);
 const payloadBytes = cbor.encode(payload)
 
 const {createHash} = require('crypto')

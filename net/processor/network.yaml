@@ -75,3 +75,8 @@ services:
         sawtooth keygen && \
         tail -f /dev/null \
         \""
+  redis:
+    container_name: redis
+    image: redis
+    ports:
+      - 6379:6379

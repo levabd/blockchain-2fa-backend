@@ -17,15 +17,28 @@ const encode = obj => Buffer.from(JSON.stringify(obj, Object.keys(obj).sort()))
 const decode = buf => JSON.parse(buf.toString())
 
 request.get({
-    url: 'http://127.0.0.1:8008/state/5f1db925cbeba3d87aca57d579994ad2baf4a77e83939da422093fa8547bcfefb972e0',
+    url: 'http://127.0.0.1:8008/state/5f1db9a2994afba4dc92ff982ed1e9c269416affbefef4e8a13b3dbbdcd2dbfe5a9e38',
     headers: {'Content-Type': 'application/octet-stream'}
 }, (err, response) => {
     if (err) return console.log(err)
-   
+
     var dataBase64 = JSON.parse(response.body).data
-    const buffer = new Buffer(dataBase64, 'base64')
-    const decoded = decode(buffer);
-    console.log(decoded);
+    console.log(dataBase64);
+
+    console.log(cbor.decode(new Buffer(dataBase64, 'base64')));
 });
+
+request.get({
+    url: 'http://127.0.0.1:8008/transactions',
+    headers: {'Content-Type': 'application/octet-stream'}
+}, (err, response) => {
+    if (err) return console.log(err)
+
+    var dataBase64 = JSON.parse(response.body).data[0].payload
+
+    console.log(cbor.decode(new Buffer(dataBase64, 'base64')));
+});
+
+
 
 
