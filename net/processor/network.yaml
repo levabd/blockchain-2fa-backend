@@ -15,32 +15,26 @@
 
 version: "2.1"
 
+networks:
+  public:
+  private:
+
 services:
+
+# public net - all private data
 
   settings-tp:
     image: hyperledger/sawtooth-settings-tp:1.0
-    container_name: sawtooth-settings-tp-default
+    container_name: sawtooth-settings-tp-public
     depends_on:
       - validator
     entrypoint: settings-tp -vv -C tcp://validator:4004
-
-  # intkey-tp-python:
-  #   image: hyperledger/sawtooth-intkey-tp-python:1.0
-  #   container_name: sawtooth-intkey-tp-python-default
-  #   depends_on:
-  #     - validator
-  #   entrypoint: intkey-tp-python -vv -C tcp://validator:4004
-
-  # xo-tp-python:
-  #   image: hyperledger/sawtooth-xo-tp-python:1.0
-  #   container_name: sawtooth-xo-tp-python-default
-  #   depends_on:
-  #     - validator
-  #   entrypoint: xo-tp-python -vv -C tcp://validator:4004
+    networks:
+      - public
 
   validator:
     image: hyperledger/sawtooth-validator:1.0
-    container_name: sawtooth-validator-default
+    container_name: sawtooth-validator-public
     expose:
       - 4004
     ports:
@@ -56,27 +50,30 @@ services:
           --bind component:tcp://eth0:4004 \
           --bind network:tcp://eth0:8800 \
         \""
+    networks:
+      - public
 
   rest-api:
     image: hyperledger/sawtooth-rest-api:1.0
-    container_name: sawtooth-rest-api-default
+    container_name: sawtooth-rest-api-public
     ports:
       - "8008:8008"
     depends_on:
       - validator
     entrypoint: sawtooth-rest-api -C tcp://validator:4004 --bind rest-api:8008
+    networks:
+      - public
 
   shell:
     image: hyperledger/sawtooth-all:1.0
-    container_name: sawtooth-shell-default
+    container_name: sawtooth-shell-public
     depends_on:
       - rest-api
     entrypoint: "bash -c \"\
         sawtooth keygen && \
         tail -f /dev/null \
         \""
-  redis:
-    container_name: redis
-    image: redis
-    ports:
-      - 6379:6379
+    networks:
+      - public
+
+
