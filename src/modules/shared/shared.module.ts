@@ -1,26 +1,24 @@
 import { Module } from '@nestjs/common';
 import {TimeHelper} from '../../services/helpers/time.helper';
 import {ClientService} from '../../config/services/services';
-import {ChainModule} from './chain.module';
-import {QueueModule} from './queue.module';
-import {TwoFaUserService} from './user.service';
+import {TfaTransactionFamily} from './families/tfa.transaction.family';
+import {CodeQueueListenerService} from '../../services/code_sender/queue.service';
+import {ChainService} from '../../services/sawtooth/chain.service';
 
 @Module({
     components:[
         ClientService,
-        TwoFaUserService,
+        TfaTransactionFamily,
+        CodeQueueListenerService,
+        ChainService,
         TimeHelper,
-    ],
-    imports: [
-        ChainModule,
-        QueueModule,
     ],
     exports:[
         ClientService,
-        TwoFaUserService,
-        TimeHelper,
-        ChainModule,
-        QueueModule,
+        TfaTransactionFamily,
+        CodeQueueListenerService,
+        ChainService,
+        TimeHelper
     ]
 })
 export class SharedModule {}

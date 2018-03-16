@@ -1,4 +1,4 @@
-import {Body, Controller, Get, HttpStatus, Post, Put, Query, Req, Res} from '@nestjs/common';
+import {Body, Controller, Get, HttpStatus, Post, Query, Req, Res} from '@nestjs/common';
 import {ApiUseTags} from '@nestjs/swagger';
 
 import {Log} from 'hlf-node-utils';
@@ -10,11 +10,11 @@ import {ClientService} from '../../../../config/services/services';
 import {TimeHelper} from '../../../../services/helpers/time.helper';
 import {Validator} from '../../../../services/helpers/validation.helper';
 import {TwoFaUser} from '../../../shared/models/chaincode/twofa/user.model';
-import {TwoFaUserService} from '../../../shared/user.service';
 import {PostUserDTO} from '../../../shared/models/dto/post.user.dto';
 import {PostCodeDTO} from '../../../shared/models/dto/post.code.dto';
 import {PostVerifyCodeDTO} from '../../../shared/models/dto/post.verify.dto';
 import {Services} from '../../../../services/code_sender/services';
+import {TfaTransactionFamily, User} from '../../../shared/families/tfa.transaction.family';
 
 @ApiUseTags('v1/api/users')
 @Controller('v1/api/users')
@@ -25,12 +25,12 @@ export class UserController {
      * Creates an instance of CarController.
      * @memberof CarController
      * @param timeHelper
-     * @param twofaService
+     * @param tfaTF
      * @param services
      * @param codeQueueListenerService
      */
     constructor(private timeHelper: TimeHelper,
-                private twofaService: TwoFaUserService,
+                private tfaTF: TfaTransactionFamily,
                 private services: ClientService,
                 private codeQueueListenerService: CodeQueueListenerService) {
         Promisefy.promisifyAll(redis);
@@ -43,41 +43,56 @@ export class UserController {
         let v = new Validator(userDto, {
             name: 'required|string',
             phone_number: 'required|string|regex:/^\\+?[1-9]\\d{1,14}$/',
-            service: 'required|in:kazakhtelecom',
+            service: 'required|in:kazakhtelecom,egov',
             client_timestamp: 'required|number',
             uin: 'nullable|number|maxNumber:1000000000000',
             sex: 'nullable|string|in:male,female',
-            birthdate: 'nullable|date',
+            email: 'nullable|string',
+            birthdate: 'nullable',
             method: 'required|in:sms,telegram,whatsapp',
         }, {'service.in': `No service with name: ${userDto.Service}`});
 
         if (v.fails()) {
             return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json(v.getErrors());
         }
+
+        let user = new User();
+
+        user.Name = userDto.Name;
+        user.PhoneNumber = userDto.PhoneNumber;
+        user.Uin = userDto.Uin;
+        user.Birthdate = userDto.Birthdate;
+        user.Email = userDto.Email;
+        user.Sex = userDto.Sex;
+        user.Name = userDto.Name;
+        user.PushToken = '';
+
+        this.tfaTF.register(user);
 
         return res.status(HttpStatus.OK).json({status: `success`});
     }
 
-    @Put()
-    putUser(@Res() res, @Body() userDto: PostUserDTO): void {
-
-        let v = new Validator(userDto, {
-            name: 'required|string',
-            phone_number: 'required|string|regex:/^\\+?[1-9]\\d{1,14}$/',
-            service: 'required|in:kazakhtelecom',
-            client_timestamp: 'required|number',
-            uin: 'nullable|number|maxNumber:1000000000000',
-            sex: 'nullable|string|in:male,female',
-            birthdate: 'nullable|date',
-            method: 'required|in:sms,telegram,whatsapp',
-        }, {'service.in': `No service with name: ${userDto.Service}`});
-
-        if (v.fails()) {
-            return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json(v.getErrors());
-        }
-
-        res.render('kazahtelecom/index', {message: 'Hello world!'});
-    }
+    //
+    // @Put()
+    // putUser(@Res() res, @Body() userDto: PostUserDTO): void {
+    //
+    //     let v = new Validator(userDto, {
+    //         name: 'required|string',
+    //         phone_number: 'required|string|regex:/^\\+?[1-9]\\d{1,14}$/',
+    //         service: 'required|in:kazakhtelecom',
+    //         client_timestamp: 'required|number',
+    //         uin: 'nullable|number|maxNumber:1000000000000',
+    //         sex: 'nullable|string|in:male,female',
+    //         birthdate: 'nullable|date',
+    //         method: 'required|in:sms,telegram,whatsapp',
+    //     }, {'service.in': `No service with name: ${userDto.Service}`});
+    //
+    //     if (v.fails()) {
+    //         return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json(v.getErrors());
+    //     }
+    //
+    //     res.render('kazahtelecom/index', {message: 'Hello world!'});
+    // }
 
     @Get('verify-number')
     async sendUserCode(@Res() res, @Query('phone_number') phoneNumber: string, @Query('service') service?: string): Promise<any[]> {
@@ -87,7 +102,7 @@ export class UserController {
             service: service
         }, {
             phone_number: 'required|string|regex:/^\\+?[1-9]\\d{1,14}$/',
-            service: 'required|string|in:kazakhtelecom',
+            service: 'required|string|in:kazakhtelecom,egov',
         }, {'service.in': `No service with name: ${service}`});
 
         if (v.fails()) {
@@ -98,7 +113,7 @@ export class UserController {
         // '77053234005'
         let HFUser = new TwoFaUser('', '');
         try {
-            HFUser = await this.twofaService.queryUser(phoneNumber);
+            // HFUser = await this.twofaService.queryUser(phoneNumber);
             // const o:any = await this.twofaService.queryUser(phoneNumber);
             Log.app.error(`HFUser`, HFUser);
 
@@ -131,7 +146,7 @@ export class UserController {
     async verifyNumber(@Res() res, @Body() body: PostVerifyNumberDTO): Promise<any[]> {
         let v = new Validator(body, {
             phone_number: 'required|string|regex:/^\\+?[1-9]\\d{1,14}$/',
-            service: 'requiredIfNot:push_token|string|in:kazakhtelecom',
+            service: 'requiredIfNot:push_token|string|in:kazakhtelecom,egov',
             push_token: 'nullable|string',
             code: 'required|number',
         }, {
@@ -148,9 +163,9 @@ export class UserController {
 
         // vallidate if user exists
         // '77053234005'
-        let HFUser = new TwoFaUser('', '');
+        // let HFUser = new TwoFaUser('', '');
         try {
-            HFUser = await this.twofaService.queryUser(body.phone_number);
+            // HFUser = await this.twofaService.queryUser(body.phone_number);
         } catch (e) {
             Log.app.error(`Error while getting user`, e);
             return res.status(HttpStatus.NOT_FOUND).json({error: 'User not found.'});
@@ -168,9 +183,8 @@ export class UserController {
         let v = new Validator(body, {
             phone_number: 'required|string|regex:/^\\+?[1-9]\\d{1,14}$/',
             service: 'requiredIfNot:push_token|string|in:kazakhtelecom',
-            push_token: 'nullable|string',
             event: 'required|string',
-            embeded: 'required|boolean',
+            embeded: 'boolean',
             client_timestamp: 'required|number',
             cert: 'nullable',
         }, {'service.in': `No service with name: ${body.service}`});
@@ -237,8 +251,8 @@ export class UserController {
             service: 'string|in:kazakhtelecom',
             event: 'required|string',
             code: 'required|number',
-            embeded: 'required|boolean',
-            remember: 'required|boolean',
+            embeded: 'boolean',
+            remember: 'boolean',
             client_timestamp: 'required|number',
             cert: 'nullable',
         }, {'service.in': `No service with name: ${body.service}`});

@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import {_hash} from '../services/helpers/helpers';
 
 export interface ProcessEnv {
     [key: string]: string | undefined;
@@ -16,6 +17,7 @@ export class EnvConfig {
     // NODE
     public static NODE_ENV = process.env['NODE_ENV'] || 'LOCAL';
     public static API_KEY = process.env['API_KEY'] || 'sgdfhdmgdkfgjk';
+    public static API_PATH = process.env['API_PATH'];
     public static PORT = process.env['PORT'] || 4001;
 
     // AWS
@@ -60,5 +62,13 @@ export class EnvConfig {
     public static KAZTEL_CHAINCODE = process.env['KAZTEL_CHAINCODE'];
 
     public static FIREBASE_CLOUD_KEY = process.env['FIREBASE_CLOUD_KEY'];
-    public static FIREBASE_CLOUD_ID = process.env['FIREBASE_CLOUD_ID'];
+
+    public static TFA_FAMILY_NAME = process.env['TFA_FAMILY_NAME'];
+    public static TFA_FAMILY_VERSION = process.env['TFA_FAMILY_VERSION'];
+    public static TFA_FAMILY_NAMESPACE =  _hash( process.env['TFA_FAMILY_NAME']).substring(0, 6);
+
+    public static KAZTEL_FAMILY_NAME = process.env['KAZTEL_FAMILY_NAME'];
+    public static KAZTEL_FAMILY_VERSION = process.env['KAZTEL_FAMILY_VERSION'];
+    public static KAZTEL_FAMILY_NAMESPACE =  _hash( process.env['KAZTEL_FAMILY_NAME']).substring(0, 6);
+
 }

@@ -1,5 +1,4 @@
 import {Body, Controller, Get, HttpStatus, Post, Query, Res} from '@nestjs/common';
-import {TwoFaUserService} from '../../shared/user.service';
 import {CodeQueueListenerService} from '../../../services/code_sender/queue.service';
 import {Log} from 'hlf-node-utils';
 import {ClientService} from '../../../config/services/services';
@@ -19,12 +18,10 @@ export class UserController {
      * Creates an instance of CarController.
      * @memberof CarController
      * @param timeHelper
-     * @param twofaService
      * @param services
      * @param codeQueueListenerService
      */
     constructor(private timeHelper: TimeHelper,
-                private twofaService: TwoFaUserService,
                 private services: ClientService,
                 private codeQueueListenerService: CodeQueueListenerService) {
         Promisefy.promisifyAll(redis);
@@ -57,7 +54,7 @@ export class UserController {
         let v = new Validator(body, {
             phone_number: 'required|string|regex:/^\\+?[1-9]\\d{1,14}$/',
             name: 'required|string',
-            service: 'required|in:kazakhtelecom',
+            service: 'required|in:kazakhtelecom,egov',
             uin: 'nullable|number|maxStringLength:12',
             method: 'required|string',
             sex: 'nullable|in:male,female',
@@ -70,9 +67,9 @@ export class UserController {
 
         // vallidate if user exists
         // '77053234005'
-        let HFUser = new TwoFaUser('', '');
+        // let HFUser = new TwoFaUser('', '');
         try {
-            HFUser = await this.twofaService.queryUser(phoneNumber);
+            // HFUser = await this.twofaService.queryUser(phoneNumber);
         } catch (e) {
             Log.app.error(`Error while getting user`, e);
             return res.status(HttpStatus.NOT_FOUND).json({error: 'User not found.'});

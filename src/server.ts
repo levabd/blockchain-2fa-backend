@@ -5,7 +5,6 @@ import {Log} from 'hlf-node-utils';
 import {SwaggerModule, DocumentBuilder} from '@nestjs/swagger';
 
 import * as express from 'express';
-import * as path from 'path';
 import * as bodyParser from 'body-parser';
 import {AppExceptionFilter} from './modules/shared/filters/app.exception.filter';
 
@@ -43,7 +42,6 @@ async function bootstrap() {
     app.use(express.static(__dirname + '/modules/web/public'));
     app.set('views', __dirname + '/modules/web/views');
     app.set('view engine', 'pug');
-
 
     /**
      * Start Chainservice API

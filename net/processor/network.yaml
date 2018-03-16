@@ -76,4 +76,11 @@ services:
     networks:
       - public
 
+  redis:
+    container_name: redis
+    image: redis
+    networks:
+      - public
+    ports:
+      - 6379:6379
 

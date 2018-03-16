@@ -21,7 +21,10 @@ export class PostUserDTO {
     readonly Sex: string;
 
     @ApiModelProperty()
-    readonly Birthdate: string;
+    readonly Email: string;
+
+    @ApiModelProperty()
+    readonly Birthdate: number;
 
     @ApiModelProperty()
     readonly Method: string;

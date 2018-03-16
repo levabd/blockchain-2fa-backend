@@ -12,15 +12,13 @@ const FAMILY_NAMESPACE = _hash(FAMILY_NAME).substring(0, 6)
 const FAMILY_VERSION = '0.1';
 
 
-
-
 const handle = function (i){
 
     const payload = {
         Verb: 'register', // register | update | delete
         User: {
             PhoneNumber: '77056564077'+i,
-            Uin: 125468416843+i,
+            Uin: 125468416843,
             Name: 'Peshkov Maxim '+i,
             IsVerified: false,
             Email: 'ss@ee.ru',
@@ -33,10 +31,9 @@ const handle = function (i){
     const uinPart = _hash(payload.User.Uin.toString()).slice(-32)
     const phoneNumberPart = _hash(payload.User.PhoneNumber.toString()).slice(-32)
 
-
-// let address = FAMILY_NAMESPACE + _hash(payload.User.Uin +payload.User.PhoneNumber).slice(-64)
+   // let address = FAMILY_NAMESPACE + _hash(payload.User.Uin +payload.User.PhoneNumber).slice(-64)
     let address = FAMILY_NAMESPACE + uinPart+ phoneNumberPart
-    // console.log(address);
+    console.log(address);
     const payloadBytes = cbor.encode(payload)
 
     const {createHash} = require('crypto')
@@ -101,7 +98,7 @@ const handle = function (i){
     })
 }
 
-for(let i=0; i<=1000;i++){
+for(let i=0; i<=10;i++){
     (function(cntr) {
         // here the value of i was passed into as the argument cntr
         // and will be captured in this function closure so each

@@ -85,13 +85,21 @@ export class Validator {
 
     // noinspection TsLint
     private checkBoolean(field: string): void {
-        if (typeof(this.dataTransformed[field]) == typeof(true)) {
+        if (this.fieldIsEmpty(field)) {return;}
+
+        if (typeof(this.dataTransformed[field]) !== typeof(true)) {
             this.addError(field, `The field '${field}' must be a boolean.`, 'number');
         }
     }
 
+    private fieldIsEmpty(field: string):boolean {
+        return this.dataTransformed[field] === undefined || this.dataTransformed[field] === '';
+    }
+
     // noinspection TsLint
     private checkIn(field: string, list: string): void {
+        if (this.fieldIsEmpty(field)) {return;}
+
         if (list[0].split(this.RULE_VALUE_DELIMITER).indexOf(this.dataTransformed[field]) === -1) {
             this.addError(field, `The field '${field}' must be one of the: ${list}.`, 'in');
         }
@@ -99,6 +107,8 @@ export class Validator {
 
     // noinspection TsLint
     private checkMaxStringLength(field: string, value: string): void {
+        if (this.fieldIsEmpty(field)) {return;}
+
         if (this.dataTransformed[field].length >= parseInt(value, 10)) {
             this.addError(field, `The field '${field}' must be less than: ${value[0]}.`, 'maxStringLength');
         }
@@ -106,6 +116,8 @@ export class Validator {
 
     // noinspection TsLint
     private checkMaxNumber(field: string, value: string): void {
+        if (this.fieldIsEmpty(field)) {return;}
+
         if (parseInt(this.dataTransformed[field], 10) >= parseInt(value[0], 10)) {
             this.addError(field, `The field '${field}' must be less than: ${value[0]}.`, 'maxStringLength');
         }
@@ -113,6 +125,8 @@ export class Validator {
 
     // noinspection TsLint
     private checkNumber(field: string): void {
+        if (this.fieldIsEmpty(field)) {return;}
+
         if (typeof this.dataTransformed[field] !== 'number') {
             this.addError(field, `The field '${field}' must be a number.`, 'number');
         }
@@ -120,6 +134,8 @@ export class Validator {
 
     // noinspection TsLint
     private checkString(field: string): void {
+        if (this.fieldIsEmpty(field)) {return;}
+
         if (typeof this.dataTransformed[field] !== 'string') {
             this.addError(field, `The field '${field}' must be a string.`, 'string');
         }
@@ -128,6 +144,8 @@ export class Validator {
     // todo add format checking
     // noinspection TsLint
     private checkDate(field: string) {
+        if (this.fieldIsEmpty(field)) {return;}
+
         if (!this.isValidDate(this.dataTransformed[field])) {
             this.addError(field, `The field '${field}' must be a valid date format: MM/DD/YYYY.`, 'date');
         }
@@ -140,6 +158,8 @@ export class Validator {
 
     // noinspection TsLint
     private checkRegex(field: string, pattern: RegExp): void {
+        if (this.fieldIsEmpty(field)) {return;}
+
         if (!this.dataTransformed[field]) {
             return;
         }
@@ -152,6 +172,8 @@ export class Validator {
 
     // noinspection TsLint
     private checkRequiredIfNot(field: string, dependFields: string[]): void {
+        if (this.fieldIsEmpty(field)) {return;}
+
         for (const dependField of  dependFields) {
             if (!this.dataTransformed[dependField]) {
                 if (!this.dataTransformed[field]) {
@@ -163,6 +185,8 @@ export class Validator {
 
     // noinspection TsLint
     private checkRequiredIf(field: string, dependFields: string[]): void {
+        if (this.fieldIsEmpty(field)) {return;}
+
         for (const dependField of  dependFields) {
             if (this.dataTransformed[dependField]) {
                 if (!this.dataTransformed[dependField]) {
