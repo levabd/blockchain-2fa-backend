@@ -16,6 +16,7 @@ import {TfaTransactionFamily, User} from '../../shared/families/tfa.transaction.
 import * as request from 'request-promise-native';
 import {PostKaztelUserDTO} from '../../shared/models/dto/post.kaztel.user.dto';
 import {KaztelTransactionFamily} from '../../shared/families/kaztel.transaction.family';
+import {ClientUser} from '../../shared/families/client.model';
 
 @ApiUseTags('v1/api/users')
 @Controller('v1/api/users')
@@ -69,15 +70,14 @@ export class UserController {
         user.Name = userDto.Name;
         user.PushToken = '';
 
-        this.tfaTF.create(user)
-            .then((res) => {
+        this.tfaTF.create(user).then((res) => {
                 console.log('success', res);
                 const body = JSON.parse(res)
                 console.log('body', body);
 
                 if (body && body.link) {
                     request.get(body.link)
-                        .then(function (error, response, body) {
+                        .then(function (error, response, _body) {
                             // Do more stuff with 'body' here
 
                             if (error) {
@@ -86,7 +86,7 @@ export class UserController {
                             if (response) {
                                 // todo
                             }
-                            console.log(error, response, body) // 200
+                            console.log(error, response, _body) // 200
                         });
                 }
             })
@@ -117,18 +117,29 @@ export class UserController {
             return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json(v.getErrors());
         }
 
-        let user = new User();
-
+        let user = new ClientUser();
+        user.Name = userDto.Name;
+        user.PhoneNumber = userDto.PhoneNumber;
+        user.Uin = userDto.Uin;
+        user.Birthdate = userDto.Birthdate;
+        user.Email = userDto.Email;
+        user.Sex = userDto.Sex;
+        user.Region = userDto.Region;
+        user.PersonalAccount = userDto.PersonalAccount;
+        user.Question = userDto.Question;
+        user.Answer = userDto.Answer;
+        user.Name = userDto.Name;
+        user.PushToken = '';
+        user.AdditionalData = {};
 
         this.kaztelTF.create(user)
-            .then(res => {
-                console.log('success', res);
+            .then((res) => {
                 const body = JSON.parse(res)
                 console.log('body', body);
 
                 if (body && body.link) {
                     request.get(body.link)
-                        .then(function (error, response, body) {
+                        .then(function (error, response, _body) {
                             // Do more stuff with 'body' here
 
                             if (error) {
@@ -137,12 +148,12 @@ export class UserController {
                             if (response) {
                                 // todo
                             }
-                            console.log(error, response, body) // 200
+                            console.log(error, response, _body) // 200
                         });
                 }
             })
-            .catch((res) => {
-                console.log('error', res);
+            .catch((error) => {
+                console.log('error', error);
             });
 
         return res.status(HttpStatus.OK).json({status: `success`});

@@ -13,8 +13,7 @@ const _toInternalError = (err) => {
 }
 
 const _getAddress = (phoneNumber) => {
-    const uinPart = _hash(phoneNumber.toString()).slice(-32)
-    return INT_KEY_NAMESPACE + uinPart ;
+    return INT_KEY_NAMESPACE +  _hash(phoneNumber.toString()).slice(-64) ;
 }
 
 module.exports.decodeCbor = _decodeCbor;

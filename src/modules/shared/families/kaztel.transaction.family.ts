@@ -1,40 +1,26 @@
 import {Component} from '@nestjs/common';
-import {Log} from 'hlf-node-utils';
 import {EnvConfig} from '../../../config/env';
-import {_hash} from '../../../services/helpers/helpers';
 import {ChainService} from '../../../services/sawtooth/chain.service';
-import * as  WebSocket from 'ws';
 import {ClientService} from '../../../config/services/services';
-
-export class User {
-    PhoneNumber: string;
-    Uin: number;
-    Name: string;
-    IsVerified: boolean;
-    Email: string;
-    Sex: string;
-    Birthdate: number;
-    PushToken: string;
-    LastActivity: number;
-}
+import {ClientUser} from './client.model';
+import {Log} from 'hlf-node-utils';
 
 @Component()
-export class KaztelTransactionFamily {
-
-    private prefix = '';
+export class KaztelTransactionFamily extends ChainService {
+    tf: string;
+    tfVersion: string;
+    prefix: string;
 
     constructor(private chainService: ChainService, private clientService: ClientService) {
-        this.clientService.getService('kazakhtelecom').getPrefix();
+        super();
+        this.prefix = this.clientService.getService('kaztel').getPrefix();
+        this.tf = EnvConfig.KAZTEL_FAMILY_NAME;
+        this.tfVersion = EnvConfig.KAZTEL_FAMILY_VERSION;
     }
 
-    getAddress(uin: number): string {
-        const uinPart = _hash(uin.toString()).slice(-32);
-        return this.prefix + uinPart;
-    }
-
-    create(user: User): Promise<any> {
-        const address = this.getAddress(user.Uin);
-        return this.chainService.addTransaction({
+    create(user: ClientUser): Promise<any> {
+        const address = this.getAddress(user.PhoneNumber);
+        return this.addTransaction({
             Action: 'create',
             Uin: user.Uin,
             PhoneNumber: user.PhoneNumber,

@@ -173,11 +173,12 @@ const getuserValidationErrors = (user) => {
     if (`${user.PersonalAccount}`.length !== 6) {
         errors.push('PersonalAccount must contains 6 numbers')
     }
-    if (!isSEmpty(user.Question)) {
+
+    if (isEmpty(user.Question)) {
         errors.push('Question is required')
     }
 
-    if (!isSEmpty(user.Answer)) {
+    if (isEmpty(user.Answer)) {
         errors.push('Answer is required')
     }
 
@@ -189,12 +190,13 @@ const getuserValidationErrors = (user) => {
         errors.push('Answer must be a string')
     }
 
-    try {
-        const json = JSON.parse(user.AdditionalData);
-    }
-    catch (e) {
-        errors.push('AdditionalData must be a valid json object')
-
+    if (!isString(user.AdditionalData)) {
+        try {
+            const json = JSON.parse(user.AdditionalData);
+        }
+        catch (e) {
+            errors.push('AdditionalData must be a valid json object')
+        }
     }
 
     return errors;

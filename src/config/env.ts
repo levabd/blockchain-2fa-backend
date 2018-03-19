@@ -58,11 +58,11 @@ export class EnvConfig {
 
     // Transaction Families config
     public static TFA_FAMILY_NAME = process.env['TFA_FAMILY_NAME'];
-    public static TFA_FAMILY_VERSION = process.env['TFA_FAMILY_VERSION'];
+    public static TFA_FAMILY_VERSION = process.env['TFA_FAMILY_VERSION'] || '0.1';
     public static TFA_FAMILY_NAMESPACE = _hash(process.env['TFA_FAMILY_NAME']).substring(0, 6);
 
     public static KAZTEL_FAMILY_NAME = process.env['KAZTEL_FAMILY_NAME'];
-    public static KAZTEL_FAMILY_VERSION = process.env['KAZTEL_FAMILY_VERSION'];
+    public static KAZTEL_FAMILY_VERSION = process.env['KAZTEL_FAMILY_VERSION']|| '0.1';
 
     public static EGOV_FAMILY_NAME = process.env['EGOV_FAMILY_NAME'];
     public static EGOV_FAMILY_VERSION = process.env['EGOV_FAMILY_VERSION'];

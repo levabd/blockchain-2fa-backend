@@ -99,6 +99,7 @@ class IntegerKeyHandler extends TransactionHandler {
                 }
 
                 const address = helpers.getAddress(phoneNumber)
+                console.log('address', address)
 
                 // Get the current state, for the key's address:
                 let getPromise = context.getState([address])

@@ -6,6 +6,7 @@ const {createContext, CryptoFactory} = require('sawtooth-sdk/signing');
 import * as cbor from 'cbor';
 import * as request from 'request-promise-native';
 import {EnvConfig} from '../../config/env';
+import {_hash} from '../helpers/helpers';
 import {Log} from 'hlf-node-utils';
 
 @Component()
@@ -17,7 +18,9 @@ export abstract class ChainService {
     protected transactionList = [];
     protected signer: any;
     protected context: any;
-    protected timer: any;
+    public abstract tf: string;
+    public abstract tfVersion: string;
+    protected abstract prefix: string;
 
     constructor() {
         this.context = createContext('secp256k1');
@@ -25,6 +28,9 @@ export abstract class ChainService {
         this.signer = new CryptoFactory(this.context).newSigner(privateKey);
     }
 
+    getAddress(PhoneNumber: string): string {
+        return this.prefix + _hash(PhoneNumber.toString()).slice(-64);
+    }
 
     getSignedBatch(transactionList:any) :any{
         const batchHeaderBytes = protobuf.BatchHeader.encode({
@@ -48,9 +54,10 @@ export abstract class ChainService {
     addTransaction(payload: object, address: string, dependOn = '') : Promise<any>{
         const payloadBytes = cbor.encode(payload);
 
+        Log.app.debug('tf', this.tf, this.tfVersion);
         const transactionHeaderBytes = protobuf.TransactionHeader.encode({
-            familyName: EnvConfig.TFA_FAMILY_NAME,
-            familyVersion: EnvConfig.TFA_FAMILY_VERSION,
+            familyName: this.tf,
+            familyVersion: this.tfVersion,
             inputs: [address],
             outputs: [address],
             signerPublicKey: this.signer.getPublicKey().asHex(),
@@ -76,6 +83,7 @@ export abstract class ChainService {
 
         // this.addToBatch(transaction);
         const batchListBytes = this.getSignedBatch([transaction]);
+        Log.app.debug('${EnvConfig.VALIDATOR_REST_API}/batches', `${EnvConfig.VALIDATOR_REST_API}/batches`);
 
         return request.post({
             url: `${EnvConfig.VALIDATOR_REST_API}/batches`,

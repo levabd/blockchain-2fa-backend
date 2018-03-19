@@ -11,7 +11,6 @@ import {EnvConfig} from '../../../config/env';
 import {TfaTransactionFamily} from '../../shared/families/tfa.transaction.family';
 import {KaztelTransactionFamily} from '../../shared/families/kaztel.transaction.family';
 import {EgovTransactionFamily} from '../../shared/families/egov.transaction.family';
-import {ClientService} from '../../../config/services/services';
 
 @ApiUseTags('v1/api/verification')
 @Controller('v1/api/verification')
@@ -39,20 +38,17 @@ export class VerificationController {
         let address = '';
         switch (body.service) {
             case 'kazakhtelecom':
-                const kazakhtelecom = this.kaztelTF.getAddress()
-
-
+                address= this.kaztelTF.getAddress(body.phone_number);
                 break;
             case 'egov':
-                address = '';
-
+                address = this.egovTF.getAddress(body.phone_number);
                 break;
             default:
                 throw new Error('Unsupported servive');
         }
 
         // Проверка, существует ли пользователь
-        request.get(`${EnvConfig.VALIDATOR_REST_API}/state`,)
+        request.get(`${EnvConfig.VALIDATOR_REST_API}/state/${address}`)
             .then(function (error, response, _body) {
                 // Do more stuff with 'body' here
 
@@ -62,7 +58,7 @@ export class VerificationController {
                 if (response) {
                     // todo
                 }
-                console.log(error, response, body) // 200
+                console.log(error, response, body); // 200
             });
 
         const code = this.genCode();

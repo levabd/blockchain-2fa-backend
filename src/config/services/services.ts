@@ -10,7 +10,7 @@ export class ClientService {
     constructor() {
         this.services.push(
             new Service(
-                'kazahtelecom',
+                'kaztel',
                 EnvConfig.KAZTEL_FAMILY_NAME,
                 EnvConfig.KAZTEL_FAMILY_VERSION
             ),

@@ -25,13 +25,12 @@ export class EgovTransactionFamily {
         this.clientService.getService('egov').getPrefix();
     }
 
-    getAddress(uin: number): string {
-        const uinPart = _hash(uin.toString()).slice(-32);
-        return this.prefix + uinPart;
+    getAddress(PhoneNumber: string): string {
+        return this.prefix + _hash(PhoneNumber.toString()).slice(-64);
     }
 
     create(user: User): Promise<any> {
-        const address = this.getAddress(user.Uin);
+        const address = this.getAddress(user.PhoneNumber);
         return this.chainService.addTransaction({
             Action: 'create',
             Uin: user.Uin,

@@ -3,6 +3,7 @@ import {Log} from 'hlf-node-utils';
 import {EnvConfig} from '../../../config/env';
 import {_hash} from '../../../services/helpers/helpers';
 import {ChainService} from '../../../services/sawtooth/chain.service';
+import {ClientService} from '../../../config/services/services';
 
 export class User {
     PhoneNumber: string;
@@ -17,23 +18,26 @@ export class User {
 }
 
 @Component()
-export class TfaTransactionFamily {
+export class TfaTransactionFamily extends ChainService{
+    tf: string;
+    tfVersion: string;
+    prefix: string;
 
-    constructor(private chainService: ChainService) {
+    constructor( private clientService: ClientService) {
+        super()
+        this.prefix = EnvConfig.TFA_FAMILY_NAMESPACE
+        this.tf = EnvConfig.TFA_FAMILY_NAME;
+        this.tfVersion = EnvConfig.TFA_FAMILY_VERSION;
     }
 
-    getAddress(uin: number, phoneNumber: string): string {
-        const uinPart = _hash(uin.toString()).slice(-32);
-        const phoneNumberPart = _hash(phoneNumber.toString()).slice(-32);
-
-        return EnvConfig.TFA_FAMILY_NAMESPACE + uinPart + phoneNumberPart;
+    getAddress(PhoneNumber: string): string {
+        return this.prefix + _hash(PhoneNumber.toString()).slice(-64);
     }
 
     create(user: User): Promise<any> {
-        const address = this.getAddress(user.Uin, user.PhoneNumber);
-        console.log('address', address);
+        const address = this.getAddress(user.PhoneNumber);
 
-        return this.chainService.addTransaction({
+        return this.addTransaction({
             Action: 'create',
             Uin: user.Uin,
             PhoneNumber: user.PhoneNumber,

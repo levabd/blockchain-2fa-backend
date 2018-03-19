@@ -27,7 +27,7 @@ export class PostKaztelUserDTO {
     readonly Region: string;
 
     @ApiModelProperty()
-    readonly PersonalAccount: string;
+    readonly PersonalAccount: number;
 
     @ApiModelProperty()
     readonly Question: string;

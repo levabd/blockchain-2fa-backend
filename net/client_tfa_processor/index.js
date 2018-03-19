@@ -14,17 +14,20 @@
  * limitations under the License.
  * ------------------------------------------------------------------------------
  */
-
 'use strict';
+
+console.log('start transaction processor')
+
 const endOfLine = require('os').EOL;
 
 if (process.argv.length < 5) {
-    console.log('There is must be 3 arguments in ordr to run this command correctly: ' + endOfLine +
+    console.log('There is must be 3 arguments in order to run this command correctly: ' + endOfLine +
         '1. A validator address' + endOfLine +
         '2. Transaction family name' + endOfLine +
         '3. Transaction family version' + endOfLine)
     process.exit(1)
 }
+
 // 'tcp://0.0.0.0:4004'
 const address = process.argv[2]
 process.env['TRANSACTION_FAMILY_KEY'] = process.argv[3]

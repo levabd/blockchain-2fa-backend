@@ -3,7 +3,6 @@ import {CodeQueueListenerService} from '../../../services/code_sender/queue.serv
 import {Log} from 'hlf-node-utils';
 import {ClientService} from '../../../config/services/services';
 import * as redis from 'redis';
-import {TwoFaUser} from '../../shared/models/chaincode/twofa/user.model';
 import {TimeHelper} from '../../../services/helpers/time.helper';
 import * as Promisefy from 'bluebird';
 import {Validator} from '../../../services/helpers/validation.helper';
@@ -82,6 +81,7 @@ export class UserController {
         if (service === '') {
             service = 'service_is_impty';
         }
+
         // save code to redis
         // this key will expire after 8 * 60 seconds
         this.redisClient.setAsync(`${phoneNumber}:${service}`, `${code}:${unixtime}`, 'EX', 7 * 60).then(function (_res) {

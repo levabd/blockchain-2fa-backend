@@ -79,7 +79,7 @@ services:
     depends_on:
       - validator
       - rest-api
-    entrypoint: "node index.js tcp://172.18.0.2:4004 kaztel 0.1"
+    entrypoint: "node index.js tcp://validator:4004 kaztel 0.1"
     networks:
       - public
 
@@ -89,7 +89,7 @@ services:
     depends_on:
       - validator
       - rest-api
-    entrypoint: "node index.js tcp://172.18.0.2:4004 egov 0.1"
+    entrypoint: "node index.js tcp://validator:4004 egov 0.1"
     networks:
       - public
 

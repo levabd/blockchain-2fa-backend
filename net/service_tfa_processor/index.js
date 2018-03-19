@@ -20,7 +20,7 @@
 const { TransactionProcessor } = require('sawtooth-sdk/processor');
 const IntegerKeyHandler = require('./handler');
 console.log("Before start listening")
-const address = 'tcp://172.18.0.2:4004';
+const address = 'tcp://validator:4004';
 const transactionProcessor = new TransactionProcessor(address);
 transactionProcessor.addHandler(new IntegerKeyHandler());
 transactionProcessor.start();
