@@ -15,6 +15,10 @@ import {PostCodeDTO} from '../../../shared/models/dto/post.code.dto';
 import {PostVerifyCodeDTO} from '../../../shared/models/dto/post.verify.dto';
 import {Services} from '../../../../services/code_sender/services';
 import {TfaTransactionFamily, User} from '../../../shared/families/tfa.transaction.family';
+import {EnvConfig} from '../../../../config/env';
+import * as request from 'request-promise-native';
+import {PostKaztelUserDTO} from '../../../shared/models/dto/post.kaztel.user.dto';
+import {KaztelTransactionFamily} from '../../../shared/families/kaztel.transaction.family';
 
 @ApiUseTags('v1/api/users')
 @Controller('v1/api/users')
@@ -31,6 +35,7 @@ export class UserController {
      */
     constructor(private timeHelper: TimeHelper,
                 private tfaTF: TfaTransactionFamily,
+                private kaztelTF: KaztelTransactionFamily,
                 private services: ClientService,
                 private codeQueueListenerService: CodeQueueListenerService) {
         Promisefy.promisifyAll(redis);
@@ -67,7 +72,81 @@ export class UserController {
         user.Name = userDto.Name;
         user.PushToken = '';
 
-        this.tfaTF.register(user);
+        this.tfaTF.create(user)
+            .then((res) => {
+                console.log('success', res);
+                const body = JSON.parse(res)
+                console.log('body', body);
+
+                if (body && body.link) {
+                    request.get(body.link)
+                        .then(function (error, response, body) {
+                            // Do more stuff with 'body' here
+
+                            if (error) {
+                                // todo
+                            }
+                            if (response) {
+                                // todo
+                            }
+                            console.log(error, response, body) // 200
+                        });
+                }
+            })
+            .catch((res) => {
+                console.log('error', res);
+            });
+
+        return res.status(HttpStatus.OK).json({status: `success`});
+    }
+
+    @Post('kaztel')
+    postKaztelUser(@Res() res, @Body() userDto: PostKaztelUserDTO): void {
+
+        let v = new Validator(userDto, {
+            name: 'required|string',
+            phone_number: 'required|string|regex:/^\\+?[1-9]\\d{1,14}$/',
+            uin: 'required|number|maxNumber:1000000000000',
+            sex: 'nullable|string|in:male,female',
+            email: 'nullable|string',
+            birthdate: 'nullable',
+            region: 'required|string',
+            personal_account: 'required|number',
+            question: 'required|string',
+            answer: 'required|string',
+        });
+
+        if (v.fails()) {
+            return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json(v.getErrors());
+        }
+
+        let user = new User();
+
+
+        this.kaztelTF.create(user)
+            .then(res => {
+                console.log('success', res);
+                const body = JSON.parse(res)
+                console.log('body', body);
+
+                if (body && body.link) {
+                    request.get(body.link)
+                        .then(function (error, response, body) {
+                            // Do more stuff with 'body' here
+
+                            if (error) {
+                                // todo
+                            }
+                            if (response) {
+                                // todo
+                            }
+                            console.log(error, response, body) // 200
+                        });
+                }
+            })
+            .catch((res) => {
+                console.log('error', res);
+            });
 
         return res.status(HttpStatus.OK).json({status: `success`});
     }

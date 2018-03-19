@@ -112,4 +112,4 @@ module.exports.isNumber = isNumber;
 module.exports.isIn = isIn;
 module.exports.isBoolean = isBoolean;
 module.exports.isEmpty = isEmpty;
-module.exports.getuserValidationErrors = getuserValidationErrors;
+module.exports.getUserValidationErrors = getuserValidationErrors;

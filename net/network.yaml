@@ -60,7 +60,17 @@ services:
       - "8008:8008"
     depends_on:
       - validator
+
     entrypoint: sawtooth-rest-api -C tcp://validator:4004 --bind rest-api:8008
+    networks:
+      - public
+
+  tfa-tp:
+    image: allatrack/tfa_tp2:latest
+    container_name: sawtooth-tfa-tp
+    depends_on:
+      - validator
+      - rest-api
     networks:
       - public
 

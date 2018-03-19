@@ -15,7 +15,7 @@ const FAMILY_VERSION = '0.1';
 const handle = function (i){
 
     const payload = {
-        Verb: 'register', // register | update | delete
+        Verb: 'register', // create | update | delete
         User: {
             PhoneNumber: '77056564077'+i,
             Uin: 125468416843,

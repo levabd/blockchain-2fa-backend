@@ -5,6 +5,8 @@ const {createContext, CryptoFactory} = require('sawtooth-sdk/signing');
 
 import * as cbor from 'cbor';
 import * as request from 'request-promise-native';
+import {EnvConfig} from '../../config/env';
+import {Log} from 'hlf-node-utils';
 
 @Component()
 export abstract class ChainService {
@@ -23,32 +25,11 @@ export abstract class ChainService {
         this.signer = new CryptoFactory(this.context).newSigner(privateKey);
     }
 
-    // addToBatch(tx: any) {
-    //     if (this.transactionList.length >= 35) {
-    //         this.sendBatch();
-    //         this.transactionList = [];
-    //         this.timer = null;
-    //         return;
-    //     }
-    //
-    //     this.transactionList.push(tx);
-    //     clearTimeout(this.timer);
-    //
-    //     const self=this;
-    //     this.timer = setTimeout(function () {
-    //         Log.app.debug('settimeout');
-    //         // value === 'foobar' (passing values is optional)
-    //         // This is executed after about 40 milliseconds.
-    //         self.sendBatch();
-    //         self.transactionList = [];
-    //         self.timer = null;
-    //     }, 1000);
-    // }
 
-    getSignedBatch() :any{
+    getSignedBatch(transactionList:any) :any{
         const batchHeaderBytes = protobuf.BatchHeader.encode({
             signerPublicKey: this.signer.getPublicKey().asHex(),
-            transactionIds: this.transactionList.map((txn) => txn.headerSignature),
+            transactionIds: transactionList.map((txn) => txn.headerSignature),
         }).finish();
 
         const signature = this.signer.sign(batchHeaderBytes);
@@ -56,7 +37,7 @@ export abstract class ChainService {
         const batch = protobuf.Batch.create({
             header: batchHeaderBytes,
             headerSignature: signature,
-            transactions: this.transactionList
+            transactions: transactionList
         });
 
        return protobuf.BatchList.encode({
@@ -68,8 +49,8 @@ export abstract class ChainService {
         const payloadBytes = cbor.encode(payload);
 
         const transactionHeaderBytes = protobuf.TransactionHeader.encode({
-            familyName: 'tfa',
-            familyVersion: '0.1',
+            familyName: EnvConfig.TFA_FAMILY_NAME,
+            familyVersion: EnvConfig.TFA_FAMILY_VERSION,
             inputs: [address],
             outputs: [address],
             signerPublicKey: this.signer.getPublicKey().asHex(),
@@ -93,13 +74,11 @@ export abstract class ChainService {
             payload: payloadBytes
         });
 
-        this.transactionList.push(transaction);
-
         // this.addToBatch(transaction);
-        const batchListBytes = this.getSignedBatch();
+        const batchListBytes = this.getSignedBatch([transaction]);
 
         return request.post({
-            url: 'http://127.0.0.1:8008/batches',
+            url: `${EnvConfig.VALIDATOR_REST_API}/batches`,
             body: batchListBytes,
             headers: {'Content-Type': 'application/octet-stream'}
         });

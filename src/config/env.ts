@@ -65,10 +65,15 @@ export class EnvConfig {
 
     public static TFA_FAMILY_NAME = process.env['TFA_FAMILY_NAME'];
     public static TFA_FAMILY_VERSION = process.env['TFA_FAMILY_VERSION'];
-    public static TFA_FAMILY_NAMESPACE =  _hash( process.env['TFA_FAMILY_NAME']).substring(0, 6);
+    public static TFA_FAMILY_NAMESPACE = _hash(process.env['TFA_FAMILY_NAME']).substring(0, 6);
 
     public static KAZTEL_FAMILY_NAME = process.env['KAZTEL_FAMILY_NAME'];
     public static KAZTEL_FAMILY_VERSION = process.env['KAZTEL_FAMILY_VERSION'];
-    public static KAZTEL_FAMILY_NAMESPACE =  _hash( process.env['KAZTEL_FAMILY_NAME']).substring(0, 6);
+    public static KAZTEL_FAMILY_NAMESPACE_HASH = _hash(process.env['KAZTEL_FAMILY_NAME']).substring(0, 6);
 
+    public static VALIDATOR_REST_API = process.env['VALIDATOR_REST_API'];
+
+    public static COMMITED = 'COMMITED';
+    public static INVALID = 'INVALID';
+    public static PENDING = 'PENDING';
 }

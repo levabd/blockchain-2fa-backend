@@ -1,10 +1,29 @@
-import {Controller, Get, Post, Req, Res} from '@nestjs/common';
-import {Log} from 'hlf-node-utils';
+import {Controller, Get, Post,  Res} from '@nestjs/common';
 import {ApiUseTags} from '@nestjs/swagger';
 
 @ApiUseTags('v1/web')
 @Controller('v1/web')
 export class HomeController {
+
+    /**
+     * Example page
+     * @memberof HomeController
+     * @param res
+     */
+    @Get('example')
+    example(@Res() res): void {
+        res.render('example/enter');
+    }
+
+    /**
+     * Example page
+     * @memberof HomeController
+     * @param res
+     */
+    @Post('example-handler')
+    exampleHandler(@Res() res): void {
+        res.render('example/choise');
+    }
 
     /**
      * Get home page

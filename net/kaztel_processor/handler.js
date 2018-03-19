@@ -61,30 +61,62 @@ class IntegerKeyHandler extends TransactionHandler {
 
                 let _applyAction;
                 let _applyData;
-
+                let errors;
                 switch (action) {
-                    case 'register':
-                        const errors = validator.getuserValidationErrors(data.User)
+                    case 'create':
+                        errors = validator.getUserValidationErrors(data.User)
+                        if (errors && errors.length) {
+                            throw new InvalidTransaction(JSON.stringify(errors))
+                        }
+                        _applyAction = actions.create
+                        _applyData = data.User
+                        break;
+                    case 'update':
+                        errors = validator.getUserValidationErrors(data.User)
+                        if (errors && errors.length) {
+                            throw new InvalidTransaction(JSON.stringify(errors))
+                        }
+                        _applyAction = actions.update
+                        _applyData = data.User
+                        break;
+                    case 'delete':
+                        _applyAction = actions.delete
+                        _applyData = null
+                        break;
+                    case 'addLog':
+                        if (!data.Log) {
+                            throw new InvalidTransaction('Payload does not contain Log model')
+                        }
+                        errors = validator.getLogValidationErrors(data.Log)
+                        if (errors && errors.length) {
+                            throw new InvalidTransaction(JSON.stringify(errors))
+                        }
+                        _applyAction = actions.addLog
+                        _applyData = {Log: data.Log, PhoneNumber: phoneNumber}
+                        break;
+                    case 'varify':
+                        if (!data.Log) {
+                            throw new InvalidTransaction('Payload does not contain Log model')
+                        }
+                        errors = validator.getLogValidationErrors(data.Log, true)
                         if (errors && errors.length) {
                             throw new InvalidTransaction(JSON.stringify(errors))
                         }
 
-                        _applyAction = actions.register
-                        _applyData = data.User
-                        break;
-                    case 'update':
-                        _applyAction = actions.update
-                        _applyData = user
+                        _applyAction = actions.verify
+                        _applyData = {Log: data.Log, PhoneNumber: phoneNumber}
                         break;
                     case 'setPushToken':
                         _applyAction = actions.setPushToken
                         _applyData = data.PushToken
                         break;
                     default:
-                        throw new InvalidTransaction(`Verb must be set, inc, dec not ${action}`)
+                        throw new InvalidTransaction(
+                            `Verb must be register, update, setPushToken ot isVerified: not ${action}`
+                        )
                 }
 
-                const address = helpers.getAddress(parsedUid, phoneNumber)
+                const address = helpers.getAddress(parsedUid)
 
                 // Get the current state, for the key's address:
                 let getPromise = context.getState([address])
