@@ -16,11 +16,22 @@
  */
 
 'use strict';
+const endOfLine = require('os').EOL;
 
-const { TransactionProcessor } = require('sawtooth-sdk/processor');
+if (process.argv.length < 5) {
+    console.log('There is must be 3 arguments in ordr to run this command correctly: ' + endOfLine +
+        '1. A validator address' + endOfLine +
+        '2. Transaction family name' + endOfLine +
+        '3. Transaction family version' + endOfLine)
+    process.exit(1)
+}
+// 'tcp://0.0.0.0:4004'
+const address = process.argv[2]
+process.env['TRANSACTION_FAMILY_KEY'] = process.argv[3]
+process.env['TRANSACTION_FAMILY_VERSION'] = process.argv[4]
+
+const {TransactionProcessor} = require('sawtooth-sdk/processor');
 const IntegerKeyHandler = require('./handler');
-const address = 'tcp://0.0.0.0:4004';
 const transactionProcessor = new TransactionProcessor(address);
-
 transactionProcessor.addHandler(new IntegerKeyHandler());
 transactionProcessor.start();

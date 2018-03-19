@@ -3,14 +3,13 @@ extends ../layouts/auth
 block content
     form.form-signin(_lpchecked='1', method='POST')
         img.mb-4(src='/images/2fa_logo.png', alt='2FA', width='72', height='72')
-        h4='Двухфакторная авторизация'
+        h4.pb-4='Двухфакторная авторизация'
         #app
             input#loginButton.btn.btn-lg.btn-primary.btn-block(
             type='submit'
             value='Войти используя 2FA'
             v-if="entering"
-            v-on:click.prevent="enter"
-            )
+            v-on:click.prevent="enter")
             input#inputPhoneNumber.form-control.mb-3(
             type='text'
             pattern='^(\\+7|7|8)?[\\s\\-]?\\(?[7][0-9]{2}\\)?[\\s\\-]?[0-9]{3}[\\s\\-]?[0-9]{2}[\\s\\-]?[0-9]{2}$'
@@ -22,12 +21,13 @@ block content
             v-model="phoneNumber"
             v-if="!entering"
             autocomplete='off')
-            #enterChose(v-if="phoneNumber && !entering")
-                p
-                    | "Выберите способ подверждения"
-                button#telegram.btn.btn-lg.btn-primary.btn-block(v-on:click="telegram") Telegram
-                button#sms.btn.btn-lg.btn-primary.btn-block(v-on:click="sms") SMS
-                button#push.btn.btn-lg.btn-primary.btn-block(v-on:click="push") Мобильное приложение
+            transition(name="fade")
+                #enterChose(v-show="phoneNumber && !entering")
+                    p
+                        | Выберите способ подверждения
+                    button#telegram.btn.btn-lg.btn-primary.btn-block(v-on:click="telegram") Telegram
+                    button#sms.btn.btn-lg.btn-primary.btn-block(v-on:click="sms") SMS
+                    button#push.btn.btn-lg.btn-primary.btn-block(v-on:click="push") Мобильное приложение
 
 block javascript
     script(src='https://cdn.jsdelivr.net/npm/vue')

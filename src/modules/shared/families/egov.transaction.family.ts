@@ -1,9 +1,7 @@
 import {Component} from '@nestjs/common';
-import {Log} from 'hlf-node-utils';
 import {EnvConfig} from '../../../config/env';
 import {_hash} from '../../../services/helpers/helpers';
 import {ChainService} from '../../../services/sawtooth/chain.service';
-import * as  WebSocket from 'ws';
 import {ClientService} from '../../../config/services/services';
 
 export class User {
@@ -19,12 +17,12 @@ export class User {
 }
 
 @Component()
-export class KaztelTransactionFamily {
+export class EgovTransactionFamily {
 
     private prefix = '';
 
     constructor(private chainService: ChainService, private clientService: ClientService) {
-        this.clientService.getService('kazakhtelecom').getPrefix();
+        this.clientService.getService('egov').getPrefix();
     }
 
     getAddress(uin: number): string {

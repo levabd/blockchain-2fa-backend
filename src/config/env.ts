@@ -54,22 +54,18 @@ export class EnvConfig {
 
     // ClientService env variables
     public static KAZAHTELECOM_KEY = process.env['KAZAHTELECOM_KEY'];
-
-    // Channels config
-    public static TWOFA_CHANNEL = process.env['TWOFA_CHANNEL'];
-    public static TWOFA_CHAINCODE = process.env['TWOFA_CHAINCODE'];
-    public static KAZTEL_CHANNEL = process.env['KAZTEL_CHANNEL'];
-    public static KAZTEL_CHAINCODE = process.env['KAZTEL_CHAINCODE'];
-
     public static FIREBASE_CLOUD_KEY = process.env['FIREBASE_CLOUD_KEY'];
 
+    // Transaction Families config
     public static TFA_FAMILY_NAME = process.env['TFA_FAMILY_NAME'];
     public static TFA_FAMILY_VERSION = process.env['TFA_FAMILY_VERSION'];
     public static TFA_FAMILY_NAMESPACE = _hash(process.env['TFA_FAMILY_NAME']).substring(0, 6);
 
     public static KAZTEL_FAMILY_NAME = process.env['KAZTEL_FAMILY_NAME'];
     public static KAZTEL_FAMILY_VERSION = process.env['KAZTEL_FAMILY_VERSION'];
-    public static KAZTEL_FAMILY_NAMESPACE_HASH = _hash(process.env['KAZTEL_FAMILY_NAME']).substring(0, 6);
+
+    public static EGOV_FAMILY_NAME = process.env['EGOV_FAMILY_NAME'];
+    public static EGOV_FAMILY_VERSION = process.env['EGOV_FAMILY_VERSION'];
 
     public static VALIDATOR_REST_API = process.env['VALIDATOR_REST_API'];
 

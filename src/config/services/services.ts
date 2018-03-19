@@ -11,15 +11,30 @@ export class ClientService {
         this.services.push(
             new Service(
                 'kazahtelecom',
-                EnvConfig.KAZAHTELECOM_KEY,
-                EnvConfig.KAZTEL_CHANNEL,
-                EnvConfig.KAZTEL_CHAINCODE,
+                EnvConfig.KAZTEL_FAMILY_NAME,
+                EnvConfig.KAZTEL_FAMILY_VERSION
+            ),
+            new Service(
+                'egov',
+                EnvConfig.EGOV_FAMILY_NAME,
+                EnvConfig.EGOV_FAMILY_VERSION
             ),
         );
     }
 
     getAll(): Service[] {
         return this.services;
+    }
+
+    getService(name: string): Service {
+        let servise;
+        let nameLowerCase = name.toLowerCase();
+        this.services.forEach(function (service) {
+            if (service.getName().toLowerCase() === nameLowerCase) {
+                servise = service;
+            }
+        });
+        return servise;
     }
 
     serviceWithNameExists(name: string): boolean {

@@ -17,16 +17,8 @@ const _toInternalError = (err) => {
     throw new InternalError(message)
 }
 
-const _getAddress = (Uin, PhoneNumber) => {
-
-    let parsedUin = parseInt(Uin)
-    if (parsedUin !== Uin) {
-        throw new InvalidTransaction(`Value must be an integer `)
-    }
-
-    const uinPart = _hash(parsedUin.toString()).slice(-32)
-    const phoneNumberPart = _hash(PhoneNumber.toString()).slice(-32)
-
+const _getAddress = (PhoneNumber) => {
+    const phoneNumberPart = _hash(PhoneNumber.toString()).slice(-64)
     return INT_KEY_NAMESPACE + uinPart + phoneNumberPart;
 }
 

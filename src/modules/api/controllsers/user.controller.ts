@@ -4,21 +4,18 @@ import {ApiUseTags} from '@nestjs/swagger';
 import {Log} from 'hlf-node-utils';
 import * as redis from 'redis';
 import * as Promisefy from 'bluebird';
-import {PostVerifyNumberDTO} from '../../../shared/models/dto/post.verify.number.dto';
-import {CodeQueueListenerService} from '../../../../services/code_sender/queue.service';
-import {ClientService} from '../../../../config/services/services';
-import {TimeHelper} from '../../../../services/helpers/time.helper';
-import {Validator} from '../../../../services/helpers/validation.helper';
-import {TwoFaUser} from '../../../shared/models/chaincode/twofa/user.model';
-import {PostUserDTO} from '../../../shared/models/dto/post.user.dto';
-import {PostCodeDTO} from '../../../shared/models/dto/post.code.dto';
-import {PostVerifyCodeDTO} from '../../../shared/models/dto/post.verify.dto';
-import {Services} from '../../../../services/code_sender/services';
-import {TfaTransactionFamily, User} from '../../../shared/families/tfa.transaction.family';
-import {EnvConfig} from '../../../../config/env';
+import {PostVerifyNumberDTO} from '../../shared/models/dto/post.verify.number.dto';
+import {CodeQueueListenerService} from '../../../services/code_sender/queue.service';
+import {ClientService} from '../../../config/services/services';
+import {TimeHelper} from '../../../services/helpers/time.helper';
+import {Validator} from '../../../services/helpers/validation.helper';
+import {TwoFaUser} from '../../shared/models/chaincode/twofa/user.model';
+import {PostUserDTO} from '../../shared/models/dto/post.user.dto';
+import {PostVerifyCodeDTO} from '../../shared/models/dto/post.verify.dto';
+import {TfaTransactionFamily, User} from '../../shared/families/tfa.transaction.family';
 import * as request from 'request-promise-native';
-import {PostKaztelUserDTO} from '../../../shared/models/dto/post.kaztel.user.dto';
-import {KaztelTransactionFamily} from '../../../shared/families/kaztel.transaction.family';
+import {PostKaztelUserDTO} from '../../shared/models/dto/post.kaztel.user.dto';
+import {KaztelTransactionFamily} from '../../shared/families/kaztel.transaction.family';
 
 @ApiUseTags('v1/api/users')
 @Controller('v1/api/users')
@@ -151,28 +148,6 @@ export class UserController {
         return res.status(HttpStatus.OK).json({status: `success`});
     }
 
-    //
-    // @Put()
-    // putUser(@Res() res, @Body() userDto: PostUserDTO): void {
-    //
-    //     let v = new Validator(userDto, {
-    //         name: 'required|string',
-    //         phone_number: 'required|string|regex:/^\\+?[1-9]\\d{1,14}$/',
-    //         service: 'required|in:kazakhtelecom',
-    //         client_timestamp: 'required|number',
-    //         uin: 'nullable|number|maxNumber:1000000000000',
-    //         sex: 'nullable|string|in:male,female',
-    //         birthdate: 'nullable|date',
-    //         method: 'required|in:sms,telegram,whatsapp',
-    //     }, {'service.in': `No service with name: ${userDto.Service}`});
-    //
-    //     if (v.fails()) {
-    //         return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json(v.getErrors());
-    //     }
-    //
-    //     res.render('kazahtelecom/index', {message: 'Hello world!'});
-    // }
-
     @Get('verify-number')
     async sendUserCode(@Res() res, @Query('phone_number') phoneNumber: string, @Query('service') service?: string): Promise<any[]> {
 
@@ -255,44 +230,6 @@ export class UserController {
         }
 
         return res.status(HttpStatus.OK).json({status: 'success'});
-    }
-
-    @Post('code')
-    postCode(@Res() res, @Body() body: PostCodeDTO) {
-        let v = new Validator(body, {
-            phone_number: 'required|string|regex:/^\\+?[1-9]\\d{1,14}$/',
-            service: 'requiredIfNot:push_token|string|in:kazakhtelecom',
-            event: 'required|string',
-            embeded: 'boolean',
-            client_timestamp: 'required|number',
-            cert: 'nullable',
-        }, {'service.in': `No service with name: ${body.service}`});
-
-        if (v.fails()) {
-            return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json(v.getErrors());
-        }
-
-        const code = this.genCode();
-        this.codeQueueListenerService.queuePUSH.add({
-            push_token: body.push_token,
-            message: 'Проверка',
-            title: `Подтвердите вход на сервис '${Services['kazakhtelecom']}'`,
-            code: code,
-        });
-
-        if (body.embeded) {
-            return res.status(HttpStatus.OK).json({
-                'name': 'Гвендолин',                    // Имя пользователя
-                'phone_number': '+469983057932',        // Телефон пользователя
-                'remember_cooldown': 2592000,         // Срок на который был запомнен второй фактор авторизации
-                'status': 'success'
-            });
-        }
-        return res.status(HttpStatus.OK).json({
-            'resend_cooldown': 600,         // Количество секунд за которые надо ввести код и за которые нельзя отправить код повторно
-            'method': 'push',               // Метод отправки (in:push,sms,telegram,whatsapp)
-            'status': 'success'
-        });
     }
 
     @Get('code')

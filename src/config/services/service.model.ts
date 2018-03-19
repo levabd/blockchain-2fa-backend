@@ -1,16 +1,16 @@
+import {_hash} from '../../services/helpers/helpers';
+
 export class Service {
 
     /**
      *
      * @param {string} Name - Name of the service
-     * @param {string} Secret - Secret which will be used for integration
-     * @param {string} Channel - Service's channel
-     * @param {string} Chaincode - Service's Chaincode
+     * @param {string} FamilyName
+     * @param {string} FamilyVersion - Service's channel
      */
     constructor(private Name: string,
-                private Secret: string,
-                private Channel: string,
-                private Chaincode: string) {
+                private FamilyName: string,
+                private FamilyVersion: string) {
     }
 
     getName(): string {
@@ -21,27 +21,23 @@ export class Service {
         this.Name = name;
     }
 
-    getChaincode(): string {
-        return this.Chaincode;
-    }
-
-    setChaincode(chaincode: string): void {
-        this.Chaincode = chaincode;
-    }
-
     getKey(): string {
         return this.Name;
     }
 
     setKey(key: string): void {
-        this.Secret = key;
+        this.FamilyName = key;
     }
 
     getChannel(): string {
-        return this.Channel;
+        return this.FamilyVersion;
     }
 
     setChannel(channel: string): void {
-        this.Channel = channel;
+        this.FamilyVersion = channel;
+    }
+
+    getPrefix() {
+        return _hash(this.FamilyName).substring(0, 6);
     }
 }

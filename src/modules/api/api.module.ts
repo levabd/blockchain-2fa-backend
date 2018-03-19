@@ -1,5 +1,5 @@
 import {MiddlewaresConsumer, Module} from '@nestjs/common';
-import {UserController} from './controllsers/users/user.controller';
+import {UserController} from './controllsers/user.controller';
 import {SmsCallbackController} from './controllsers/sms/sms.callback.controller';
 import {SharedModule} from '../shared/shared.module';
 import {NestModule} from '@nestjs/common/interfaces';

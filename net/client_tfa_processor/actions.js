@@ -169,7 +169,7 @@ const _addLog = (context, address, data) => (possibleAddressValues) => {
         indexKey = _getLatestIndex(logKeys)
     }
 
-    log.Code = hexdec(CRC16(INT_KEY_FAMILY + log.Event + phoneNumber + log.ActionTime))
+    log.Code = hexdec(CRC16(process.env['TRANSACTION_FAMILY_KEY'] + log.Event + phoneNumber + log.ActionTime))
 
     if (log.Code.Status && log.Code.Status === log_statuses.RESEND_CODE) {
         log.Code.Status = log_statuses.RESEND_CODE

@@ -9,10 +9,21 @@ var app = new Vue({
             this.entering = false;
         },
         telegram: function () {
-            this.entering = false;
+            this.handlePress()
+            // this.entering = true;
         },
         sms: function () {
-            this.entering = false;
+            this.handlePress()
+            // this.entering = true;
         },
+        push: function () {
+            this.handlePress()
+            // this.entering = true;
+        },
+        handlePress: function () {
+            console.log(234234234)
+
+            this.http.get('/')
+        }
     }
 })
