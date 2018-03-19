@@ -33,7 +33,6 @@ export class VerificationController {
             client_timestamp: 'required|number',
             cert: 'nullable',
         }, {'service.in': `No service with name: ${body.service}`});
-
         if (v.fails()) {
             return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json(v.getErrors());
         }
@@ -41,7 +40,7 @@ export class VerificationController {
         switch (body.service) {
             case 'kazakhtelecom':
                 const kazakhtelecom = this.kaztelTF.getAddress()
-                
+
 
                 break;
             case 'egov':

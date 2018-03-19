@@ -60,17 +60,36 @@ services:
       - "8008:8008"
     depends_on:
       - validator
-
     entrypoint: sawtooth-rest-api -C tcp://validator:4004 --bind rest-api:8008
     networks:
       - public
 
-  tfa-tp:
-    image: allatrack/tfa_tp2:latest
-    container_name: sawtooth-tfa-tp
+  s-tfa-tp:
+    image: allatrack/s_tfa_tp:latest
+    container_name: sawtooth-s-tfa-tp
     depends_on:
       - validator
       - rest-api
+    networks:
+      - public
+
+  kaztel-sc-tfa-tp:
+    image: allatrack/sc_tfa_tp:latest
+    container_name: sawtooth-kaztel-sc-tfa-tp
+    depends_on:
+      - validator
+      - rest-api
+    entrypoint: "node index.js tcp://172.18.0.2:4004 kaztel 0.1"
+    networks:
+      - public
+
+  egov-sc-tfa-tp:
+    image: allatrack/sc_tfa_tp:latest
+    container_name: sawtooth-egov-sc-tfa-tp
+    depends_on:
+      - validator
+      - rest-api
+    entrypoint: "node index.js tcp://172.18.0.2:4004 egov 0.1"
     networks:
       - public
 

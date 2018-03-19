@@ -15,4 +15,4 @@ RUN npm install
 # Bundle app source
 COPY . .
 
-CMD [ "node", "index.js" ]
+# CMD [ "node", "index.js", "tcp://172.18.0.2:4004" , "kaztel", "egov", "0.1"]
