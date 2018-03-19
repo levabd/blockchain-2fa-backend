@@ -7,7 +7,7 @@ export class AppExceptionFilter implements ExceptionFilter {
             .status(500)
             .json({
                 error: `Internal Server Error.`,
-                details: exception.response.message
+                details: exception.response
             });
     }
 }

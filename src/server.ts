@@ -40,8 +40,8 @@ async function bootstrap() {
      *  Set up static files
      */
     app.use(express.static(__dirname + '/modules/web/public'));
-    app.set('views', __dirname + '/modules/web/views');
-    app.set('view engine', 'pug');
+    app.set('views', __dirname + '/modules/web/pwa/dist');
+    app.set('view engine', 'html');
 
     /**
      * Start Chainservice API

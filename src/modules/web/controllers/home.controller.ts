@@ -1,5 +1,8 @@
 import {Controller, Get, Post,  Res} from '@nestjs/common';
 import {ApiUseTags} from '@nestjs/swagger';
+import * as path from 'path';
+import {Log} from 'hlf-node-utils';
+const resolvePath = (file: string) => path.resolve(__dirname , '..', `pwa/dist/${file}`);
 
 @ApiUseTags('v1/web')
 @Controller('v1/web')
@@ -12,7 +15,8 @@ export class HomeController {
      */
     @Get('example')
     example(@Res() res): void {
-        res.render('example/enter');
+        Log.app.debug('path', resolvePath('index.html'));
+        res.redirect('http://localhost:3003/');
     }
 
     /**

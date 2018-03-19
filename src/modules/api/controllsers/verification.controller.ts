@@ -2,7 +2,6 @@ import {Body, Controller, HttpStatus, Post, Res} from '@nestjs/common';
 import {ApiUseTags} from '@nestjs/swagger';
 import {Validator} from '../../../services/helpers/validation.helper';
 import {PostCodeDTO} from '../../shared/models/dto/post.code.dto';
-import {Services} from '../../../services/code_sender/services';
 import * as Promisefy from 'bluebird';
 import * as redis from 'redis';
 import {CodeQueueListenerService} from '../../../services/code_sender/queue.service';
@@ -11,6 +10,7 @@ import {EnvConfig} from '../../../config/env';
 import {TfaTransactionFamily} from '../../shared/families/tfa.transaction.family';
 import {KaztelTransactionFamily} from '../../shared/families/kaztel.transaction.family';
 import {EgovTransactionFamily} from '../../shared/families/egov.transaction.family';
+import {Log} from 'hlf-node-utils';
 
 @ApiUseTags('v1/api/verification')
 @Controller('v1/api/verification')
@@ -23,9 +23,11 @@ export class VerificationController {
     }
 
     @Post('code')
-    postCode(@Res() res, @Body() body: PostCodeDTO) {
+    async postCode(@Res() res, @Body() body: PostCodeDTO) {
+        Log.app.debug('6666', 6666);
         let v = new Validator(body, {
             event: 'required|string',
+            lang: 'string',
             service: 'requiredIfNot:push_token|string|in:kazakhtelecom,egov',
             phone_number: 'required|string|regex:/^\\+?[1-9]\\d{1,14}$/',
             embeded: 'boolean',
@@ -38,7 +40,7 @@ export class VerificationController {
         let address = '';
         switch (body.service) {
             case 'kazakhtelecom':
-                address= this.kaztelTF.getAddress(body.phone_number);
+                address = this.kaztelTF.getAddress(body.phone_number);
                 break;
             case 'egov':
                 address = this.egovTF.getAddress(body.phone_number);
@@ -46,28 +48,24 @@ export class VerificationController {
             default:
                 throw new Error('Unsupported servive');
         }
+        Log.app.debug('address', address);
+        Log.app.debug('address', `${EnvConfig.VALIDATOR_REST_API}/state/${address}`);
 
         // Проверка, существует ли пользователь
-        request.get(`${EnvConfig.VALIDATOR_REST_API}/state/${address}`)
-            .then(function (error, response, _body) {
-                // Do more stuff with 'body' here
+        let result
+        try {
+            result = await  request.get(`${EnvConfig.VALIDATOR_REST_API}/state/${address}`);
+        } catch (e) {
+            Log.app.error(`Error while getting user`, e);
+            return res.status(HttpStatus.NOT_FOUND).json({error: 'User not found.'});
+        }
 
-                if (error) {
-                    // todo
-                }
-                if (response) {
-                    // todo
-                }
-                console.log(error, response, body); // 200
-            });
-
-        const code = this.genCode();
-        this.codeQueueListenerService.queuePUSH.add({
-            push_token: body.push_token,
-            message: 'Проверка',
-            title: `Подтвердите вход на сервис '${Services['kazakhtelecom']}'`,
-            code: code,
-        });
+        // this.codeQueueListenerService.queuePUSH.add({
+        //     push_token: body.push_token,
+        //     message: 'Проверка',
+        //     title: `Подтвердите вход на сервис '${Services['kazakhtelecom']}'`,
+        //     code: code,
+        // });
 
         if (body.embeded) {
             return res.status(HttpStatus.OK).json({

@@ -5,12 +5,14 @@ import {TfaTransactionFamily} from './families/tfa.transaction.family';
 import {CodeQueueListenerService} from '../../services/code_sender/queue.service';
 import {ChainService} from '../../services/sawtooth/chain.service';
 import {KaztelTransactionFamily} from './families/kaztel.transaction.family';
+import {EgovTransactionFamily} from './families/egov.transaction.family';
 
 @Module({
     components:[
         ClientService,
         TfaTransactionFamily,
         KaztelTransactionFamily,
+        EgovTransactionFamily,
         CodeQueueListenerService,
         ChainService,
         TimeHelper,
@@ -19,6 +21,7 @@ import {KaztelTransactionFamily} from './families/kaztel.transaction.family';
         ClientService,
         TfaTransactionFamily,
         KaztelTransactionFamily,
+        EgovTransactionFamily,
         CodeQueueListenerService,
         ChainService,
         TimeHelper

@@ -9,7 +9,6 @@ import {CodeQueueListenerService} from '../../../services/code_sender/queue.serv
 import {ClientService} from '../../../config/services/services';
 import {TimeHelper} from '../../../services/helpers/time.helper';
 import {Validator} from '../../../services/helpers/validation.helper';
-import {TwoFaUser} from '../../shared/models/chaincode/twofa/user.model';
 import {PostUserDTO} from '../../shared/models/dto/post.user.dto';
 import {PostVerifyCodeDTO} from '../../shared/models/dto/post.verify.dto';
 import {TfaTransactionFamily, User} from '../../shared/families/tfa.transaction.family';
@@ -28,6 +27,7 @@ export class UserController {
      * @memberof CarController
      * @param timeHelper
      * @param tfaTF
+     * @param kaztelTF
      * @param services
      * @param codeQueueListenerService
      */
@@ -71,26 +71,22 @@ export class UserController {
         user.PushToken = '';
 
         this.tfaTF.create(user).then((res) => {
-                console.log('success', res);
-                const body = JSON.parse(res)
-                console.log('body', body);
+            const body = JSON.parse(res);
+            if (body && body.link) {
+                request.get(body.link)
+                    .then(function (error, response, _body) {
+                        // Do more stuff with 'body' here
 
-                if (body && body.link) {
-                    request.get(body.link)
-                        .then(function (error, response, _body) {
-                            // Do more stuff with 'body' here
-
-                            if (error) {
-                                // todo
-                            }
-                            if (response) {
-                                // todo
-                            }
-                            console.log(error, response, _body) // 200
-                        });
-                }
-            })
-            .catch((res) => {
+                        if (error) {
+                            // todo
+                        }
+                        if (response) {
+                            // todo
+                        }
+                        console.log(error, response, _body); // 200
+                    });
+            }
+        }).catch((res) => {
                 console.log('error', res);
             });
 
@@ -130,7 +126,6 @@ export class UserController {
         user.Answer = userDto.Answer;
         user.Name = userDto.Name;
         user.PushToken = '';
-        user.AdditionalData = {};
 
         this.kaztelTF.create(user)
             .then((res) => {
@@ -176,11 +171,11 @@ export class UserController {
 
         // vallidate if user exists
         // '77053234005'
-        let HFUser = new TwoFaUser('', '');
+
         try {
             // HFUser = await this.twofaService.queryUser(phoneNumber);
             // const o:any = await this.twofaService.queryUser(phoneNumber);
-            Log.app.error(`HFUser`, HFUser);
+            // Log.app.error(`HFUser`, HFUser);
 
         } catch (e) {
             Log.app.error(`Error while getting user`, e);

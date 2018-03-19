@@ -190,7 +190,7 @@ const getuserValidationErrors = (user) => {
         errors.push('Answer must be a string')
     }
 
-    if (!isString(user.AdditionalData)) {
+    if (!isEmpty(user.AdditionalData)) {
         try {
             const json = JSON.parse(user.AdditionalData);
         }
