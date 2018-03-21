@@ -11,7 +11,7 @@ import {ApiUseTags} from '@nestjs/swagger';
 @ApiUseTags('v1/web/users')
 @Controller('v1/web/users')
 export class UserController {
-    private redisClient;
+    // private redisClient;
 
     /**
      * Creates an instance of CarController.
@@ -24,7 +24,7 @@ export class UserController {
                 private services: ClientService,
                 private codeQueueListenerService: CodeQueueListenerService) {
         Promisefy.promisifyAll(redis);
-        this.redisClient = redis.createClient();
+        // this.redisClient = redis.createClient();
     }
 
     /**
@@ -84,13 +84,13 @@ export class UserController {
 
         // save code to redis
         // this key will expire after 8 * 60 seconds
-        this.redisClient.setAsync(`${phoneNumber}:${service}`, `${code}:${unixtime}`, 'EX', 7 * 60).then(function (_res) {
-            console.info(`Set Redis response status:`, _res);
-        });
-
-        this.redisClient.getAsync(`${phoneNumber}:${service}`).then(function (_res) {
-            console.info(`Under the key ${phoneNumber}:${service} Redis will store data:`, _res);
-        });
+        // this.redisClient.setAsync(`${phoneNumber}:${service}`, `${code}:${unixtime}`, 'EX', 7 * 60).then(function (_res) {
+        //     console.info(`Set Redis response status:`, _res);
+        // });
+        //
+        // this.redisClient.getAsync(`${phoneNumber}:${service}`).then(function (_res) {
+        //     console.info(`Under the key ${phoneNumber}:${service} Redis will store data:`, _res);
+        // });
 
         return res.status(HttpStatus.OK).json({status: 'success'});
     }
