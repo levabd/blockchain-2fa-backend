@@ -23,9 +23,9 @@ RUN cd /tmp && npm run build
 FROM base AS release
 WORKDIR /var/www
 # create empty .env file for dotenv lib
-RUN touch .env
-COPY --from=dependencies /frontend_api_key_generation_example ./node_modules
-COPY --from=build /frontend_api_key_generation_example ./dist
+COPY ./.env /var/www
+COPY --from=dependencies /tmp/prod_node_modules ./node_modules
+COPY --from=build /tmp/dist ./dist
 
 VOLUME /var/log/portal-service
 EXPOSE 3000

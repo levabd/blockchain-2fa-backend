@@ -1,2 +1,2 @@
-docker build . -t hlf-ts-boilerplate
-docker run -i -t -p 3000:3000 hlf-ts-boilerplate
+docker build -t allatrack/blockchain_2fa_backend .
+docker run -i -t -p 3000:3000 allatrack/blockchain_2fa_backend
