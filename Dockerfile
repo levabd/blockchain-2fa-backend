@@ -18,7 +18,6 @@ RUN cd /tmp && npm install
 FROM dependencies AS build
 COPY ./src /tmp/src
 RUN cd /tmp && npm run build
-COPY ./src/config/creds /tmp/dist/config/creds
 
 # --- Release ---
 FROM base AS release

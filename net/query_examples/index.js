@@ -47,15 +47,15 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 var tlist =[]
-for(let i=0; i<=1000;i++){
+for(let i=0; i<=10000;i++){
     (function(cntr) {
 
-        var pn = getRandomInt(9999, 99999)
+        var pn = getRandomInt(999999, 9999999)
         const payload = {
             Action: 'create', // create | update | delete
-            PhoneNumber: '770565'+pn,
+            PhoneNumber: '7705'+pn,
             User: {
-                PhoneNumber:'770565'+pn,
+                PhoneNumber:'7705'+pn,
                 Uin: 125468416843,
                 Name: 'Peshkov Maxim ',
                 IsVerified: false,
@@ -69,9 +69,7 @@ for(let i=0; i<=1000;i++){
 
         // let address = FAMILY_NAMESPACE + _hash(payload.User.Uin +payload.User.PhoneNumber).slice(-64)
         let address = FAMILY_NAMESPACE + phoneNumberPart
-        console.log(address);
         const payloadBytes = cbor.encode(payload)
-
 
         const transactionHeaderBytes = protobuf.TransactionHeader.encode({
             familyName: 'tfa',

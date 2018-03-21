@@ -13,18 +13,18 @@ const {
 } = require('sawtooth-sdk/processor/exceptions')
 
 const request = require('request')
-const encode = obj => Buffer.from(JSON.stringify(obj, Object.keys(obj).sort()))
-const decode = buf => JSON.parse(buf.toString())
+
+console.log('length');
 
 request.get({
-    url: 'http://127.0.0.1:8008/state/cd242ec4e96d1849969b050993a4e4ec0410c8d967b86f431a94a511e6944055d15dec',
+    url: 'http://127.0.0.1:8008/blocks?limit=1000&min=200',
     headers: {'Content-Type': 'application/octet-stream'}
 }, (err, response) => {
     if (err) return console.log(err)
 
     var dataBase64 = JSON.parse(response.body).data
 
-    console.log(cbor.decode(new Buffer(dataBase64, 'base64')));
+    console.log('length', dataBase64.length);
 });
 //.
 
