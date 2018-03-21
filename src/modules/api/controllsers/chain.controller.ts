@@ -3,7 +3,7 @@ import {ApiUseTags} from '@nestjs/swagger';
 
 import {EnvConfig} from '../../../config/env';
 import * as request from 'request-promise-native';
-import {Log} from 'hlf-node-utils';
+
 import {ChainService} from '../../../services/sawtooth/chain.service';
 import {CodeQueueListenerService} from '../../../services/code_sender/queue.service';
 
@@ -29,7 +29,7 @@ export class ChainController {
             }).then(response => {
                 return response.data[0];
             }).catch(error => {
-                Log.app.debug('result ', error);
+                console.log('result ', error);
                 throw new Error(error);
             });
 

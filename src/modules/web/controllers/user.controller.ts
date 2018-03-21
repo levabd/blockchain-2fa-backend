@@ -1,6 +1,6 @@
 import {Body, Controller, Get, HttpStatus, Post, Query, Res} from '@nestjs/common';
 import {CodeQueueListenerService} from '../../../services/code_sender/queue.service';
-import {Log} from 'hlf-node-utils';
+
 import {ClientService} from '../../../config/services/services';
 import * as redis from 'redis';
 import {TimeHelper} from '../../../services/helpers/time.helper';
@@ -70,7 +70,7 @@ export class UserController {
         try {
             // HFUser = await this.twofaService.queryUser(phoneNumber);
         } catch (e) {
-            Log.app.error(`Error while getting user`, e);
+            console.error(`Error while getting user`, e);
             return res.status(HttpStatus.NOT_FOUND).json({error: 'User not found.'});
         }
 
@@ -85,11 +85,11 @@ export class UserController {
         // save code to redis
         // this key will expire after 8 * 60 seconds
         this.redisClient.setAsync(`${phoneNumber}:${service}`, `${code}:${unixtime}`, 'EX', 7 * 60).then(function (_res) {
-            Log.app.info(`Set Redis response status:`, _res);
+            console.info(`Set Redis response status:`, _res);
         });
 
         this.redisClient.getAsync(`${phoneNumber}:${service}`).then(function (_res) {
-            Log.app.info(`Under the key ${phoneNumber}:${service} Redis will store data:`, _res);
+            console.info(`Under the key ${phoneNumber}:${service} Redis will store data:`, _res);
         });
 
         return res.status(HttpStatus.OK).json({status: 'success'});

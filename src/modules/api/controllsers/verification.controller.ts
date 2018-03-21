@@ -7,7 +7,7 @@ import * as redis from 'redis';
 import {CodeQueueListenerService} from '../../../services/code_sender/queue.service';
 import {TfaTransactionFamily} from '../../shared/families/tfa.transaction.family';
 
-import {Log} from 'hlf-node-utils';
+
 import {ChainService} from '../../../services/sawtooth/chain.service';
 import {UserLog} from '../../shared/models/user.log';
 import {TimeHelper} from '../../../services/helpers/time.helper';
@@ -45,7 +45,7 @@ export class VerificationController {
             this.chainService.initTF(body.service);
             user = await this.chainService.getStateByPhoneNumber(body.phone_number);
         } catch (e) {
-            Log.app.error(`Error while getting user`, e);
+            console.error(`Error while getting user`, e);
             return res.status(HttpStatus.NOT_FOUND).json({error: 'User not found.'});
         }
 
@@ -76,7 +76,7 @@ export class VerificationController {
             this.chainService.initTF(body.service);
             user = await this.chainService.getStateByPhoneNumber(body.phone_number);
         } catch (e) {
-            Log.app.error(`Error while getting user`, e);
+            console.error(`Error while getting user`, e);
             return res.status(HttpStatus.NOT_FOUND).json({error: 'User not found.'});
         }
 
@@ -92,7 +92,7 @@ export class VerificationController {
             log.Cert = body.cert;
             response = await this.chainService.addLog(body.phone_number, log);
         } catch (e) {
-            Log.app.error(`Error while getting user`, e);
+            console.error(`Error while getting user`, e);
             return res.status(HttpStatus.BAD_GATEWAY).json({error: 'Ошибка отправки кода.'});
         }
 
@@ -128,7 +128,7 @@ export class VerificationController {
             this.chainService.initTF(body.service);
             user = await this.chainService.getStateByPhoneNumber(body.phone_number);
         } catch (e) {
-            Log.app.error(`Error while getting user`, e);
+            console.error(`Error while getting user`, e);
             return res.status(HttpStatus.NOT_FOUND).json({error: 'Пользователь не найдет.'});
         }
 
@@ -165,7 +165,7 @@ export class VerificationController {
             });
 
         } catch (e) {
-            Log.app.error(`Error while getting user`, e);
+            console.error(`Error while getting user`, e);
             return res.status(HttpStatus.BAD_GATEWAY).json({error: 'Ошибка проверки кода.'});
         }
     }
@@ -201,7 +201,7 @@ export class VerificationController {
             this.chainService.initTF(body.service);
             user = await this.chainService.getStateByPhoneNumber(body.phone_number);
         } catch (e) {
-            Log.app.error(`Error while getting user`, e);
+            console.error(`Error while getting user`, e);
             return res.status(HttpStatus.NOT_FOUND).json({error: 'Пользователь не найдет.'});
         }
 
@@ -223,7 +223,7 @@ export class VerificationController {
             this.chainService.initTF(params.service);
             user = await this.chainService.getStateByPhoneNumber(params.phone_number);
         } catch (e) {
-            Log.app.error(`Error while getting user`, e);
+            console.error(`Error while getting user`, e);
             return res.status(HttpStatus.NOT_FOUND).json({error: e});
         }
 
@@ -252,7 +252,7 @@ export class VerificationController {
                 // todo
                 break;
             default:
-                Log.app.error(`ChainController@deliverCode: method ${log.Method} is not supported.`);
+                console.error(`ChainController@deliverCode: method ${log.Method} is not supported.`);
                 break;
         }
 

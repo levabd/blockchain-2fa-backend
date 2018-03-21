@@ -1,4 +1,4 @@
-const crypto = require('crypto')
+import  * as crypto from 'crypto';
 
 export const _hash = (x) => crypto.createHash('sha512').update(x).digest('hex').toLowerCase()
 

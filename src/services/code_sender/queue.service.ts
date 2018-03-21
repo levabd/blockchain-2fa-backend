@@ -1,6 +1,6 @@
 import {EnvConfig} from '../../config/env';
 import {Component} from '@nestjs/common';
-import {Log} from 'hlf-node-utils';
+
 import * as Queue from 'bull';
 import * as request from 'request-promise-native';
 import {Services} from './services';
@@ -32,7 +32,7 @@ export class CodeQueueListenerService {
      * @memberof CodeQueueListenerService
      */
     public listen(): void {
-        Log.config.info(`waiting for the jobs`);
+        console.info(`waiting for the jobs`);
         this.queueTelegram.process(this.processTelegramJob);
         this.queueSMS.process(this.processSMSJob);
         this.queuePUSH.process(this.processPUSHJob);
@@ -51,7 +51,7 @@ export class CodeQueueListenerService {
     private processTelegramJob(job, done): void {
         // job.data contains the custom data passed when the job was created
         // job.id contains id of this job.
-        Log.config.info(`process queueTelegram`, job.data);
+        console.info(`process queueTelegram`, job.data);
         done();
 
     }
@@ -65,7 +65,7 @@ export class CodeQueueListenerService {
      */
     private processSMSJob(job, done) {
 
-        Log.config.info(`processSMSJob start`);
+        console.info(`processSMSJob start`);
 
         if (job.data.phone_number === '') {
             done(new Error('Phone number is empty'));
@@ -97,7 +97,7 @@ export class CodeQueueListenerService {
             }
         };
         request.post(options).then(r => {
-            Log.config.info(`processSMSJob end`, r);
+            console.info(`processSMSJob end`, r);
             done();
         });
     }
@@ -113,12 +113,12 @@ export class CodeQueueListenerService {
         const fcm = new gcm.Sender(EnvConfig.FIREBASE_CLOUD_KEY);
 
         if (!job.data.title || !job.data.message) {
-            Log.app.warn(`CodeQueueListenerService@processPUSHJob: Can not send push notification- not title or message provided.`);
+            console.info(`CodeQueueListenerService@processPUSHJob: Can not send push notification- not title or message provided.`);
             return;
         }
 
         if (!job.data.push_token) {
-            Log.app.warn(`CodeQueueListenerService@processPUSHJob: Can not send push notification- not push_token provided.`);
+            console.info(`CodeQueueListenerService@processPUSHJob: Can not send push notification- not push_token provided.`);
             return;
         }
         let message = new gcm.Message({
@@ -131,11 +131,11 @@ export class CodeQueueListenerService {
 
         fcm.sendNoRetry(message, [job.data.push_token], (err, response) => {
             if (err) {
-                Log.app.error(`CodeQueueListenerService@processPUSHJob@sendNoRetry: Firebase error`, err);
+                console.error(`CodeQueueListenerService@processPUSHJob@sendNoRetry: Firebase error`, err);
             }
         });
 
-        Log.config.info(`CodeQueueListenerService@processPUSHJob: processed`);
+        console.info(`CodeQueueListenerService@processPUSHJob: processed`);
         done();
     }
 }

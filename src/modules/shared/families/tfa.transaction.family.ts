@@ -1,5 +1,5 @@
 import {Component} from '@nestjs/common';
-import {Log} from 'hlf-node-utils';
+
 import {EnvConfig} from '../../../config/env';
 import {_hash} from '../../../services/helpers/helpers';
 import {ChainService} from '../../../services/sawtooth/chain.service';
@@ -46,10 +46,10 @@ export class TfaTransactionFamily extends ChainService{
     }
 
     update(user: User) {
-        Log.app.debug('create');
+        console.log('create');
     }
 
     setPushToken(pushToken: string) {
-        Log.app.debug('setPushToken');
+        console.log('setPushToken');
     }
 }

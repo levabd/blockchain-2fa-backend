@@ -52,7 +52,6 @@
     "googleapis": "^22.2.0",
     "grpc": "^1.9.1",
     "handlebars": "^4.0.11",
-    "hlf-node-utils": "github:peshkov3/hlf-node-utils",
     "js-sha1": "^0.6.0",
     "jwks-rsa": "^1.2.1",
     "jwt-decode": "^2.2.0",
@@ -74,7 +73,8 @@
     "ws": "^5.0.0",
     "yup": "^0.23.0",
     "zeromq": "^4.6.0",
-    "nodemon": "^1.17.1"
+    "nodemon": "^1.17.1",
+    "reflect-metadata": "^0.1.12"
   },
   "devDependencies": {
     "@types/bull": "^3.3.6",
@@ -84,7 +84,6 @@
     "@types/node": "^7.0.18",
     "@types/supertest": "^2.0.4",
     "ajv": "^6.2.0",
-    "chai": "^4.1.2",
     "eslint": "^4.18.1",
     "eslint-config-google": "^0.9.1",
     "jasmine": "^2.99.0",

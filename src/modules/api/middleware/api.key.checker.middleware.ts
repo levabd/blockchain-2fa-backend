@@ -1,5 +1,5 @@
 import {Middleware, NestMiddleware, ExpressMiddleware, HttpStatus} from '@nestjs/common';
-import {Log} from 'hlf-node-utils';
+
 import * as crc32 from 'crc-32';
 import * as crypto from 'crypto';
 import {EnvConfig} from '../../../config/env';
@@ -11,7 +11,7 @@ export class ApiKeyCheckerMiddleware implements NestMiddleware {
     resolve(...args: any[]): ExpressMiddleware {
         return (req, res, next) => {
             if (!req.headers['api-key']) {
-                Log.app.debug('ApiKeyCheckerMiddleware@resolve: attempt to execute query with no ip key');
+                console.log('ApiKeyCheckerMiddleware@resolve: attempt to execute query with no ip key');
                 return res.status(HttpStatus.UNAUTHORIZED).json({error: 'Wrong API key'});
             }
 
@@ -29,7 +29,7 @@ export class ApiKeyCheckerMiddleware implements NestMiddleware {
             const hash = md5(`${req.path}::body::${bodySrc}::key::${EnvConfig.API_KEY}::phone_number::${phoneNumber}`);
 
             if (hash !== apiKey.substring(0, apiKey.length - 17)) {
-                Log.app.debug(`ApiKeyCheckerMiddleware@resolve: attempt to execute query with wrong api key: ${apiKey}`);
+                console.log(`ApiKeyCheckerMiddleware@resolve: attempt to execute query with wrong api key: ${apiKey}`);
                 return res.status(HttpStatus.UNAUTHORIZED).json({error: 'Wrong API key'});
             }
 

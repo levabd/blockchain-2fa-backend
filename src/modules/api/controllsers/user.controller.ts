@@ -1,7 +1,6 @@
 import {Body, Controller, Get, HttpStatus, Post, Query, Req, Res} from '@nestjs/common';
 import {ApiUseTags} from '@nestjs/swagger';
 
-import {Log} from 'hlf-node-utils';
 import * as redis from 'redis';
 import * as Promisefy from 'bluebird';
 import {PostVerifyNumberDTO} from '../../shared/models/dto/post.verify.number.dto';
@@ -167,10 +166,10 @@ export class UserController {
         try {
             // HFUser = await this.twofaService.queryUser(phoneNumber);
             // const o:any = await this.twofaService.queryUser(phoneNumber);
-            // Log.app.error(`HFUser`, HFUser);
+            // console.error(`HFUser`, HFUser);
 
         } catch (e) {
-            Log.app.error(`Error while getting user`, e);
+            console.error(`Error while getting user`, e);
             return res.status(HttpStatus.NOT_FOUND).json({error: 'User not found.'});
         }
 
@@ -184,11 +183,11 @@ export class UserController {
         // save code to redis
         // this key will expire after 8 * 60 seconds
         this.redisClient.setAsync(`${phoneNumber}:${service}`, `${code}:${unixtime}`, 'EX', 7 * 60).then(function (_res) {
-            Log.app.info(`Set Redis response status:`, _res);
+            console.info(`Set Redis response status:`, _res);
         });
 
         this.redisClient.getAsync(`${phoneNumber}:${service}`).then(function (_res) {
-            Log.app.info(`Under the key ${phoneNumber}:${service} Redis will store data:`, _res);
+            console.info(`Under the key ${phoneNumber}:${service} Redis will store data:`, _res);
         });
 
         return res.status(HttpStatus.OK).json({status: 'success'});
@@ -219,7 +218,7 @@ export class UserController {
         try {
             // HFUser = await this.twofaService.queryUser(body.phone_number);
         } catch (e) {
-            Log.app.error(`Error while getting user`, e);
+            console.error(`Error while getting user`, e);
             return res.status(HttpStatus.NOT_FOUND).json({error: 'User not found.'});
         }
 

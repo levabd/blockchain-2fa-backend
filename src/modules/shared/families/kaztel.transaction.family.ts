@@ -3,7 +3,7 @@ import {EnvConfig} from '../../../config/env';
 import {ChainService} from '../../../services/sawtooth/chain.service';
 import {ClientService} from '../../../config/services/services';
 import {ClientUser} from './client.model';
-import {Log} from 'hlf-node-utils';
+
 
 @Component()
 export class KaztelTransactionFamily extends ChainService {

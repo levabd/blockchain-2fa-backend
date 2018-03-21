@@ -1,6 +1,6 @@
 import {ApiUseTags} from '@nestjs/swagger';
 import {Body, Controller, Post} from '@nestjs/common';
-import {Log} from 'hlf-node-utils';
+
 import * as sha1 from 'js-sha1';
 import {SmsBodyDto} from './sms.model';
 import {EnvConfig} from '../../../../config/env';
@@ -19,10 +19,10 @@ export class SmsCallbackController {
     @Post('callback')
     callback(@Body() smsBodyDto: SmsBodyDto): void {
         if (smsBodyDto.sha1 !== sha1(`${smsBodyDto.id}:${smsBodyDto.phone}:${smsBodyDto.status}:${EnvConfig.SMS_CALLBACK_TOKEN}`)) {
-            Log.app.info(`Callback called with an invalid hash`, smsBodyDto);
+            console.info(`Callback called with an invalid hash`, smsBodyDto);
             return;
         }
 
-        Log.app.info(`SMS callback - `, smsBodyDto);
+        console.info(`SMS callback - `, smsBodyDto);
     }
 }

@@ -1,4 +1,4 @@
-import {Log} from 'hlf-node-utils';
+
 import * as  changeCase from 'change-case';
 
 const DICT = {
@@ -120,7 +120,7 @@ export class Validator {
                         try {
                             this[`check${funcName}`](fieldNameToCheck, splitted);
                         } catch (E) {
-                            Log.app.warn(`Validator@constructor: validation error funcName `, funcName, fieldNameToCheck);
+                            console.info(`Validator@constructor: validation error funcName `, funcName, fieldNameToCheck);
                         }
                         continue;
                     }
@@ -129,7 +129,7 @@ export class Validator {
                     this['check' + this.capitalizeFirstLetter(splitted[0])](fieldNameToCheck);
 
                 } catch (e) {
-                    Log.app.warn(`Validator@constructor: validation type is not supported`, e);
+                    console.info(`Validator@constructor: validation type is not supported`, e);
                 }
             }
         });
