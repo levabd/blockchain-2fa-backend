@@ -21,4 +21,13 @@ export class PostCodeDTO {
     // noinspection TsLint
     @ApiModelProperty()
     readonly cert: string;
+    // noinspection TsLint
+    @ApiModelProperty()
+    readonly method: string;
+    // noinspection TsLint
+    @ApiModelProperty()
+    readonly resend: string;
+    // noinspection TsLint
+    @ApiModelProperty()
+    readonly code: string;
 }

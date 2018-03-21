@@ -3,36 +3,39 @@ import * as  changeCase from 'change-case';
 
 const DICT = {
     en: {
-        required: `The field :field is required.`,
-        number: `The field :field must be a number.`,
-        string: `The field :field must be a string.`,
-        boolean: `The field :field must be a boolean.`,
-        in: `The field :field must be one of the: :list.`,
-        maxStringLength: `The field :field must be less than: :value.`,
-        maxNumberLength: `The field :field must be less than: :value.`,
-        date: `The field :field must be a valid date format.`,
-        regex: `The :field format is invalid.`,
-        requiredIf: `The field :field is required when :dependField is not empty.`,
-        requiredIfNot: `The field :field is required when :dependField is empty.`,
+        required: 'The field :field is required.',
+        number: 'The field :field must be a number.',
+        string: 'The field :field must be a string.',
+        boolean: 'The field :field must be a boolean.',
+        in: 'The field :field must be one of the: :list.',
+        maxStringLength: 'The field :field must be less than: :value.',
+        maxNumberLength: 'The length of field :field must be less than: :value.',
+        maxNumber: 'The field :field must be less than: :value.',
+        date: 'The field :field must be a valid date format.',
+        regex: 'The :field format is invalid.',
+        requiredIf: 'The field :field is required when :dependField is not empty.',
+        requiredIfNot: 'The field :field is required when :dependField is empty.',
     },
     ru: {
-        required: `Поле :field обязательно для заполнения.`,
-        number: `Поле :field должно быть числом.`,
-        string: `Поле :field должно быть строкой.`,
-        boolean: `Поле :field должно быть true или false.`,
-        in: `Поле :field должно входить в список: :list.`,
-        maxStringLength: `Поле :field должно содерджать :value символов.`,
-        maxNumberLength: `Число :field должно быть меньше :value.`,
-        date: `Неверный формат даты.`,
-        regex: `Поле :field неверного формата.`,
-        requiredIf: `Поле :field обязательно, если не пустое поле :dependField.`,
-        requiredIfNot: `Поле :field обязательно, если пустое поле :dependField.`,
+        required: 'Поле :field обязательно для заполнения.',
+        number: 'Поле :field должно быть числом.',
+        string: 'Поле :field должно быть строкой.',
+        boolean: 'Поле :field должно быть true или false.',
+        in: 'Поле :field должно входить в список: :list.',
+        maxStringLength: 'Поле :field должно содерджать :value символов.',
+        maxNumberLength: 'Число :field должно быть меньше :value.',
+        maxNumber: 'Число :field должно быть меньше :value.',
+        date: 'Неверный формат даты.',
+        regex: 'Поле :field неверного формата.',
+        requiredIf: 'Поле :field обязательно, если не пустое поле :dependField.',
+        requiredIfNot: 'Поле :field обязательно, если пустое поле :dependField.',
     },
 };
 
 const FIELD_LIST_DICT = {
     ru: {
         phone_number: `'Номер телефона'`,
+        index: `'Индекс'`,
         event: `'Событие'`,
         service: `''Сервис`,
         push_token: `'Пуш токен'`,
@@ -41,6 +44,7 @@ const FIELD_LIST_DICT = {
         cert: `'Сертификат'`,
         name: `'Имя'`,
         uin: `'ИИН'`,
+        code: `'Код'`,
         sex: `'Пол'`,
         email: `'Электронная почта'`,
         birthdate: `'День рождения'`,
@@ -49,11 +53,12 @@ const FIELD_LIST_DICT = {
         question: `'Вопрос'`,
         answer: `'Ответ'`,
         additional_data: `'Дополнительная информация'`,
+        region: `'Регион'`,
         method: `'Метод'`,
-        remember: `'Запомнить'`,
     },
     en: {
         phone_number: `'Phone number'`,
+        index: `'Index'`,
         event: `'Event'`,
         service: `''Service`,
         push_token: `'Push token'`,
@@ -62,6 +67,7 @@ const FIELD_LIST_DICT = {
         cert: `'Certificate'`,
         name: `'Name'`,
         uin: `'Uin'`,
+        code: `'Code'`,
         sex: `'Sex'`,
         email: `'Email'`,
         birthdate: `'Birthdate'`,
@@ -71,6 +77,7 @@ const FIELD_LIST_DICT = {
         answer: `'Answer'`,
         additional_data: `'Additional data'`,
         method: `'Method'`,
+        region: `'Region'`,
         remember: `'Remember'`,
     },
 };
@@ -113,7 +120,7 @@ export class Validator {
                         try {
                             this[`check${funcName}`](fieldNameToCheck, splitted);
                         } catch (E) {
-                            Log.app.warn(`Validator@constructor: funcName`, funcName, fieldNameToCheck);
+                            Log.app.warn(`Validator@constructor: validation error funcName `, funcName, fieldNameToCheck);
                         }
                         continue;
                     }
@@ -204,6 +211,16 @@ export class Validator {
         }
 
         if (parseInt(this.dataTransformed[field], 10) >= parseInt(value[0], 10)) {
+            this.addError(field, 'maxNumber', {field: field, value: value});
+        }
+    }
+    // noinspection TsLint
+    private checkMaxNumberLength(field: string, value: string): void {
+        if (this.fieldIsEmpty(field)) {
+            return;
+        }
+
+        if (`${this.dataTransformed[field]}`.length >= parseInt(value[0], 10)) {
             this.addError(field, 'maxNumberLength', {field: field, value: value});
         }
     }

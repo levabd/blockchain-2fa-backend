@@ -6,11 +6,13 @@ import {NestModule} from '@nestjs/common/interfaces';
 import {LoggerMiddleware} from './middleware/logger.middleware';
 import {JsonMiddleware} from './middleware/json.middleware';
 import {VerificationController} from './controllsers/verification.controller';
+import {ChainController} from './controllsers/chain.controller';
 
 @Module({
     controllers: [
         UserController,
         VerificationController,
+        ChainController,
         SmsCallbackController
     ],
     imports: [

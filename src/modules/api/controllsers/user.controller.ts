@@ -13,7 +13,7 @@ import {PostUserDTO} from '../../shared/models/dto/post.user.dto';
 import {PostVerifyCodeDTO} from '../../shared/models/dto/post.verify.dto';
 import {TfaTransactionFamily, User} from '../../shared/families/tfa.transaction.family';
 import * as request from 'request-promise-native';
-import {PostKaztelUserDTO} from '../../shared/models/dto/post.kaztel.user.dto';
+import {PostClientUserDTO} from '../../shared/models/dto/post.kaztel.user.dto';
 import {KaztelTransactionFamily} from '../../shared/families/kaztel.transaction.family';
 import {ClientUser} from '../../shared/families/client.model';
 
@@ -68,7 +68,7 @@ export class UserController {
         user.Email = userDto.Email;
         user.Sex = userDto.Sex;
         user.Name = userDto.Name;
-        user.PushToken = '';
+        user.PushToken = userDto.PushToken;
 
         this.tfaTF.create(user).then((res) => {
             const body = JSON.parse(res);
@@ -94,7 +94,7 @@ export class UserController {
     }
 
     @Post('kaztel')
-    postKaztelUser(@Res() res, @Body() userDto: PostKaztelUserDTO): void {
+    postKaztelUser(@Res() res, @Body() userDto: PostClientUserDTO): void {
 
         let v = new Validator(userDto, {
             name: 'required|string',
@@ -103,10 +103,6 @@ export class UserController {
             sex: 'nullable|string|in:male,female',
             email: 'nullable|string',
             birthdate: 'nullable',
-            region: 'required|string',
-            personal_account: 'required|number',
-            question: 'required|string',
-            answer: 'required|string',
         });
 
         if (v.fails()) {
@@ -120,12 +116,8 @@ export class UserController {
         user.Birthdate = userDto.Birthdate;
         user.Email = userDto.Email;
         user.Sex = userDto.Sex;
-        user.Region = userDto.Region;
-        user.PersonalAccount = userDto.PersonalAccount;
-        user.Question = userDto.Question;
-        user.Answer = userDto.Answer;
         user.Name = userDto.Name;
-        user.PushToken = '';
+        user.PushToken = userDto.PushToken;
 
         this.kaztelTF.create(user)
             .then((res) => {

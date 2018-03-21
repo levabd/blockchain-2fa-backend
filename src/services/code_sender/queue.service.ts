@@ -49,12 +49,11 @@ export class CodeQueueListenerService {
      * @memberof CodeQueueListenerService
      */
     private processTelegramJob(job, done): void {
-        {
-            // job.data contains the custom data passed when the job was created
-            // job.id contains id of this job.
-            Log.config.info(`process queueTelegram`, job.data);
-            done();
-        }
+        // job.data contains the custom data passed when the job was created
+        // job.id contains id of this job.
+        Log.config.info(`process queueTelegram`, job.data);
+        done();
+
     }
 
     /**
@@ -64,47 +63,43 @@ export class CodeQueueListenerService {
      * @param done
      * @memberof CodeQueueListenerService
      */
-    private async processSMSJob(job, done) {
-        {
-            Log.config.info(`processSMSJob start`);
+    private processSMSJob(job, done) {
 
-            if (job.data.phone_number === '') {
-                done(new Error('Phone number is empty'));
-                return;
-            }
-            if (job.data.service === '') {
-                done(new Error('Service is empty'));
-                return;
-            }
-            if (job.data.service !== 'kazahtelecom') {
-                done(new Error('Service kazahtelecom only can be handled'));
-                return;
-            }
-            if (job.data.code === '') {
-                done(new Error('Code is empty'));
-                return;
-            }
-            // if (isValidNumber(job.data.phone_number) === true) {
-            //     done(new Error('Code is empty'));
-            //     return;
-            // }
-            const options = {
-                method: 'POST',
-                uri: 'http://smsc.kz/sys/send.php',
-                formData: {
-                    login: EnvConfig.SMS_USERNAME,
-                    psw: EnvConfig.SMS_PASSWORD,
-                    phones: job.data.phone_number,
-                    sender: 'TwoFA_S',
-                    mes: 'Ваш код подтверждения для сервиса "' + Services[job.data.service] + '": ' + job.data.code,
-                    charset: 'utf-8'
-                }
-            };
-            const result = await request.post(options);
+        Log.config.info(`processSMSJob start`);
 
-            Log.config.info(`processSMSJob end`, result);
-            done();
+        if (job.data.phone_number === '') {
+            done(new Error('Phone number is empty'));
+            return;
         }
+        if (job.data.service === '') {
+            done(new Error('Service is empty'));
+            return;
+        }
+        if (job.data.service !== 'kaztel') {
+            done(new Error('Service kazahtelecom only can be handled'));
+            return;
+        }
+        if (job.data.code === '') {
+            done(new Error('Code is empty'));
+            return;
+        }
+
+        const options = {
+            method: 'POST',
+            uri: 'http://smsc.kz/sys/send.php',
+            formData: {
+                login: EnvConfig.SMS_USERNAME,
+                psw: EnvConfig.SMS_PASSWORD,
+                phones: job.data.phone_number,
+                sender: 'TwoFA_S',
+                mes: 'Ваш код подтверждения для сервиса "' + Services[job.data.service] + '": ' + job.data.code,
+                charset: 'utf-8'
+            }
+        };
+        request.post(options).then(r => {
+            Log.config.info(`processSMSJob end`, r);
+            done();
+        });
     }
 
     /**
@@ -115,7 +110,6 @@ export class CodeQueueListenerService {
      * @memberof CodeQueueListenerService
      */
     private processPUSHJob(job, done): void {
-
         const fcm = new gcm.Sender(EnvConfig.FIREBASE_CLOUD_KEY);
 
         if (!job.data.title || !job.data.message) {
@@ -136,7 +130,9 @@ export class CodeQueueListenerService {
         });
 
         fcm.sendNoRetry(message, [job.data.push_token], (err, response) => {
-            Log.app.info(`CodeQueueListenerService@processPUSHJob@sendNoRetry: Firebase response`, [err, response]);
+            if (err) {
+                Log.app.error(`CodeQueueListenerService@processPUSHJob@sendNoRetry: Firebase error`, err);
+            }
         });
 
         Log.config.info(`CodeQueueListenerService@processPUSHJob: processed`);

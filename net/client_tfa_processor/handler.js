@@ -76,7 +76,7 @@ class IntegerKeyHandler extends TransactionHandler {
                         _applyAction = actions.addLog
                         _applyData = {Log: data.Log, PhoneNumber: phoneNumber}
                         break;
-                    case 'varify':
+                    case 'verify':
                         if (!data.Log) {
                             throw new InvalidTransaction('Payload does not contain Log model')
                         }
@@ -94,7 +94,7 @@ class IntegerKeyHandler extends TransactionHandler {
                         break;
                     default:
                         throw new InvalidTransaction(
-                            `Verb must be register, update, setPushToken ot isVerified: not ${action}`
+                            `Verb must be register, update, verify, setPushToken ot isVerified: not ${action}`
                         )
                 }
 
@@ -104,17 +104,21 @@ class IntegerKeyHandler extends TransactionHandler {
                 // Get the current state, for the key's address:
                 let getPromise = context.getState([address])
 
-                // Apply the action to the promise's result:
-                let actionPromise = getPromise.then(
-                    _applyAction(context, address, _applyData)
-                )
+                try {
+                    // Apply the action to the promise's result:
+                    let actionPromise = getPromise.then(
+                        _applyAction(context, address, _applyData)
+                    )
 
-                // Validate that the action promise results in the correctly set address:
-                return actionPromise.then(addresses => {
-                    if (addresses.length === 0) {
-                        throw new InternalError('State Error!')
-                    }
-                })
+                    // Validate that the action promise results in the correctly set address:
+                    return actionPromise.then(addresses => {
+                        if (addresses.length === 0) {
+                            throw new InternalError('State Error!')
+                        }
+                    })
+                } catch(e){
+                    console.log('e', e);
+                }
             });
     }
 }

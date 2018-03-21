@@ -1,6 +1,6 @@
 import {ApiModelProperty} from '@nestjs/swagger';
 
-export class PostKaztelUserDTO {
+export class PostClientUserDTO {
 
     @ApiModelProperty()
     readonly Name: string;
@@ -24,17 +24,8 @@ export class PostKaztelUserDTO {
     readonly PushToken: string;
 
     @ApiModelProperty()
-    readonly Region: string;
-
-    @ApiModelProperty()
-    readonly PersonalAccount: number;
-
-    @ApiModelProperty()
-    readonly Question: string;
-
-    @ApiModelProperty()
-    readonly Answer: string;
-
-    @ApiModelProperty()
     readonly AdditionalData: string;
+
+    @ApiModelProperty()
+    Logs: any;
 }

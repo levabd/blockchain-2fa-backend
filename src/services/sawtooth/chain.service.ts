@@ -1,4 +1,5 @@
 import {Component} from '@nestjs/common';
+
 const {createHash} = require('crypto');
 const {protobuf} = require('sawtooth-sdk');
 const {createContext, CryptoFactory} = require('sawtooth-sdk/signing');
@@ -7,15 +8,24 @@ import * as cbor from 'cbor';
 import * as request from 'request-promise-native';
 import {EnvConfig} from '../../config/env';
 import {_hash} from '../helpers/helpers';
-import {Log} from 'hlf-node-utils';
+import {UserLog} from '../../modules/shared/models/user.log';
+import {PostClientUserDTO} from '../../modules/shared/models/dto/post.kaztel.user.dto';
+
+const AVAILABLE_TFS = {
+    kaztel: {
+        name: EnvConfig.KAZTEL_FAMILY_NAME,
+        version: EnvConfig.KAZTEL_FAMILY_VERSION,
+    },
+    egov: {
+        name: EnvConfig.EGOV_FAMILY_NAME,
+        version: EnvConfig.EGOV_FAMILY_VERSION,
+    },
+};
 
 @Component()
 export abstract class ChainService {
 
     // TODO: refactor
-
-    protected batchQueue = [];
-    protected transactionList = [];
     protected signer: any;
     protected context: any;
     public abstract tf: string;
@@ -28,11 +38,66 @@ export abstract class ChainService {
         this.signer = new CryptoFactory(this.context).newSigner(privateKey);
     }
 
-    getAddress(PhoneNumber: string): string {
-        return this.prefix + _hash(PhoneNumber.toString()).slice(-64);
+    initTF(name: string) {
+        this.tf = AVAILABLE_TFS[name]['name'];
+        this.tfVersion = AVAILABLE_TFS[name]['version'];
+        this.prefix = _hash(name).substring(0, 6);
     }
 
-    getSignedBatch(transactionList:any) :any{
+    getAddress(phoneNumber: string, prefix?: string): string {
+        return this.prefix + _hash(phoneNumber.toString()).slice(-64);
+    }
+
+    getStateByPhoneNumber(phoneNumber: string): PostClientUserDTO {
+        return request.get({
+            uri: `${EnvConfig.VALIDATOR_REST_API}/state/${this.getAddress(phoneNumber)}`,
+            json: true // Automatically parses the JSON string in the response
+        }).then(response => {
+            return <PostClientUserDTO>cbor.decode(new Buffer(response.data, 'base64'));
+        }).catch(error => {
+            throw new Error(error);
+        });
+    }
+
+    getStateByAddress(phoneNumber: string): PostClientUserDTO {
+        return request.get({
+            uri: `${EnvConfig.VALIDATOR_REST_API}/state/${this.getAddress(phoneNumber)}`,
+            json: true // Automatically parses the JSON string in the response
+        }).then(response => {
+            return <PostClientUserDTO>cbor.decode(new Buffer(response.data, 'base64'));
+        }).catch(error => {
+            throw new Error(error);
+        });
+    }
+
+    addLog(phoneNumber: string, log: UserLog): any {
+        const address = this.getAddress(phoneNumber);
+        return this.addTransaction({
+            Action: 'addLog',
+            PhoneNumber: phoneNumber,
+            Log: log,
+        }, address).then(response => {
+            console.log('response', response);
+            return JSON.parse(response);
+        }).catch(error => {
+            throw new Error(error);
+        });
+    }
+
+    verify(phoneNumber: string, log: UserLog) {
+        const address = this.getAddress(phoneNumber);
+        return this.addTransaction({
+            Action: 'verify',
+            PhoneNumber: phoneNumber,
+            Log: log,
+        }, address).then(response => {
+            return JSON.parse(response);
+        }).catch(error => {
+            throw new Error(error);
+        });
+    }
+
+    getSignedBatch(transactionList: any): any {
         const batchHeaderBytes = protobuf.BatchHeader.encode({
             signerPublicKey: this.signer.getPublicKey().asHex(),
             transactionIds: transactionList.map((txn) => txn.headerSignature),
@@ -46,15 +111,14 @@ export abstract class ChainService {
             transactions: transactionList
         });
 
-       return protobuf.BatchList.encode({
+        return protobuf.BatchList.encode({
             batches: [batch]
         }).finish();
     }
 
-    addTransaction(payload: object, address: string, dependOn = '') : Promise<any>{
+    addTransaction(payload: object, address: string, dependOn = ''): Promise<any> {
         const payloadBytes = cbor.encode(payload);
 
-        Log.app.debug('tf', this.tf, this.tfVersion);
         const transactionHeaderBytes = protobuf.TransactionHeader.encode({
             familyName: this.tf,
             familyVersion: this.tfVersion,
@@ -83,8 +147,6 @@ export abstract class ChainService {
 
         // this.addToBatch(transaction);
         const batchListBytes = this.getSignedBatch([transaction]);
-        Log.app.debug('${EnvConfig.VALIDATOR_REST_API}/batches', `${EnvConfig.VALIDATOR_REST_API}/batches`);
-
         return request.post({
             url: `${EnvConfig.VALIDATOR_REST_API}/batches`,
             body: batchListBytes,

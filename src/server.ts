@@ -8,6 +8,10 @@ import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import {AppExceptionFilter} from './modules/shared/filters/app.exception.filter';
 
+import * as zmq from 'zeromq';
+
+const sock = zmq.socket('pull');
+
 async function bootstrap() {
 
     const app = await NestFactory.create(ApplicationModule);
@@ -42,6 +46,17 @@ async function bootstrap() {
     app.use(express.static(__dirname + '/modules/web/public'));
     app.set('views', __dirname + '/modules/web/pwa/dist');
     app.set('view engine', 'html');
+
+    sock.connect('tcp://localhost:4004');
+    sock.on('message', function (msg) {
+        console.log('work: %s', msg.toString());
+    });
+    sock.on('sawtooth/state-delta', function (msg) {
+        console.log('work: %s', msg.toString());
+    });
+    sock.on('sawtooth/block-commit', function (msg) {
+        console.log('work: %s', msg.toString());
+    });
 
     /**
      * Start Chainservice API

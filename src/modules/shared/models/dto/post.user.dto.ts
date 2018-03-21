@@ -28,4 +28,7 @@ export class PostUserDTO {
 
     @ApiModelProperty()
     readonly Method: string;
+
+    @ApiModelProperty()
+    readonly PushToken: string;
 }

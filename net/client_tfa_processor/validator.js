@@ -1,58 +1,3 @@
-const regionsRu = [
-    'Астана',
-    'Алматы',
-    'Акмолинская область',
-    'Актюбинская область',
-    'Алматинская область',
-    'Атырауская область',
-    'Восточно-Казахстанская область,',
-    'Жамбылская область',
-    'Западно Казахстанская область',
-    'Карагандинская область',
-    'Костанайская область',
-    'Кзылординская область',
-    'Мангистауская область',
-    'Павлодарская область',
-    'Северо-Казахстанская область',
-    'Южно-Казахстанская область',
-];
-
-const regionsEn = [
-    'Astana',
-    'Almaty',
-    'Akmola region',
-    'Aktobe region',
-    'Alma-Ata\'s region',
-    'Atyrau region',
-    'East Kazakhstan region,',
-    'Jambyl Region',
-    'West-Kazakhstan region',
-    'Karaganda region',
-    'Kostanay Region',
-    'Kzylorda oblast',
-    'Mangistau region',
-    'Pavlodar region',
-    'North-Kazakhstan region',
-    'South-Kazakhstan oblast',
-];
-const regionsKz = [
-    'Астана',
-    'Алматы',
-    'Ақмола облысы',
-    'Ақтөбе облысы',
-    'Алматы облысы',
-    'Атырау облысы',
-    'Шығыс Қазақстан облысы',
-    'Жамбыл облысы',
-    'Батыс Қазақстан облысы',
-    'Қарағанды облысы',
-    'Қостанай облысы',
-    'Қызылорда облысы',
-    'Маңғыстау облысы',
-    'Павлодар облысы',
-    'Солтүстік Қазақстан облысы',
-    'Оңтүстік Қазақстан облысы',
-];
 // noinspection TsLint
 const isEmpty = (value) => {
     return !value || value === '';
@@ -152,49 +97,10 @@ const getuserValidationErrors = (user) => {
         errors.push('Birthdate must be a number')
     }
 
-    if (isEmpty(user.Region)) {
-        errors.push('Region is required')
-    }
-
-    if (regionsEn.indexOf(user.Region) === -1
-        && regionsKz.indexOf(user.Region) === -1
-        && regionsRu.indexOf(user.Region) === -1) {
-        errors.push('Region name is not valid. Only Kazakhstan regions are supported.')
-    }
-
-    if (isEmpty(user.PersonalAccount)) {
-        errors.push('PersonalAccount is required')
-    }
-
-    if (!isNumber(user.PersonalAccount)) {
-        errors.push('PersonalAccount must bu a number')
-    }
-
-    if (`${user.PersonalAccount}`.length !== 6) {
-        errors.push('PersonalAccount must contains 6 numbers')
-    }
-
-    if (isEmpty(user.Question)) {
-        errors.push('Question is required')
-    }
-
-    if (isEmpty(user.Answer)) {
-        errors.push('Answer is required')
-    }
-
-    if (!isString(user.Question)) {
-        errors.push('Question must be a string')
-    }
-
-    if (!isString(user.Answer)) {
-        errors.push('Answer must be a string')
-    }
-
     if (!isEmpty(user.AdditionalData)) {
         try {
             const json = JSON.parse(user.AdditionalData);
-        }
-        catch (e) {
+        } catch (e) {
             errors.push('AdditionalData must be a valid json object')
         }
     }
@@ -209,11 +115,11 @@ const getLogValidationErrors = (user, log) => {
     }
 
     if (!isString(user.Event)) {
-        errors.push('Name must be a string')
+        errors.push('Event must be a string')
     }
 
     if (isEmpty(user.Status)) {
-        errors.push('Event is required')
+        errors.push('Status is required')
     }
 
     if (!isString(user.Status)) {
@@ -228,7 +134,7 @@ const getLogValidationErrors = (user, log) => {
         errors.push('ExpiredAt must be a number')
     }
 
-    if (!isBoolean(user.Embeded)) {
+    if (!isEmpty(user.Embeded) && !isBoolean(user.Embeded)) {
         errors.push('Embeded must be a boolean')
     }
 

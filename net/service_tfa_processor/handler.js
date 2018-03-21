@@ -40,25 +40,6 @@ class IntegerKeyHandler extends TransactionHandler {
                     throw new InvalidTransaction('PhoneNumber has invalid format')
                 }
 
-                let uin = data.Uin
-                if (uin === null || uin === undefined) {
-                    throw new InvalidTransaction('Uin is required')
-                }
-                const uinAsStr = `${uin}`
-                if (uinAsStr.length !== 12) {
-                    throw new InvalidTransaction(`Uin length must be 12. ${uinAsStr.length} given.`)
-                }
-
-                found = uinAsStr.match(/[0-9]{12}/);
-                if (!found) {
-                    throw new InvalidTransaction('Uin has invalid format')
-                }
-
-                let parsedUid = parseInt(uin)
-                if (parsedUid !== uin) {
-                    throw new InvalidTransaction(`Value must be an integer `)
-                }
-
                 let _applyAction;
                 let _applyData;
                 let errors;

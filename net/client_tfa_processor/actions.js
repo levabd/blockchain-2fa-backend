@@ -1,5 +1,6 @@
 const cbor = require('cbor')
-const CRC16 = require('crc16');
+
+const helpers = require('./helpers');
 const {
     InvalidTransaction
 } = require('sawtooth-sdk/processor/exceptions')
@@ -11,12 +12,13 @@ const log_statuses = {
     VALID: 'VALID',
     EXPIRED: 'EXPIRED',
 }
+const timeout = 300;
 
 const _setEntry = (context, address, stateValue) => {
     let entries = {
         [address]: cbor.encode(stateValue)
     }
-    return context.setState(entries)
+    return context.setState(entries, timeout)
 }
 
 const _getAddressStateValue = (possibleAddressValues, address) => {
@@ -79,10 +81,6 @@ const _update = (context, address, payloadUser) => (possibleAddressValues) => {
     stateUser.Email = payloadUser.Email
     stateUser.Sex = payloadUser.Sex
     stateUser.Birthdate = payloadUser.Birthdate
-    stateUser.Region = payloadUser.Region
-    stateUser.PersonalAccount = payloadUser.PersonalAccount
-    stateUser.Question = payloadUser.Question
-    stateUser.Answer = payloadUser.Answer
     stateUser.AdditionalData = payloadUser.AdditionalData
 
     return _setEntry(context, address, stateUser)
@@ -127,20 +125,6 @@ const _delete = (context, address) => (possibleAddressValues) => {
     return context.deleteState([address])
 }
 
-const hexdec = (hexString) => {
-    hexString = (hexString + '').replace(/[^a-f0-9]/gi, '')
-    return parseInt(hexString, 16)
-}
-
-const sortNumber = (a, b) => {
-    return a - b;
-}
-
-const _getLatestIndex = (indexes) => {
-    indexes.sort(sortNumber);
-    return indexes[indexes.length - 1]
-}
-
 /**
  * Append log event to user
  *
@@ -154,7 +138,12 @@ const _addLog = (context, address, data) => (possibleAddressValues) => {
     let stateUser = _getAddressStateValue(possibleAddressValues, address)
     const log = data.Log
     const phoneNumber = data.PhoneNumber
-    let logKeys = Object.keys(stateUser.Logs)
+    let logKeys
+    if (stateUser.Logs) {
+        logKeys = Object.keys(stateUser.Logs)
+    } else {
+        logKeys = []
+    }
     let indexKey = 0
 
     if (!stateUser) {
@@ -166,10 +155,10 @@ const _addLog = (context, address, data) => (possibleAddressValues) => {
     }
 
     if (logKeys.length !== 0) {
-        indexKey = _getLatestIndex(logKeys)
+        indexKey = helpers.getLatestIndex(logKeys)
     }
 
-    log.Code = hexdec(CRC16(process.env['TRANSACTION_FAMILY_KEY'] + log.Event + phoneNumber + log.ActionTime))
+    log.Code = helpers.generateCode(process.env['TRANSACTION_FAMILY_KEY'] + log.Event + phoneNumber + log.ActionTime)
 
     if (log.Code.Status && log.Code.Status === log_statuses.RESEND_CODE) {
         log.Code.Status = log_statuses.RESEND_CODE
@@ -177,9 +166,10 @@ const _addLog = (context, address, data) => (possibleAddressValues) => {
         log.Code.Status = log_statuses.SEND_CODE
     }
 
-    stateUser.Logs[parseInt(indexKey, 10)] = log;
+    const logIndex = parseInt(indexKey, 10)
+    stateUser.Logs[log_statuses.RESEND_CODE ? logIndex + 1 : logIndex] = log;
 
-    return _setEntry(context, address, stateValue)
+    return _setEntry(context, address, stateUser)
 }
 
 /**
@@ -201,6 +191,7 @@ const _verify = (context, address, data) => (possibleAddressValues) => {
         throw new InvalidTransaction(`User does not has Logs.`)
     }
 
+
     let sendCodelogKeys = Object.keys(stateUser.Logs)
     let filteredLogsArray = {}
     sendCodelogKeys.forEach(logIndex => {
@@ -213,12 +204,15 @@ const _verify = (context, address, data) => (possibleAddressValues) => {
     })
 
     sendCodelogKeys = Object.keys(filteredLogsArray)
-
-    const indexKey = _getLatestIndex(sendCodelogKeys)
+    const indexKey = helpers.getLatestIndex(sendCodelogKeys)
     const latestLogWithSendCode = filteredLogsArray[indexKey]
 
     let requestLog = data.Log
-    if (latestLogWithSendCode.ExpiredAt >= requestLog.ActionTime) {
+    if (!requestLog.Code) {
+        throw new InvalidTransaction(`Code was not provided while verification proccess.`)
+    }
+
+    if (latestLogWithSendCode.ExpiredAt <= requestLog.ActionTime) {
         requestLog.Status = log_statuses.EXPIRED;
     } else if (parseInt(latestLogWithSendCode.Code, 10) === parseInt(requestLog.Code, 10)) {
         requestLog.Status = log_statuses.VALID;
@@ -226,9 +220,12 @@ const _verify = (context, address, data) => (possibleAddressValues) => {
         requestLog.Status = log_statuses.INVALID;
     }
 
-    stateUser.Logs[parseInt(indexKey, 10) + 1] = requestLog;
+    const stateUserLogsKeys = Object.keys(stateUser.Logs)
+    const latestStateUserLogsKeysKey = helpers.getLatestIndex(stateUserLogsKeys)
+    console.log('latestStateUserLogsKeysKey', latestStateUserLogsKeysKey);
+    stateUser.Logs[parseInt(latestStateUserLogsKeysKey, 10) + 1] = requestLog;
 
-    return _setEntry(context, address, stateValue)
+    return _setEntry(context, address, stateUser)
 }
 
 module.exports.create = _create;
