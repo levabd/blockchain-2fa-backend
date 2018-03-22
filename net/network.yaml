@@ -111,5 +111,40 @@ services:
     networks:
       - public
     ports:
-      - 6379:6379
+      - 6380:6379
 
+  backend_api:
+    container_name: backend_api
+    image: allatrack/blockchain_2fa_backend
+    networks:
+      - public
+    ports:
+      - 3000:3000
+
+  backend_frontend:
+    container_name: backend_frontend
+    image: allatrack/blockchain_2fa_frontend
+    networks:
+      - public
+    ports:
+      - 3001:3001
+
+  cabinet_tfa:
+    container_name: cabinet_tfa
+    image: allatrack/tfa_cabinet
+    restart: always
+    build: .
+    ports:
+      - 3002:8080
+    networks:
+      - public
+
+  mongo:
+    container_name: mongo
+    image: mongo
+    volumes:
+      - ./data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - public

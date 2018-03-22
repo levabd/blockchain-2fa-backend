@@ -159,7 +159,7 @@ const _addLog = (context, address, data) => (possibleAddressValues) => {
     }
 
     log.Code = helpers.generateCode(process.env['TRANSACTION_FAMILY_KEY'] + log.Event + phoneNumber + log.ActionTime)
-
+    console.log('log.Code', log.Code);
     if (log.Code.Status && log.Code.Status === log_statuses.RESEND_CODE) {
         log.Code.Status = log_statuses.RESEND_CODE
     } else {

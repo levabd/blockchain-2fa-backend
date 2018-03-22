@@ -19,6 +19,7 @@ export class CodeQueueListenerService {
      */
     constructor() {
         const redisURL = `redis://${EnvConfig.REDIS_HOST}:${EnvConfig.REDIS_PORT}`;
+
         this.queueSMS = new Queue('code_queue_sms', redisURL);
         this.queuePUSH = new Queue('code_queue_push', redisURL);
         this.queueTelegram = new Queue('code_queue_telegram', redisURL);
