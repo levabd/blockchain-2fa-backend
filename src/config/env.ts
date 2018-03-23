@@ -1,10 +1,6 @@
 import 'dotenv/config';
 import {_hash} from '../services/helpers/helpers';
 
-export interface ProcessEnv {
-    [key: string]: string | undefined;
-}
-
 /**
  * node EnvConfig variables,
  * copy .env.example file, rename to .env
