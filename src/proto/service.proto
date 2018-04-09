@@ -1,0 +1,46 @@
+// Copyright 2017 Intel Corporation
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// -----------------------------------------------------------------------------
+
+syntax = "proto3";
+option go_package = "handler";
+
+message User {
+
+    string PhoneNumber = 1;
+
+    uint32 Uin = 2;
+
+    string Name = 3;
+
+    bool IsVerified = 4;
+
+    string Email = 5;
+
+    string Sex = 6;
+
+    double Birthdate = 7;
+
+    string PushToken = 8;
+}
+enum PayloadType {
+    USER_CREATE = 0;
+    USER_UPDATE = 1;
+}
+
+message SCPayload {
+    PayloadType Action = 1;
+    string PhoneNumber = 2;
+    User PayloadUser = 3;
+}
