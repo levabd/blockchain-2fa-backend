@@ -7,13 +7,15 @@ import {LoggerMiddleware} from './middleware/logger.middleware';
 import {JsonMiddleware} from './middleware/json.middleware';
 import {VerificationController} from './controllsers/verification.controller';
 import {ChainController} from './controllsers/chain.controller';
+import {TelegramController} from './controllsers/telegram.controller';
 
 @Module({
     controllers: [
         UserController,
         VerificationController,
         ChainController,
-        SmsCallbackController
+        SmsCallbackController,
+        // TelegramController
     ],
     imports: [
         SharedModule

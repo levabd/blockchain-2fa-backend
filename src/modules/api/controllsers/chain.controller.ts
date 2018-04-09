@@ -6,6 +6,7 @@ import * as request from 'request-promise-native';
 
 import {ChainService} from '../../../services/sawtooth/chain.service';
 import {CodeQueueListenerService} from '../../../services/code_sender/queue.service';
+import {ApiController} from './controller';
 
 @ApiUseTags('v1/api/chain')
 @Controller('v1/api/chain')
@@ -29,11 +30,15 @@ export class ChainController {
             }).then(response => {
                 return response.data[0];
             }).catch(error => {
-                console.log('result ', error);
-                throw new Error(error);
+                if (error.error && error.error.code && error.error.code===60){
+                    console.log('Invalid transaction');
+
+                    return new Error('Invalid transaction');
+                }
             });
 
         } catch (e) {
+            console.log('e', e);
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({error: e});
         }
 

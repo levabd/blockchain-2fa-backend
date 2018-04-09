@@ -10,7 +10,7 @@ import {SharedModule} from './shared/shared.module';
 
 @Module({
     modules: [
-        WebModule,
+        // WebModule,
         ApiModule,
         SharedModule
     ],

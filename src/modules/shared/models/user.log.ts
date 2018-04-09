@@ -1,7 +1,7 @@
 export class UserLog {
     Event: string;
     Status: string;
-    Code: string;
+    Code: number;
     ExpiredAt: number|Date;
     Embeded: boolean;
     ActionTime: number;

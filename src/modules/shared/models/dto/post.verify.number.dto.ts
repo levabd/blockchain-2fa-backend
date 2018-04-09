@@ -1,21 +1,13 @@
 import {ApiModelProperty} from '@nestjs/swagger';
 
 export class PostVerifyNumberDTO {
-    @ApiModelProperty()
-    readonly event: string;
     // noinspection TsLint
     @ApiModelProperty()
-    service: string;
+    phone_number: string;
     // noinspection TsLint
     @ApiModelProperty()
-    readonly phone_number: string;
-    // noinspection TsLint
+    readonly push_token: string;
     @ApiModelProperty()
-    readonly embeded: boolean;
-    // noinspection TsLint
-    @ApiModelProperty()
-    readonly client_timestamp: number;
-    // noinspection TsLint
-    @ApiModelProperty()
-    readonly cert: string;
+    readonly code: string;
+    readonly lang: string;
 }

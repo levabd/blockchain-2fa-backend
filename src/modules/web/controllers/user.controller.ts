@@ -8,7 +8,6 @@ import * as Promisefy from 'bluebird';
 import {Validator} from '../../../services/helpers/validation.helper';
 import {ApiUseTags} from '@nestjs/swagger';
 
-@ApiUseTags('v1/web/users')
 @Controller('v1/web/users')
 export class UserController {
     // private redisClient;

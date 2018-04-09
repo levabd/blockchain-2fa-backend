@@ -83,7 +83,10 @@ export class CodeQueueListenerService {
             done(new Error('Code is empty'));
             return;
         }
-
+        let message = 'Ваш код подтверждения для сервиса "' + Services[job.data.service] + '": ' + job.data.code;
+        if (job.data.registration) {
+            message = 'Ваш код подтверждения для сервиса TFA: ' + job.data.code;
+        }
         const options = {
             method: 'POST',
             uri: 'http://smsc.kz/sys/send.php',
@@ -92,7 +95,7 @@ export class CodeQueueListenerService {
                 psw: EnvConfig.SMS_PASSWORD,
                 phones: job.data.phone_number,
                 sender: 'TwoFA_S',
-                mes: 'Ваш код подтверждения для сервиса "' + Services[job.data.service] + '": ' + job.data.code,
+                mes: message,
                 charset: 'utf-8'
             }
         };

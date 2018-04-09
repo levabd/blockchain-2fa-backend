@@ -64,8 +64,13 @@ export class EnvConfig {
     public static EGOV_FAMILY_VERSION = process.env['EGOV_FAMILY_VERSION'];
 
     public static VALIDATOR_REST_API = process.env['VALIDATOR_REST_API'];
+    public static VALIDATOR_REST_API_HOST_PORT = process.env['VALIDATOR_REST_API_HOST_PORT'];
 
     public static COMMITED = 'COMMITED';
     public static INVALID = 'INVALID';
     public static PENDING = 'PENDING';
+    public static FRONTEND_API = process.env['FRONTEND_API'];
+    public static KAZTEL_CALLBACK_URL = process.env['KAZTEL_CALLBACK_URL'];
+    public static EGOV_CALLBACK_URL = process.env['EGOV_CALLBACK_URL'];
+    public static TELEGRAM_BOT_KEY = process.env['TELEGRAM_BOT_KEY'];
 }

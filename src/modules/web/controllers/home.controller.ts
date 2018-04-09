@@ -4,7 +4,6 @@ import * as path from 'path';
 
 const resolvePath = (file: string) => path.resolve(__dirname , '..', `pwa/dist/${file}`);
 
-@ApiUseTags('v1/web')
 @Controller('v1/web')
 export class HomeController {
 

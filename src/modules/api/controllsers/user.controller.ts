@@ -8,18 +8,24 @@ import {CodeQueueListenerService} from '../../../services/code_sender/queue.serv
 import {ClientService} from '../../../config/services/services';
 import {TimeHelper} from '../../../services/helpers/time.helper';
 import {Validator} from '../../../services/helpers/validation.helper';
-import {PostUserDTO} from '../../shared/models/dto/post.user.dto';
-import {PostVerifyCodeDTO} from '../../shared/models/dto/post.verify.dto';
-import {TfaTransactionFamily, User} from '../../shared/families/tfa.transaction.family';
-import * as request from 'request-promise-native';
-import {PostClientUserDTO} from '../../shared/models/dto/post.kaztel.user.dto';
+import {TfaTransactionFamily} from '../../shared/families/tfa.transaction.family';
 import {KaztelTransactionFamily} from '../../shared/families/kaztel.transaction.family';
-import {ClientUser} from '../../shared/families/client.model';
+import {ChainService} from '../../../services/sawtooth/chain.service';
+import {EnvConfig} from '../../../config/env';
+import * as WebSocket from 'ws';
+import {ApiController} from './controller';
+import {EgovTransactionFamily} from '../../shared/families/egov.transaction.family';
+
+const fs = require('fs');
+const protobufLib = require('protocol-buffers');
+const messagesService = protobufLib(fs.readFileSync('src/proto/service.proto'));
+
+const REDIS_USER_POSTFIX = 'verify-number-code';
 
 @ApiUseTags('v1/api/users')
 @Controller('v1/api/users')
-export class UserController {
-    // private redisClient;
+export class UserController extends ApiController {
+    private redisClient;
 
     /**
      * Creates an instance of CarController.
@@ -27,274 +33,177 @@ export class UserController {
      * @param timeHelper
      * @param tfaTF
      * @param kaztelTF
+     * @param egovTF
+     * @param chainService
      * @param services
      * @param codeQueueListenerService
      */
     constructor(private timeHelper: TimeHelper,
-                private tfaTF: TfaTransactionFamily,
-                private kaztelTF: KaztelTransactionFamily,
+                public tfaTF: TfaTransactionFamily,
+                public kaztelTF: KaztelTransactionFamily,
+                public egovTF: EgovTransactionFamily,
+                public chainService: ChainService,
                 private services: ClientService,
                 private codeQueueListenerService: CodeQueueListenerService) {
+        super(tfaTF, kaztelTF, egovTF);
         Promisefy.promisifyAll(redis);
-        // this.redisClient = redis.createClient();
-    }
-
-    @Post()
-    postUser(@Res() res, @Body() userDto: PostUserDTO): void {
-
-        let v = new Validator(userDto, {
-            name: 'required|string',
-            phone_number: 'required|string|regex:/^\\+?[1-9]\\d{1,14}$/',
-            service: 'required|in:kazakhtelecom,egov',
-            client_timestamp: 'required|number',
-            uin: 'nullable|number|maxNumber:1000000000000',
-            sex: 'nullable|string|in:male,female',
-            email: 'nullable|string',
-            birthdate: 'nullable',
-            method: 'required|in:sms,telegram,whatsapp',
-        }, {'service.in': `No service with name: ${userDto.Service}`});
-
-        if (v.fails()) {
-            return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json(v.getErrors());
-        }
-
-        let user = new User();
-
-        user.Name = userDto.Name;
-        user.PhoneNumber = userDto.PhoneNumber;
-        user.Uin = userDto.Uin;
-        user.Birthdate = userDto.Birthdate;
-        user.Email = userDto.Email;
-        user.Sex = userDto.Sex;
-        user.Name = userDto.Name;
-        user.PushToken = userDto.PushToken;
-
-        this.tfaTF.create(user).then((res) => {
-            const body = JSON.parse(res);
-            if (body && body.link) {
-                request.get(body.link)
-                    .then(function (error, response, _body) {
-                        // Do more stuff with 'body' here
-
-                        if (error) {
-                            // todo
-                        }
-                        if (response) {
-                            // todo
-                        }
-                        console.log(error, response, _body); // 200
-                    });
-            }
-        }).catch((res) => {
-                console.log('error', res);
-            });
-
-        return res.status(HttpStatus.OK).json({status: `success`});
-    }
-
-    @Post('kaztel')
-    postKaztelUser(@Res() res, @Body() userDto: PostClientUserDTO): void {
-
-        let v = new Validator(userDto, {
-            name: 'required|string',
-            phone_number: 'required|string|regex:/^\\+?[1-9]\\d{1,14}$/',
-            uin: 'required|number|maxNumber:1000000000000',
-            sex: 'nullable|string|in:male,female',
-            email: 'nullable|string',
-            birthdate: 'nullable',
-        });
-
-        if (v.fails()) {
-            return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json(v.getErrors());
-        }
-
-        let user = new ClientUser();
-        user.Name = userDto.Name;
-        user.PhoneNumber = userDto.PhoneNumber;
-        user.Uin = userDto.Uin;
-        user.Birthdate = userDto.Birthdate;
-        user.Email = userDto.Email;
-        user.Sex = userDto.Sex;
-        user.Name = userDto.Name;
-        user.PushToken = userDto.PushToken;
-
-        this.kaztelTF.create(user)
-            .then((res) => {
-                const body = JSON.parse(res)
-                console.log('body', body);
-
-                if (body && body.link) {
-                    request.get(body.link)
-                        .then(function (error, response, _body) {
-                            // Do more stuff with 'body' here
-
-                            if (error) {
-                                // todo
-                            }
-                            if (response) {
-                                // todo
-                            }
-                            console.log(error, response, _body) // 200
-                        });
-                }
-            })
-            .catch((error) => {
-                console.log('error', error);
-            });
-
-        return res.status(HttpStatus.OK).json({status: `success`});
+        const redisURL = `redis://${EnvConfig.REDIS_HOST}:${EnvConfig.REDIS_PORT}`;
+        this.redisClient = redis.createClient({url: redisURL});
     }
 
     @Get('verify-number')
-    async sendUserCode(@Res() res, @Query('phone_number') phoneNumber: string, @Query('service') service?: string): Promise<any[]> {
+    async sendUserCode(@Req() req,
+                       @Res() res,
+                       @Query('phone_number') phoneNumber: string): Promise<any[]> {
 
-        let v = new Validator({
-            phone_number: phoneNumber,
-            service: service
-        }, {
-            phone_number: 'required|string|regex:/^\\+?[1-9]\\d{1,14}$/',
-            service: 'required|string|in:kazakhtelecom,egov',
-        }, {'service.in': `No service with name: ${service}`});
-
+        let v = new Validator({phone_number: phoneNumber}, {phone_number: 'required|string|regex:/^\\+?[1-9]\\d{1,14}$/',});
         if (v.fails()) {
             return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json(v.getErrors());
         }
-
-        // vallidate if user exists
-        // '77053234005'
-
-        try {
-            // HFUser = await this.twofaService.queryUser(phoneNumber);
-            // const o:any = await this.twofaService.queryUser(phoneNumber);
-            // console.error(`HFUser`, HFUser);
-
-        } catch (e) {
-            console.error(`Error while getting user`, e);
-            return res.status(HttpStatus.NOT_FOUND).json({error: 'User not found.'});
+        let user = await this.getUser(phoneNumber, 'tfa');
+        if (user === null) {
+            return res.status(HttpStatus.NOT_FOUND).json({user: [this.getUserNotFoundMessage(req.query.lang || 'en')]});
         }
+        const code = this.genCode();
 
-        // send sms
-        // const code = this.sendSMS(phoneNumber, service);
-        // const unixtime = this.timeHelper.getUnixTimeAfterMinutes(7);
+        console.log('code', code);
 
-        if (service === '') {
-            service = 'service_is_impty';
+        if (phoneNumber.charAt(0) === '+') {
+            phoneNumber = phoneNumber.substring(1);
         }
+        let self=this;
         // save code to redis
         // this key will expire after 8 * 60 seconds
-        // this.redisClient.setAsync(`${phoneNumber}:${service}`, `${code}:${unixtime}`, 'EX', 7 * 60).then(function (_res) {
-        //     console.info(`Set Redis response status:`, _res);
-        // });
-        //
-        // this.redisClient.getAsync(`${phoneNumber}:${service}`).then(function (_res) {
-        //     console.info(`Under the key ${phoneNumber}:${service} Redis will store data:`, _res);
-        // });
-
+        this.redisClient.setAsync(`${phoneNumber}:${REDIS_USER_POSTFIX}`, `${code}`, 'EX', 7 * 60).then(() => {
+            // send sms
+            self.codeQueueListenerService.queueSMS.add({
+                phone_number: phoneNumber,
+                service: 'kaztel',
+                code: code,
+                registration: true,
+            });
+        });
         return res.status(HttpStatus.OK).json({status: 'success'});
     }
 
     @Post('verify-number')
     async verifyNumber(@Res() res, @Body() body: PostVerifyNumberDTO): Promise<any[]> {
+
+        // валидация
         let v = new Validator(body, {
             phone_number: 'required|string|regex:/^\\+?[1-9]\\d{1,14}$/',
-            service: 'requiredIfNot:push_token|string|in:kazakhtelecom,egov',
             push_token: 'nullable|string',
             code: 'required|number',
         }, {
-            'service.in': `No service with name: ${body.service}`,
             'service.requiredIfNot': `The service field is required when push_token is empty.`
         });
-
-        v.addError('code', `The 'code' field is not valid.`);
-        v.addError('code', `The 'code' expires.`);
-
         if (v.fails()) {
             return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json(v.getErrors());
         }
+        // убрать плюс в начале номера телефона если он есть
+        if (body.phone_number.charAt(0) === '+') {
+            body.phone_number = body.phone_number.substring(1);
+        }
+        // Проверка, существует ли пользователь
+        let user = await this.getUser(body.phone_number, 'tfa');
+        if (user === null) {
+            return res.status(HttpStatus.NOT_FOUND).json({user: [this.getUserNotFoundMessage(body.lang || 'en')]});
+        }
+        // проверка кода
+        const codeFromRedis = await this.redisClient.getAsync(`${body.phone_number}:${REDIS_USER_POSTFIX}`);
+        if (codeFromRedis == null) {
+            return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+                code: [body.lang === 'ru' ? 'Вы ввели неверный код' : "The 'Code' expires or does not exists."]
+            });
+        }
+        if (parseInt(codeFromRedis, 10) != parseInt(body.code, 10)) {
+            return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+                code: [body.lang === 'ru' ? 'Вы ввели неверный код' : "The 'Code' is not valid."]
+            });
+        }
+        await this.redisClient.del(`${body.phone_number}:${REDIS_USER_POSTFIX}`);
 
-        // vallidate if user exists
-        // '77053234005'
-        // let HFUser = new TwoFaUser('', '');
-        try {
-            // HFUser = await this.twofaService.queryUser(body.phone_number);
-        } catch (e) {
-            console.error(`Error while getting user`, e);
-            return res.status(HttpStatus.NOT_FOUND).json({error: 'User not found.'});
+        // подготовка адресов, за которыми нужно отследить успешное прохождение транзакции
+        let userKaztel = await this.getUser(body.phone_number, 'kaztel');
+        let userEgov = await this.getUser(body.phone_number, 'egov');
+        let addresses = [
+            this.chainService.getAddress(body.phone_number, 'tfa'),
+        ];
+        if (userKaztel !== null) {
+            addresses.push(this.chainService.getAddress(body.phone_number, 'kaztel'));
+        }
+        if (userEgov !== null) {
+            addresses.push(this.chainService.getAddress(body.phone_number, 'egov'));
         }
 
-        if (body.service === '') {
-            body.service = 'service_is_impty';
+        // начинаем слушать изменения адресов
+        let ws = new WebSocket(`ws:${EnvConfig.VALIDATOR_REST_API_HOST_PORT}/subscriptions`);
+        ws.onopen = () => {
+            ws.send(JSON.stringify({
+                'action': 'subscribe',
+                'address_prefixes': addresses
+            }));
+        };
+
+        user.IsVerified = true;
+        user.PushToken = body.push_token;
+        await this.tfaTF.updateUser(body.phone_number, user);
+
+        if (userKaztel !== null) {
+            userKaztel.IsVerified = true;
+            await this.kaztelTF.updateUser(body.phone_number, userKaztel);
+        }
+        if (userEgov !== null) {
+            userKaztel.IsVerified = true;
+            await this.egovTF.updateUser(body.phone_number, userEgov);
         }
 
-        return res.status(HttpStatus.OK).json({status: 'success'});
+        ws.onmessage = mess => {
+            const data = JSON.parse(mess.data);
+            let responseSend = false;
+
+            for (let i = 0; i < data.state_changes.length; i++) {
+                const stateChange = data.state_changes[i];
+                if (addresses.indexOf(stateChange.address) !== -1) {
+                    const _user = messagesService.User.decode(new Buffer(stateChange.value, 'base64'));
+                    if (responseSend){
+                        ws.send(JSON.stringify({
+                            'action': 'unsubscribe'
+                        }));
+                        break;
+                    }
+                    // todo: по хорошему надо во всех чейнах отследить изменения
+                    if (_user.IsVerified) {
+                        try {
+                            responseSend =true
+                            return res.status(HttpStatus.OK).json({status: 'success'});
+                        } catch(e){
+                            console.log('error - trying to send response second time', e);
+                        }
+                    }
+                }
+            }
+        };
+        ws.onclose = () => {
+            ws.send(JSON.stringify({
+                'action': 'unsubscribe'
+            }));
+        };
     }
 
-    @Get('code')
-    getCode(@Req() req, @Res() res,
-            @Query('phone_number') phoneNumber: string,
-            @Query('push_token') pushToken: string,
-            @Query('client_timestamp') clientTimestamp: string) {
-
-        let v = new Validator(req.query, {
-            phone_number: 'required|string|regex:/^\\+?[1-9]\\d{1,14}$/',
-            push_token: 'required|string',
-            client_timestamp: 'required|number',
-        });
-
-        // todo add The push token is wrong. validation
-
-        if (v.fails()) {
-            return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json(v.getErrors());
-        }
-
-        return res.status(HttpStatus.OK).json({
-            'service': 'kazakhtelecom',
-            'embeded': 'true',
-            'event': 'login',
-            'cert': '3u+UR6n8AgABAAAAHxxdXKmiOmUoqKnZlf8lTOhlPYy93EAkbPfs5+49YLFd/B1+omSKbW7DoqNM40/EeVnwJ8kYoXv9zy9D5C5m5A==', // ,
-            'code': '4444',
-            'status': 'success'
-        });
-    }
-
-    @Post('verify')
-    postVerify(@Res() res, @Body() body: PostVerifyCodeDTO) {
-        let v = new Validator(body, {
-            phone_number: 'required|string|regex:/^\\+?[1-9]\\d{1,14}$/',
-            service: 'string|in:kazakhtelecom',
-            event: 'required|string',
-            code: 'required|number',
-            embeded: 'boolean',
-            remember: 'boolean',
-            client_timestamp: 'required|number',
-            cert: 'nullable',
-        }, {'service.in': `No service with name: ${body.service}`});
-
-        if (v.fails()) {
-            return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json(v.getErrors());
-        }
-        return res.status(HttpStatus.OK).json({
-            'resend_cooldown': 600,         // Количество секунд за которые надо ввести код и за которые нельзя отправить код повторно
-            'method': 'push',               // Метод отправки (in:push,sms,telegram,whatsapp)
-            'status': 'success'
-        });
-    }
-
-    private sendSMS(phoneNumber: string, service: string): number {
-        const code = this.genCode();
-        this.codeQueueListenerService.queueSMS.add({
-            phone_number: phoneNumber,
-            service: service ? service : 'kazahtelecom',
-            code: code,
-        });
-
-        return code;
-    }
-
+    /**
+     * Generate code
+     * @returns {number}
+     */
     private genCode(): number {
-        // todo check code length
-        const code = Math.floor(Math.random() * 999999);
-        return code;
+        return this.getRandomInt(9999, 99999);
     }
 
+    /**
+     * Returns a random integer between min (inclusive) and max (inclusive)
+     * Using Math.round() will give you a non-uniform distribution!
+     */
+    private getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
 }

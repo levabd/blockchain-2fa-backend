@@ -29,5 +29,7 @@ export class PostCodeDTO {
     readonly resend: string;
     // noinspection TsLint
     @ApiModelProperty()
-    readonly code: string;
+    readonly code: number;
+    @ApiModelProperty()
+    readonly lang: string;
 }

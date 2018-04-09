@@ -1,34 +1,12 @@
-import {ApiModelProperty} from '@nestjs/swagger';
+export class TfaUserDTO {
 
-export class PostClientUserDTO {
-
-    @ApiModelProperty()
-    readonly PhoneNumber: string;
-
-    @ApiModelProperty()
-    readonly Uin: number;
-
-    @ApiModelProperty()
-    readonly Name: string;
-
-    @ApiModelProperty()
-    IsVerified: boolean;
-
-    @ApiModelProperty()
-    readonly Email: string;
-
-    @ApiModelProperty()
-    readonly Sex: string;
-
-    @ApiModelProperty()
-    readonly Birthdate: number;
-
-    @ApiModelProperty()
-    PushToken: string;
-
-    @ApiModelProperty()
-    readonly AdditionalData: string;
-
-    @ApiModelProperty()
-    Logs: any;
+    constructor(private PhoneNumber: string,
+                private Uin: number,
+                private Name: string,
+                private IsVerified: boolean,
+                private Email: string,
+                private Sex: string,
+                private Birthdate: number,
+                private PushToken: string,
+    ){}
 }

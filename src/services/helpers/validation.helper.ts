@@ -1,4 +1,3 @@
-
 import * as  changeCase from 'change-case';
 
 const DICT = {
@@ -100,7 +99,11 @@ export class Validator {
             this.dataTransformed[changeCase.snakeCase(f)] = this.data[f];
         }
 
-        this.lang = this.data.lang || 'en';
+        if (['ru', 'en'].indexOf(this.data.lang) !== -1) {
+            this.lang = this.data.lang || 'en';
+        } else {
+            this.lang = 'en';
+        }
 
         Object.keys(this.rules).forEach(fieldNameToCheck => {
             const fieldRules = this.rules[fieldNameToCheck].split(this.RULES_DELIMITER);
@@ -214,6 +217,7 @@ export class Validator {
             this.addError(field, 'maxNumber', {field: field, value: value});
         }
     }
+
     // noinspection TsLint
     private checkMaxNumberLength(field: string, value: string): void {
         if (this.fieldIsEmpty(field)) {
@@ -231,9 +235,20 @@ export class Validator {
             return;
         }
 
-        if (typeof this.dataTransformed[field] !== 'number') {
+        try {
+            let pn = parseInt(this.dataTransformed[field], 10);
+
+            if (typeof pn !== 'number' || typeof this.dataTransformed[field] !== 'number') {
+                this.addError(field, 'number', {field: field});
+            }
+            return;
+        } catch (e) {
+            console.log('not number passed to request');
             this.addError(field, 'number', {field: field});
+            return;
         }
+
+
     }
 
     // noinspection TsLint
@@ -336,11 +351,12 @@ export class Validator {
      * @returns {string}
      */
     private getMessage(checkType: string | undefined, data: any): string {
-        let letter = DICT[this.lang][checkType];
+        console.log('checkType', checkType);
+        let letter = DICT[this.lang || 'en'][checkType];
 
         Object.keys(data).forEach(key => {
             try {
-                letter = letter.replace(`:${key}`, key === 'list' ? data[key]: FIELD_LIST_DICT[this.lang][data.field]);
+                letter = letter.replace(`:${key}`, key === 'list' ? data[key] : FIELD_LIST_DICT[this.lang || 'en'][data.field]);
             } catch (e) {
                 console.log('Error while parsing error message', e);
             }

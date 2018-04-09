@@ -3,14 +3,15 @@ import {Component} from '@nestjs/common';
 const {createHash} = require('crypto');
 const {protobuf} = require('sawtooth-sdk');
 const {createContext, CryptoFactory} = require('sawtooth-sdk/signing');
-
-import * as cbor from 'cbor';
 import * as request from 'request-promise-native';
 import {EnvConfig} from '../../config/env';
 import {_hash} from '../helpers/helpers';
 import {UserLog} from '../../modules/shared/models/user.log';
-import {PostClientUserDTO} from '../../modules/shared/models/dto/post.kaztel.user.dto';
+import * as fs from 'fs';
+import {Batch} from '../../modules/shared/models/batch';
 
+const protobufMe = require('protocol-buffers');
+const messagesClientService = protobufMe(fs.readFileSync('src/proto/service_client.proto'));
 const AVAILABLE_TFS = {
     kaztel: {
         name: EnvConfig.KAZTEL_FAMILY_NAME,
@@ -20,7 +21,16 @@ const AVAILABLE_TFS = {
         name: EnvConfig.EGOV_FAMILY_NAME,
         version: EnvConfig.EGOV_FAMILY_VERSION,
     },
+    tfa: {
+        name: EnvConfig.TFA_FAMILY_NAME,
+        version: EnvConfig.TFA_FAMILY_VERSION,
+    },
 };
+
+export const CODE_CREATE = 0;
+export const CODE_UPDATE = 1;
+export const CODE_GENERATE = 2;
+export const CODE_VERIFY = 3;
 
 @Component()
 export abstract class ChainService {
@@ -44,53 +54,60 @@ export abstract class ChainService {
         this.prefix = _hash(name).substring(0, 6);
     }
 
+    setPrefix(name: string) {
+        this.prefix = _hash(name).substring(0, 6);
+    }
+
     getAddress(phoneNumber: string, prefix?: string): string {
+        if (prefix) {
+            this.setPrefix(prefix);
+        }
         return this.prefix + _hash(phoneNumber.toString()).slice(-64);
     }
 
-    getStateByPhoneNumber(phoneNumber: string): PostClientUserDTO {
-        return request.get({
-            uri: `${EnvConfig.VALIDATOR_REST_API}/state/${this.getAddress(phoneNumber)}`,
-            json: true // Automatically parses the JSON string in the response
-        }).then(response => {
-            return <PostClientUserDTO>cbor.decode(new Buffer(response.data, 'base64'));
-        }).catch(error => {
-            throw new Error(error);
-        });
-    }
-
-    getStateByAddress(phoneNumber: string): PostClientUserDTO {
-        return request.get({
-            uri: `${EnvConfig.VALIDATOR_REST_API}/state/${this.getAddress(phoneNumber)}`,
-            json: true // Automatically parses the JSON string in the response
-        }).then(response => {
-            return <PostClientUserDTO>cbor.decode(new Buffer(response.data, 'base64'));
-        }).catch(error => {
-            throw new Error(error);
-        });
-    }
-
-    addLog(phoneNumber: string, log: UserLog): any {
-        const address = this.getAddress(phoneNumber);
+    updateUser(phoneNumber: string, user: object, service = 'tfa'): Promise<Batch> {
+        this.initTF(service || 'tfa');
         return this.addTransaction({
-            Action: 'addLog',
+            Action: CODE_UPDATE,
             PhoneNumber: phoneNumber,
-            Log: log,
-        }, address).then(response => {
-            console.log('response', response);
+            PayloadUser: user,
+        }, this.getAddress(phoneNumber)).then(response => {
+            return <Batch>JSON.parse(response).data;
+        }).catch(error => {
+            console.log('invalid response', error);
+            throw new Error(error);
+        });
+    }
+
+    getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    generateCode(phoneNumber: string, log: UserLog, tf: string): any {
+        this.initTF(tf || 'kaztel');
+        const address = this.getAddress(phoneNumber);
+        const payloadData = messagesClientService.SCPayload.encode({
+            Action: CODE_GENERATE,
+            PhoneNumber: phoneNumber,
+            PayloadLog: log,
+        });
+        return this.addTransaction(payloadData, address).then(response => {
             return JSON.parse(response);
         }).catch(error => {
+            console.log('invalid response', error);
             throw new Error(error);
         });
     }
 
-    verify(phoneNumber: string, log: UserLog) {
+    verify(phoneNumber: string, log: UserLog, tf: string) {
+        this.initTF(tf || 'kaztel');
         const address = this.getAddress(phoneNumber);
-        return this.addTransaction({
-            Action: 'verify',
+        const payloadData = messagesClientService.SCPayload.encode({
+            Action: CODE_VERIFY,
             PhoneNumber: phoneNumber,
-            Log: log,
-        }, address).then(response => {
+            PayloadLog: log,
+        });
+        return this.addTransaction(payloadData, address).then(response => {
             return JSON.parse(response);
         }).catch(error => {
             throw new Error(error);
@@ -116,9 +133,7 @@ export abstract class ChainService {
         }).finish();
     }
 
-    addTransaction(payload: object, address: string, dependOn = ''): Promise<any> {
-        const payloadBytes = cbor.encode(payload);
-
+    addTransaction(payloadBytes: object, address: string, dependOn = ''): Promise<any> {
         const transactionHeaderBytes = protobuf.TransactionHeader.encode({
             familyName: this.tf,
             familyVersion: this.tfVersion,
@@ -136,7 +151,6 @@ export abstract class ChainService {
             dependencies: [],
             payloadSha512: createHash('sha512').update(payloadBytes).digest('hex')
         }).finish();
-
         const signature = this.signer.sign(transactionHeaderBytes);
 
         const transaction = protobuf.Transaction.create({
@@ -145,11 +159,9 @@ export abstract class ChainService {
             payload: payloadBytes
         });
 
-        // this.addToBatch(transaction);
-        const batchListBytes = this.getSignedBatch([transaction]);
         return request.post({
             url: `${EnvConfig.VALIDATOR_REST_API}/batches`,
-            body: batchListBytes,
+            body: this.getSignedBatch([transaction]),
             headers: {'Content-Type': 'application/octet-stream'}
         });
     }
