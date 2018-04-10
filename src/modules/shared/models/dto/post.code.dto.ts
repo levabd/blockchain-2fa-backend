@@ -17,7 +17,7 @@ export class PostCodeDTO {
     readonly embeded: boolean;
     // noinspection TsLint
     @ApiModelProperty()
-    readonly client_timestamp: string;
+    client_timestamp: string;
     // noinspection TsLint
     @ApiModelProperty()
     readonly cert: string;
@@ -32,4 +32,7 @@ export class PostCodeDTO {
     readonly code: number;
     @ApiModelProperty()
     readonly lang: string;
+
+    @ApiModelProperty()
+    readonly status: string;
 }

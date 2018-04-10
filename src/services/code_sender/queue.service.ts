@@ -5,6 +5,8 @@ import * as Queue from 'bull';
 import * as request from 'request-promise-native';
 import {Services} from './services';
 import * as gcm from 'node-gcm';
+import {TelegramServer} from '../telegram/telegram.server';
+const Telegraf = require('telegraf');
 
 @Component()
 export class CodeQueueListenerService {
@@ -17,7 +19,7 @@ export class CodeQueueListenerService {
      * Creates an instance of QueueService.
      * @memberof CodeQueueListenerService
      */
-    constructor() {
+    constructor(private telegramServer: TelegramServer) {
         const redisURL = `redis://${EnvConfig.REDIS_HOST}:${EnvConfig.REDIS_PORT}`;
 
         this.queueSMS = new Queue('code_queue_sms', redisURL);
@@ -52,8 +54,17 @@ export class CodeQueueListenerService {
         // job.data contains the custom data passed when the job was created
         // job.id contains id of this job.
         console.info(`process queueTelegram`, job.data);
+        if (job.data.chat_id === '') {
+            done(new Error('Chat id is empty'));
+            return;
+        }
+        if (job.data.message === '') {
+            done(new Error('Message is empty'));
+            return;
+        }
+        const telegrafApp = new Telegraf (EnvConfig.TELEGRAM_BOT_KEY);
+        telegrafApp.telegram.sendMessage(job.data.chat_id, job.data.message);
         done();
-
     }
 
     /**

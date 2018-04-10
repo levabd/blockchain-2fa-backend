@@ -58,7 +58,7 @@ export class EnvConfig {
     public static TFA_FAMILY_NAMESPACE = _hash(process.env['TFA_FAMILY_NAME']).substring(0, 6);
 
     public static KAZTEL_FAMILY_NAME = process.env['KAZTEL_FAMILY_NAME'];
-    public static KAZTEL_FAMILY_VERSION = process.env['KAZTEL_FAMILY_VERSION']|| '0.1';
+    public static KAZTEL_FAMILY_VERSION = process.env['KAZTEL_FAMILY_VERSION'] || '0.1';
 
     public static EGOV_FAMILY_NAME = process.env['EGOV_FAMILY_NAME'];
     public static EGOV_FAMILY_VERSION = process.env['EGOV_FAMILY_VERSION'];
@@ -73,4 +73,5 @@ export class EnvConfig {
     public static KAZTEL_CALLBACK_URL = process.env['KAZTEL_CALLBACK_URL'];
     public static EGOV_CALLBACK_URL = process.env['EGOV_CALLBACK_URL'];
     public static TELEGRAM_BOT_KEY = process.env['TELEGRAM_BOT_KEY'];
+    public static MONGO_DB = process.env['MONGO_DB'];
 }

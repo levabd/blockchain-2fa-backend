@@ -15,6 +15,7 @@ import {EnvConfig} from '../../../config/env';
 import * as WebSocket from 'ws';
 import {ApiController} from './controller';
 import {EgovTransactionFamily} from '../../shared/families/egov.transaction.family';
+import {TelegramController} from './telegram.controller';
 
 const fs = require('fs');
 const protobufLib = require('protocol-buffers');
@@ -62,6 +63,7 @@ export class UserController extends ApiController {
         }
         let user = await this.getUser(phoneNumber, 'tfa');
         if (user === null) {
+            console.log('user not found!!!!!');
             return res.status(HttpStatus.NOT_FOUND).json({user: [this.getUserNotFoundMessage(req.query.lang || 'en')]});
         }
         const code = this.genCode();
@@ -71,7 +73,7 @@ export class UserController extends ApiController {
         if (phoneNumber.charAt(0) === '+') {
             phoneNumber = phoneNumber.substring(1);
         }
-        let self=this;
+        let self = this;
         // save code to redis
         // this key will expire after 8 * 60 seconds
         this.redisClient.setAsync(`${phoneNumber}:${REDIS_USER_POSTFIX}`, `${code}`, 'EX', 7 * 60).then(() => {
@@ -107,13 +109,15 @@ export class UserController extends ApiController {
         // Проверка, существует ли пользователь
         let user = await this.getUser(body.phone_number, 'tfa');
         if (user === null) {
+            console.log('user not found!!!!!');
             return res.status(HttpStatus.NOT_FOUND).json({user: [this.getUserNotFoundMessage(body.lang || 'en')]});
         }
+        const redisKey = `${body.phone_number}:${REDIS_USER_POSTFIX}`;
         // проверка кода
-        const codeFromRedis = await this.redisClient.getAsync(`${body.phone_number}:${REDIS_USER_POSTFIX}`);
+        const codeFromRedis = await this.redisClient.getAsync(redisKey);
         if (codeFromRedis == null) {
             return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
-                code: [body.lang === 'ru' ? 'Вы ввели неверный код' : "The 'Code' expires or does not exists."]
+                code: [body.lang === 'ru' ? 'Кода либо нету либо его срок истёк' : "The 'Code' expires or does not exists."]
             });
         }
         if (parseInt(codeFromRedis, 10) != parseInt(body.code, 10)) {
@@ -121,7 +125,7 @@ export class UserController extends ApiController {
                 code: [body.lang === 'ru' ? 'Вы ввели неверный код' : "The 'Code' is not valid."]
             });
         }
-        await this.redisClient.del(`${body.phone_number}:${REDIS_USER_POSTFIX}`);
+        await this.redisClient.del(redisKey);
 
         // подготовка адресов, за которыми нужно отследить успешное прохождение транзакции
         let userKaztel = await this.getUser(body.phone_number, 'kaztel');
@@ -135,7 +139,6 @@ export class UserController extends ApiController {
         if (userEgov !== null) {
             addresses.push(this.chainService.getAddress(body.phone_number, 'egov'));
         }
-
         // начинаем слушать изменения адресов
         let ws = new WebSocket(`ws:${EnvConfig.VALIDATOR_REST_API_HOST_PORT}/subscriptions`);
         ws.onopen = () => {
@@ -166,7 +169,7 @@ export class UserController extends ApiController {
                 const stateChange = data.state_changes[i];
                 if (addresses.indexOf(stateChange.address) !== -1) {
                     const _user = messagesService.User.decode(new Buffer(stateChange.value, 'base64'));
-                    if (responseSend){
+                    if (responseSend) {
                         ws.send(JSON.stringify({
                             'action': 'unsubscribe'
                         }));
@@ -175,9 +178,9 @@ export class UserController extends ApiController {
                     // todo: по хорошему надо во всех чейнах отследить изменения
                     if (_user.IsVerified) {
                         try {
-                            responseSend =true
+                            responseSend = true
                             return res.status(HttpStatus.OK).json({status: 'success'});
-                        } catch(e){
+                        } catch (e) {
                             console.log('error - trying to send response second time', e);
                         }
                     }

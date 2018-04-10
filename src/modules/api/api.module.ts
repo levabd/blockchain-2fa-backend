@@ -7,6 +7,7 @@ import {LoggerMiddleware} from './middleware/logger.middleware';
 import {JsonMiddleware} from './middleware/json.middleware';
 import {VerificationController} from './controllsers/verification.controller';
 import {ChainController} from './controllsers/chain.controller';
+import {ApiKeyCheckerMiddleware} from './middleware/api.key.checker.middleware';
 import {TelegramController} from './controllsers/telegram.controller';
 
 @Module({
@@ -15,7 +16,7 @@ import {TelegramController} from './controllsers/telegram.controller';
         VerificationController,
         ChainController,
         SmsCallbackController,
-        // TelegramController
+        TelegramController
     ],
     imports: [
         SharedModule
@@ -24,7 +25,7 @@ import {TelegramController} from './controllsers/telegram.controller';
 export class ApiModule implements NestModule{
     configure(consumer: MiddlewaresConsumer): MiddlewaresConsumer | void {
         consumer.apply(JsonMiddleware).forRoutes(UserController);
-        // consumer.apply(ApiKeyCheckerMiddleware).forRoutes(UserController);
+        consumer.apply(ApiKeyCheckerMiddleware).forRoutes(UserController);
         consumer.apply(LoggerMiddleware).forRoutes(UserController);
     }
 }

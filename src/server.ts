@@ -2,8 +2,6 @@ import {EnvConfig} from './config/env';
 import {NestFactory} from '@nestjs/core';
 import {ApplicationModule} from './modules/app.module';
 import {SwaggerModule, DocumentBuilder} from '@nestjs/swagger';
-
-
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import {AppExceptionFilter} from './modules/shared/filters/app.exception.filter';
@@ -21,7 +19,7 @@ async function bootstrap() {
         res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
         next();
     });
-    app.useGlobalFilters(new AppExceptionFilter());
+    // app.useGlobalFilters(new AppExceptionFilter());
 
     /**
      * Swagger implementation

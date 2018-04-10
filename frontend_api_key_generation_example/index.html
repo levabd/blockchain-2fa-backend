@@ -10,16 +10,14 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/spark-md5/3.0.0/spark-md5.js"></script>
 <script src="crc32.js"></script>
 <script>
-
-    function makeRandomHexString()
-    {
+    function makeRandomHexString() {
         var text = "";
         var possible = "1234567890abcdef";
-        for( var i=0; i < 17; i++ )
+        for( var i=0; i < 17; i++ ) {
             text += possible.charAt(Math.floor(Math.random() * possible.length));
+        }
         return text;
     }
-
 
     var request_url = '/v1/users/verify-number';
     var request_phone = '+77476944868';
@@ -30,7 +28,6 @@
 
     console.log(apiKey);
     console.log(encodeURIComponent(request_phone));
-
 </script>
 </body>
 </html>

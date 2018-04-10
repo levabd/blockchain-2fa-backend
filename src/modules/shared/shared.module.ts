@@ -6,6 +6,7 @@ import {CodeQueueListenerService} from '../../services/code_sender/queue.service
 import {ChainService} from '../../services/sawtooth/chain.service';
 import {KaztelTransactionFamily} from './families/kaztel.transaction.family';
 import {EgovTransactionFamily} from './families/egov.transaction.family';
+import {TelegramServer} from '../../services/telegram/telegram.server';
 
 @Module({
     components:[
@@ -16,6 +17,7 @@ import {EgovTransactionFamily} from './families/egov.transaction.family';
         CodeQueueListenerService,
         ChainService,
         TimeHelper,
+        TelegramServer
     ],
     exports:[
         ClientService,
@@ -24,7 +26,8 @@ import {EgovTransactionFamily} from './families/egov.transaction.family';
         EgovTransactionFamily,
         CodeQueueListenerService,
         ChainService,
-        TimeHelper
+        TimeHelper,
+        TelegramServer
     ]
 })
 export class SharedModule {}

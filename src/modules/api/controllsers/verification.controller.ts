@@ -1,4 +1,4 @@
-import {Body, Controller, Get, HttpStatus,  Post, Query, Req, Res} from '@nestjs/common';
+import {Body, Controller, Get, HttpStatus, Post, Query, Req, Res} from '@nestjs/common';
 import {ApiUseTags} from '@nestjs/swagger';
 import {Validator} from '../../../services/helpers/validation.helper';
 import {PostCodeDTO} from '../../shared/models/dto/post.code.dto';
@@ -15,6 +15,7 @@ import {EnvConfig} from '../../../config/env';
 import {ApiController} from './controller';
 import {KaztelTransactionFamily} from '../../shared/families/kaztel.transaction.family';
 import {EgovTransactionFamily} from '../../shared/families/egov.transaction.family';
+import * as  changeCase from 'change-case';
 
 export const RESEND_CODE = 'RESEND_CODE';
 export const SEND_CODE = 'SEND_CODE';
@@ -22,6 +23,7 @@ export const EXPIRED = 'EXPIRED';
 export const VALID = 'VALID';
 export const INVALID = 'INVALID';
 import * as WebSocket from 'ws';
+import {TelegramServer} from '../../../services/telegram/telegram.server';
 
 const fs = require('fs');
 const protobufLib = require('protocol-buffers');
@@ -35,6 +37,7 @@ export class VerificationController extends ApiController {
                 public egovTF: EgovTransactionFamily,
                 public chainService: ChainService,
                 private timeHelper: TimeHelper,
+                private telegramServer: TelegramServer,
                 private codeQueueListenerService: CodeQueueListenerService) {
         super(tfaTF, kaztelTF, egovTF);
 
@@ -65,7 +68,7 @@ export class VerificationController extends ApiController {
             service: 'requiredIfNot:push_token|string|in:kaztel,egov',
             phone_number: 'required|string|regex:/^\\+?[1-9]\\d{1,14}$/',
             embeded: 'boolean',
-            client_timestamp: 'required|number',
+            client_timestamp: 'required',
             cert: 'nullable',
         }, {'service.in': `No service with name: ${body.service}`});
         if (v.fails()) {
@@ -75,23 +78,33 @@ export class VerificationController extends ApiController {
         if (user === null) {
             return res.status(HttpStatus.NOT_FOUND).json({user: [this.getUserNotFoundMessage(body.lang || 'en')]});
         }
+
+        let number = body.phone_number;
+        if (number.charAt(0) === '+') {
+            number = number.substring(1);
+        }
+        number = number.substring(1);
+        let userTelegram = await this.telegramServer.userExists(new RegExp('^8|7' + number + '$', 'i'));
         // todo device check embeded,  cert
-        return res.status(HttpStatus.OK).json({status: 'success', push_token: user.PushToken !== ''});
+        return res.status(HttpStatus.OK).json({
+            status: 'success',
+            push_token: user.PushToken !== '',
+            registered_in_telegram: userTelegram !== null
+        });
     }
 
     @Post('code')
     async postCode(@Res() res, @Body() body: PostCodeDTO) {
-
         let v = new Validator(body, {
             event: 'required|string',
-            lang: 'string',
+            lang: 'nullable|string',
             method: 'required|string|in:sms,push,telegram,whatsapp',
             service: 'requiredIfNot:push_token|string|in:kaztel,egov',
             phone_number: 'required|string|regex:/^\\+?[1-9]\\d{1,14}$/',
             embeded: 'boolean',
-            client_timestamp: 'required|number',
+            client_timestamp: 'required',
             cert: 'nullable',
-            resend: 'boolean',
+            resend: 'nullable|boolean',
         }, {'service.in': `No service with name: ${body.service}`});
 
         if (v.fails()) {
@@ -125,6 +138,18 @@ export class VerificationController extends ApiController {
         } else {
             let tfaUser = await this.getUser(body.phone_number, 'tfa');
             pushToken = tfaUser.PushToken;
+        }
+        let telegramUser;
+        if (body.method === 'telegram') {
+            let number = body.phone_number;
+            if (number.charAt(0) === '+') {
+                number = number.substring(1);
+            }
+            telegramUser = await this.telegramServer.userExists(new RegExp('^8|7' + number.substring(1) + '$', 'i'));
+            console.log('telegramUser', telegramUser);
+            if (!telegramUser) {
+                return res.status(HttpStatus.BAD_GATEWAY).json({user: ['User select telegram, but not registered in it yet.']});
+            }
         }
         ws.onmessage = mess => {
             const data = JSON.parse(mess.data);
@@ -173,7 +198,10 @@ export class VerificationController extends ApiController {
                                 });
                                 break;
                             case 'telegram':
-                                // todo
+                                this.codeQueueListenerService.queueTelegram.add({
+                                    chat_id: telegramUser.chatId,
+                                    message: 'Ваш код подтверждения для сервиса "' + Services[body.service] + '": ' + log.Code,
+                                });
                                 break;
                             case 'whatsapp':
                                 // todo
@@ -205,13 +233,15 @@ export class VerificationController extends ApiController {
                   @Res() res,
                   @Query('phone_number') phoneNumber: string,
                   @Query('push_token') pushToken: string,
-                  @Query('service') service: string,
                   @Query('client_timestamp') clientTimestamp: string) {
-
+        try {
+            req.query.client_timestamp = parseInt(req.query.client_timestamp, 10);
+        } catch (e) {
+            console.log('e', e);
+        }
         let v = new Validator(req.query, {
             phone_number: 'required|string|regex:/^\\+?[1-9]\\d{1,14}$/',
             push_token: 'required|string',
-            service: 'required|string|in:kaztel,egov',
             client_timestamp: 'required|number',
         });
 
@@ -219,52 +249,109 @@ export class VerificationController extends ApiController {
         if (v.fails()) {
             return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json(v.getErrors());
         }
-        let user = await this.getUser(phoneNumber, service);
-        if (user === null) {
+        let tfaKaztel = await this.getUser(phoneNumber, 'tfa');
+        if (!tfaKaztel.IsVerified || tfaKaztel.PushToken !== pushToken) {
             return res.status(HttpStatus.NOT_FOUND).json({user: [this.getUserNotFoundMessage(req.query.lang || 'en')]});
         }
-        let sendCodeArrayKeysSorted = [];
-        const keys = Object.keys(user.Logs);
-        if (keys.length === 0) {
-            return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({user: ['Пользователю ещё не отправили код подтверждения']});
+        let userKaztel = await this.getUser(phoneNumber, 'kaztel');
+        let userEgov = await this.getUser(phoneNumber, 'egov');
+        if (userKaztel === null && userEgov == null) {
+            return res.status(HttpStatus.NOT_FOUND).json({user: [this.getUserNotFoundMessage(req.query.lang || 'en')]});
         }
-        const keysLength = keys.length - 1;
+        let logKaztel = {status: 'no_send_codes', log: {Service: null}};
+        if (userKaztel) {
+            logKaztel = this.getLatestCode(userKaztel);
+        }
+        let logEgov = {status: 'no_send_codes', log: {Service: null}};
+        if (userEgov) {
+            logEgov = this.getLatestCode(userEgov);
+        }
+        if (logKaztel.status !== 'success' && logEgov.status !== 'success') {
+            switch (logKaztel.status) {
+                case 'no_send_codes':
+                    return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+                        user: [req.query.lang == 'ru' ? 'Пользователю ещё не отправили ни одного кода подтверждения' : 'No code for user yet']
+                    });
+                case 'no_code_used':
+                    return res.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                        .json({
+                            user: [req.query.lang == 'ru'
+                                ? 'Пользователю ещё не отправили ни одного кода подтверждения'
+                                : 'No code for user yet']
+                        });
+                default:
+                    return res.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                        .json({user: ['Error getiing code']});
+            }
+        }
+
+        if (logKaztel.status === 'success') {
+            return res.status(HttpStatus.OK).json(this.transformLog(logKaztel.log, 'kaztel'));
+        }
+
+        if (logEgov.status === 'success') {
+            return res.status(HttpStatus.OK).json(this.transformLog(logEgov.log, 'egov'));
+        }
+
+        return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({user: ['Error getting code']});
+    }
+
+    private transformLog(log: any, service: string): object {
+        const fieldsToHandle = Object.keys(log);
+        let obj = {};
+        for (let f of fieldsToHandle) {
+            if (f == 'Status' || f == 'ExpiredAt' || f == 'Method' || f == 'ActionTime') {
+                continue;
+            }
+            obj[changeCase.snakeCase(f)] = log[f];
+        }
+        obj['service'] = service;
+        return obj;
+    }
+
+    private getLatestCode(user: any): any {
+        let sendCodeArrayKeysSorted = [];
+        const userKeys = Object.keys(user.Logs);
+        if (userKeys.length === 0) {
+            return {status: 'no_send_codes'};
+        }
+        const currentTimestamp = (new Date()).getTime() / 1000;
+        const keysLength = userKeys.length - 1;
         let sendCodeArrayKeys = [];
         let validCodeArrayKeys = [];
-        for (let i = 0; i <= keys.length; i++) {
-            const log = user.Logs[keys[i]];
+        for (let i = 0; i <= userKeys.length; i++) {
+            const log = user.Logs[userKeys[i]];
             if (!log.Status) {
                 continue;
             }
             if (log.Status === SEND_CODE || log.Status === RESEND_CODE) {
-                sendCodeArrayKeys.push(parseInt(keys[i], 10));
+                if (currentTimestamp <= log.ExpiredAt) {
+                    sendCodeArrayKeys.push(parseInt(userKeys[i], 10));
+                }
             }
             if (log.Status === VALID) {
-                validCodeArrayKeys.push(parseInt(keys[i], 10));
+                validCodeArrayKeys.push(parseInt(userKeys[i], 10));
             }
             if (i !== keysLength) {
                 continue;
             }
             if (sendCodeArrayKeys.length === 0) {
-                return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({user: ['Пользователю ещё не отправили код подтверждения']});
+                return {status: 'no_send_codes'};
             }
             sendCodeArrayKeysSorted = sendCodeArrayKeys.sort(sortNumber);
             const latestCodeIndex = sendCodeArrayKeysSorted.length === 1 ? 0 : sendCodeArrayKeysSorted[sendCodeArrayKeysSorted.length - 1];
             const latestLog = user.Logs[latestCodeIndex];
-
             if (!validCodeArrayKeys.length) {
-                return res.status(HttpStatus.OK).json(latestLog);
+                return {status: 'success', log: latestLog};
             }
             const validKeysLength = validCodeArrayKeys.length - 1;
             for (let j = 0; j < validCodeArrayKeys.length; j++) {
                 const logValid = user.Logs[validCodeArrayKeys[j]];
                 if (logValid.Code === latestLog.Code) {
-                    return res.status(HttpStatus.UNPROCESSABLE_ENTITY)
-                        .json({user: ['Пользователь уже авторизовался используя последний отправленный код']});
+                    return {status: 'no_code_used'};
                 }
-
                 if (j === validKeysLength) {
-                    return res.status(HttpStatus.OK).json(latestLog);
+                    return {status: 'success', log: latestLog};
                 }
             }
         }
@@ -272,6 +359,7 @@ export class VerificationController extends ApiController {
 
     @Post('verify')
     async postVerify(@Res() res, @Body() body: PostCodeDTO) {
+        console.log('body', body);
         let v = new Validator(body, {
             event: 'required|string',
             lang: 'string',
@@ -279,7 +367,9 @@ export class VerificationController extends ApiController {
             service: 'requiredIfNot:push_token|string|in:kaztel,egov',
             phone_number: 'required|string|regex:/^\\+?[1-9]\\d{1,14}$/',
             embeded: 'boolean',
-            client_timestamp: 'required|number',
+            // используется только при отправке мобильным приложением - для установке статуса REJECT
+            status: 'string',
+            client_timestamp: 'required',
             cert: 'nullable',
         }, {'service.in': `No service with name: ${body.service}`});
         if (v.fails()) {
@@ -296,12 +386,16 @@ export class VerificationController extends ApiController {
         ];
         let ws = this.openWsConnection(addresses);
         try {
+            let rejectStatus = null;
+            if (body.status && body.status) {
+                rejectStatus = 'REJECT';
+            }
             let log = new UserLog();
             log.ActionTime = (new Date()).getTime() / 1000;
-            log.ExpiredAt = this.timeHelper.getUnixTimeAfterMinutes(7);
+            log.ExpiredAt = this.timeHelper.getUnixTimeAfterMinutes(1);
             log.Event = body.event;
             log.Embeded = body.embeded;
-            log.Status = 'VERIFY';
+            log.Status = rejectStatus || 'VERIFY';
             log.Code = body.code;
             log.Cert = body.cert;
             await this.chainService.verify(body.phone_number, log, body.service);
@@ -336,15 +430,19 @@ export class VerificationController extends ApiController {
                         //     default:
                         //         break;
                         // }
-
+                        // todo make request to redirest url with user data
                         responseSend = true;
                         ws.send(JSON.stringify({'action': 'unsubscribe'}));
                         // responde to the view
-                        return res.status(HttpStatus.OK).json({user: user, status: 'VALID'});
+                        return res.status(HttpStatus.OK).json({status: 'VALID'});
                     } else {
                         responseSend = true;
                         ws.send(JSON.stringify({'action': 'unsubscribe'}));
-                        return res.status(HttpStatus.OK).json({status: _user.Logs[_user.Logs.length - 1].Status});
+                        const status = _user.Logs[_user.Logs.length - 1].Status;
+                        if (status === 'EXPIRED') {
+                            return res.status(440).json({status: status});
+                        }
+                        return res.status(HttpStatus.BAD_REQUEST).json({status: status});
                     }
                 }
             }
