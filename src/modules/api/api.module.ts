@@ -6,17 +6,16 @@ import {NestModule} from '@nestjs/common/interfaces';
 import {LoggerMiddleware} from './middleware/logger.middleware';
 import {JsonMiddleware} from './middleware/json.middleware';
 import {VerificationController} from './controllsers/verification.controller';
-import {ChainController} from './controllsers/chain.controller';
+import {WebController} from './controllsers/web.controller';
 import {ApiKeyCheckerMiddleware} from './middleware/api.key.checker.middleware';
-import {TelegramController} from './controllsers/telegram.controller';
+import {FrontendApiKeyCheckerMiddleware} from './middleware/frontend.api.key.checker.middleware';
 
 @Module({
     controllers: [
         UserController,
         VerificationController,
-        ChainController,
-        SmsCallbackController,
-        TelegramController
+        WebController,
+        SmsCallbackController
     ],
     imports: [
         SharedModule
@@ -26,6 +25,7 @@ export class ApiModule implements NestModule{
     configure(consumer: MiddlewaresConsumer): MiddlewaresConsumer | void {
         consumer.apply(JsonMiddleware).forRoutes(UserController);
         consumer.apply(ApiKeyCheckerMiddleware).forRoutes(UserController);
+        consumer.apply(FrontendApiKeyCheckerMiddleware).forRoutes(VerificationController);
         consumer.apply(LoggerMiddleware).forRoutes(UserController);
     }
 }

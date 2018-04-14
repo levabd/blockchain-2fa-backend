@@ -3,14 +3,11 @@ import {MiddlewaresConsumer, Module} from '@nestjs/common';
 import {NestModule} from '@nestjs/common/interfaces';
 
 import {CodeQueueListenerService} from '../services/code_sender/queue.service';
-import {WebModule} from './web/web.module';
 import {ApiModule} from './api/api.module';
 import {SharedModule} from './shared/shared.module';
 
-
 @Module({
     modules: [
-        // WebModule,
         ApiModule,
         SharedModule
     ],

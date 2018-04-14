@@ -13,6 +13,7 @@ export class EnvConfig {
     // NODE
     public static NODE_ENV = process.env['NODE_ENV'] || 'LOCAL';
     public static API_KEY = process.env['API_KEY'] || 'sgdfhdmgdkfgjk';
+    public static API_KEY_FRONTEND = process.env['API_KEY_FRONTEND'] || 'sgdfhdmgdkfgjk';
     public static API_PATH = process.env['API_PATH'];
     public static PORT = process.env['PORT'] || 4001;
 

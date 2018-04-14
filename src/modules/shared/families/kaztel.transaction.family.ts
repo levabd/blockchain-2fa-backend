@@ -38,7 +38,6 @@ export class KaztelTransactionFamily extends ChainService {
     }
 
     getUser(phoneNumber: string): Promise<PostClientUserDTO|null> {
-        console.log('this.getAddress(phoneNumber)', this.getAddress(phoneNumber));
         return request.get({
             uri: `${EnvConfig.VALIDATOR_REST_API}/state/${this.getAddress(phoneNumber)}`,
             json: true

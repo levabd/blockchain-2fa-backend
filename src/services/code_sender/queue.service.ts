@@ -6,6 +6,7 @@ import * as request from 'request-promise-native';
 import {Services} from './services';
 import * as gcm from 'node-gcm';
 import {TelegramServer} from '../telegram/telegram.server';
+
 const Telegraf = require('telegraf');
 
 @Component()
@@ -50,10 +51,9 @@ export class CodeQueueListenerService {
      * @param done
      * @memberof CodeQueueListenerService
      */
-    private processTelegramJob(job, done): void {
+    private async processTelegramJob(job, done) {
         // job.data contains the custom data passed when the job was created
         // job.id contains id of this job.
-        console.info(`process queueTelegram`, job.data);
         if (job.data.chat_id === '') {
             done(new Error('Chat id is empty'));
             return;
@@ -62,8 +62,15 @@ export class CodeQueueListenerService {
             done(new Error('Message is empty'));
             return;
         }
-        const telegrafApp = new Telegraf (EnvConfig.TELEGRAM_BOT_KEY);
-        telegrafApp.telegram.sendMessage(job.data.chat_id, job.data.message);
+        const telegrafApp = new Telegraf(EnvConfig.TELEGRAM_BOT_KEY);
+        try {
+            await telegrafApp.telegram.sendMessage(job.data.chat_id, job.data.message);
+        } catch (e) {
+            if (e.response && e.response.error_code === 403) {
+                console.log('postVerify - user was not registered in telegram');
+            }
+        }
+
         done();
     }
 
@@ -110,10 +117,15 @@ export class CodeQueueListenerService {
                 charset: 'utf-8'
             }
         };
-        request.post(options).then(r => {
-            console.info(`processSMSJob end`, r);
-            done();
-        });
+
+        try {
+            request.post(options).then(r => {
+                console.info(`processSMSJob end`, r);
+                done();
+            });
+        } catch (e) {
+            console.log('e', e);
+        }
     }
 
     /**
@@ -142,12 +154,15 @@ export class CodeQueueListenerService {
                 body: job.data.message
             },
         });
-
-        fcm.sendNoRetry(message, [job.data.push_token], (err, response) => {
-            if (err) {
-                console.error(`CodeQueueListenerService@processPUSHJob@sendNoRetry: Firebase error`, err);
-            }
-        });
+        try {
+            fcm.sendNoRetry(message, [job.data.push_token], (err, response) => {
+                if (err) {
+                    console.error(`CodeQueueListenerService@processPUSHJob@sendNoRetry: Firebase error`, err);
+                }
+            });
+        } catch (e) {
+            console.log('e', e);
+        }
 
         console.info(`CodeQueueListenerService@processPUSHJob: processed`);
         done();

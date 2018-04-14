@@ -1,4 +1,4 @@
-import {Body, Controller, Get, HttpStatus, Post, Query, Req, Res} from '@nestjs/common';
+import {Body, Controller, HttpStatus, Post, Req, Res} from '@nestjs/common';
 import {ApiUseTags} from '@nestjs/swagger';
 import {Validator} from '../../../services/helpers/validation.helper';
 import {PostCodeDTO} from '../../shared/models/dto/post.code.dto';
@@ -9,22 +9,16 @@ import {TfaTransactionFamily} from '../../shared/families/tfa.transaction.family
 import {ChainService} from '../../../services/sawtooth/chain.service';
 import {UserLog} from '../../shared/models/user.log';
 import {TimeHelper} from '../../../services/helpers/time.helper';
-import {_getLatestIndex, sortNumber} from '../../../services/helpers/helpers';
 import {Services} from '../../../services/code_sender/services';
 import {EnvConfig} from '../../../config/env';
 import {ApiController} from './controller';
 import {KaztelTransactionFamily} from '../../shared/families/kaztel.transaction.family';
 import {EgovTransactionFamily} from '../../shared/families/egov.transaction.family';
-import * as  changeCase from 'change-case';
-
-export const RESEND_CODE = 'RESEND_CODE';
-export const SEND_CODE = 'SEND_CODE';
-export const EXPIRED = 'EXPIRED';
-export const VALID = 'VALID';
-export const INVALID = 'INVALID';
-import * as WebSocket from 'ws';
 import {TelegramServer} from '../../../services/telegram/telegram.server';
-
+import {PostVerifyCodeDTO} from '../../shared/models/dto/post.verify.dto';
+import {_getLatestIndex} from '../../../services/helpers/helpers';
+import {REDIS_USER_PUSH_RESULT_POSTFIX, REJECT, RESEND_CODE, SEND_CODE, VALID} from '../../../config/constants';
+const Telegraf = require('telegraf');
 const fs = require('fs');
 const protobufLib = require('protocol-buffers');
 const messagesServiceClient = protobufLib(fs.readFileSync('src/proto/service_client.proto'));
@@ -32,6 +26,8 @@ const messagesServiceClient = protobufLib(fs.readFileSync('src/proto/service_cli
 @ApiUseTags('v1/api/verification')
 @Controller('v1/api/verification')
 export class VerificationController extends ApiController {
+    private telegrafApp: any;
+
     constructor(public tfaTF: TfaTransactionFamily,
                 public kaztelTF: KaztelTransactionFamily,
                 public egovTF: EgovTransactionFamily,
@@ -40,24 +36,8 @@ export class VerificationController extends ApiController {
                 private telegramServer: TelegramServer,
                 private codeQueueListenerService: CodeQueueListenerService) {
         super(tfaTF, kaztelTF, egovTF);
-
+        this.telegrafApp = new Telegraf(EnvConfig.TELEGRAM_BOT_KEY);
         Promisefy.promisifyAll(redis);
-    }
-
-    @Get('enter')
-    getEnter(@Res() res, @Query('event') event: string,
-             @Query('service') service: string) {
-        let v = new Validator({
-            event: event,
-            service: service
-        }, {
-            event: 'required|string',
-            service: 'required|string|in:kaztel,egov',
-        }, {'service.in': `No service with name: ${service}`});
-        if (v.fails()) {
-            return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json(v.getErrors());
-        }
-        return res.redirect(`${EnvConfig.FRONTEND_API}?service=${service}&event=${event}`);
     }
 
     @Post('verify-user')
@@ -106,7 +86,6 @@ export class VerificationController extends ApiController {
             cert: 'nullable',
             resend: 'nullable|boolean',
         }, {'service.in': `No service with name: ${body.service}`});
-
         if (v.fails()) {
             return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json(v.getErrors());
         }
@@ -115,8 +94,27 @@ export class VerificationController extends ApiController {
         if (user === null) {
             return res.status(HttpStatus.NOT_FOUND).json({user: [this.getUserNotFoundMessage(body.lang || 'en')]});
         }
+        let telegramUser;
+        if (body.method === 'telegram') {
+            let number = user.PhoneNumber;
+            if (number.charAt(0) === '+') {
+                number = number.substring(1);
+            }
+            telegramUser = await this.telegramServer.userExists(new RegExp('^8|7' + number.substring(1) + '$', 'i'));
+            if (!telegramUser) {
+                return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({user: [this.getMessage(body.lang, 'telegram_bot_unregistered')]});
+            }
+            // check if user delete the bot
+            try {
+                await this.telegrafApp.telegram.sendMessage(telegramUser.chatId, 'Здравствуйте');
+            } catch (e) {
+                if (e.response && e.response.error_code === 403) {
+                    return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({status: 'telegram_bot_unregistered'});
+                }
+            }
+        }
         // начинаем слушать изменения адресов
-        let addresses = [this.chainService.getAddress(body.phone_number, body.service)];
+        let addresses = [this.chainService.getAddress(user.PhoneNumber, body.service)];
         let ws = this.openWsConnection(addresses);
         try {
             let log = new UserLog();
@@ -127,39 +125,30 @@ export class VerificationController extends ApiController {
             log.Status = body.resend ? 'RESEND_CODE' : 'SEND_CODE';
             log.Embeded = body.embeded;
             log.Cert = body.cert;
-            await this.chainService.generateCode(body.phone_number, log, body.service);
+            await this.chainService.generateCode(user.PhoneNumber, log, body.service);
         } catch (e) {
             console.error(`Error while getting user`, e);
             return res.status(HttpStatus.BAD_GATEWAY).json({error: 'Error sending code.'});
         }
         let pushToken = '';
         if (body.method === 'push' && !user.IsVerified) {
-            return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({user: ['User is not verified']});
+            return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({user: [this.getMessage(body.lang, 'not_verified')]});
         } else {
-            let tfaUser = await this.getUser(body.phone_number, 'tfa');
+            let tfaUser = await this.getUser(user.PhoneNumber, 'tfa');
+            if (!tfaUser) {
+                return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({user: [this.getMessage(body.lang, 'not_verified')]});
+            }
             pushToken = tfaUser.PushToken;
         }
-        let telegramUser;
-        if (body.method === 'telegram') {
-            let number = body.phone_number;
-            if (number.charAt(0) === '+') {
-                number = number.substring(1);
-            }
-            telegramUser = await this.telegramServer.userExists(new RegExp('^8|7' + number.substring(1) + '$', 'i'));
-            console.log('telegramUser', telegramUser);
-            if (!telegramUser) {
-                return res.status(HttpStatus.BAD_GATEWAY).json({user: ['User select telegram, but not registered in it yet.']});
-            }
-        }
+
+        let responseSend = false;
         ws.onmessage = mess => {
             const data = JSON.parse(mess.data);
-            let responseSend = false;
-            for (let i = 0; i < data.state_changes.length; i++) {
+            for (let stateChange of data.state_changes) {
                 if (responseSend) {
                     ws.send(JSON.stringify({'action': 'unsubscribe'}));
                     break;
                 }
-                const stateChange = data.state_changes[i];
                 if (addresses.indexOf(stateChange.address) !== -1) {
                     let userDecoded;
                     try {
@@ -168,7 +157,7 @@ export class VerificationController extends ApiController {
                         console.log('VerificationController@postCode: Cant decode user', e);
                         responseSend = true;
                         ws.send(JSON.stringify({'action': 'unsubscribe'}));
-                        return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({user: [' Cant decode user']});
+                        return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({user: [this.getMessage(body.lang, 'error_decode_user_bc')]});
                     }
                     if (userDecoded.Logs.length > user.Logs.length) {
                         const log: UserLog = userDecoded.Logs[_getLatestIndex(Object.keys(userDecoded.Logs))];
@@ -191,6 +180,7 @@ export class VerificationController extends ApiController {
                                 });
                                 break;
                             case 'sms':
+                                console.log('log.Code', log.Code);
                                 this.codeQueueListenerService.queueSMS.add({
                                     phone_number: user.PhoneNumber,
                                     service: body.service,
@@ -228,138 +218,8 @@ export class VerificationController extends ApiController {
         };
     }
 
-    @Get('code')
-    async getCode(@Req() req,
-                  @Res() res,
-                  @Query('phone_number') phoneNumber: string,
-                  @Query('push_token') pushToken: string,
-                  @Query('client_timestamp') clientTimestamp: string) {
-        try {
-            req.query.client_timestamp = parseInt(req.query.client_timestamp, 10);
-        } catch (e) {
-            console.log('e', e);
-        }
-        let v = new Validator(req.query, {
-            phone_number: 'required|string|regex:/^\\+?[1-9]\\d{1,14}$/',
-            push_token: 'required|string',
-            client_timestamp: 'required|number',
-        });
-
-        // todo add The push token is wrong. validation
-        if (v.fails()) {
-            return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json(v.getErrors());
-        }
-        let tfaKaztel = await this.getUser(phoneNumber, 'tfa');
-        if (!tfaKaztel.IsVerified || tfaKaztel.PushToken !== pushToken) {
-            return res.status(HttpStatus.NOT_FOUND).json({user: [this.getUserNotFoundMessage(req.query.lang || 'en')]});
-        }
-        let userKaztel = await this.getUser(phoneNumber, 'kaztel');
-        let userEgov = await this.getUser(phoneNumber, 'egov');
-        if (userKaztel === null && userEgov == null) {
-            return res.status(HttpStatus.NOT_FOUND).json({user: [this.getUserNotFoundMessage(req.query.lang || 'en')]});
-        }
-        let logKaztel = {status: 'no_send_codes', log: {Service: null}};
-        if (userKaztel) {
-            logKaztel = this.getLatestCode(userKaztel);
-        }
-        let logEgov = {status: 'no_send_codes', log: {Service: null}};
-        if (userEgov) {
-            logEgov = this.getLatestCode(userEgov);
-        }
-        if (logKaztel.status !== 'success' && logEgov.status !== 'success') {
-            switch (logKaztel.status) {
-                case 'no_send_codes':
-                    return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
-                        user: [req.query.lang == 'ru' ? 'Пользователю ещё не отправили ни одного кода подтверждения' : 'No code for user yet']
-                    });
-                case 'no_code_used':
-                    return res.status(HttpStatus.UNPROCESSABLE_ENTITY)
-                        .json({
-                            user: [req.query.lang == 'ru'
-                                ? 'Пользователю ещё не отправили ни одного кода подтверждения'
-                                : 'No code for user yet']
-                        });
-                default:
-                    return res.status(HttpStatus.UNPROCESSABLE_ENTITY)
-                        .json({user: ['Error getiing code']});
-            }
-        }
-
-        if (logKaztel.status === 'success') {
-            return res.status(HttpStatus.OK).json(this.transformLog(logKaztel.log, 'kaztel'));
-        }
-
-        if (logEgov.status === 'success') {
-            return res.status(HttpStatus.OK).json(this.transformLog(logEgov.log, 'egov'));
-        }
-
-        return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({user: ['Error getting code']});
-    }
-
-    private transformLog(log: any, service: string): object {
-        const fieldsToHandle = Object.keys(log);
-        let obj = {};
-        for (let f of fieldsToHandle) {
-            if (f == 'Status' || f == 'ExpiredAt' || f == 'Method' || f == 'ActionTime') {
-                continue;
-            }
-            obj[changeCase.snakeCase(f)] = log[f];
-        }
-        obj['service'] = service;
-        return obj;
-    }
-
-    private getLatestCode(user: any): any {
-        let sendCodeArrayKeysSorted = [];
-        const userKeys = Object.keys(user.Logs);
-        if (userKeys.length === 0) {
-            return {status: 'no_send_codes'};
-        }
-        const currentTimestamp = (new Date()).getTime() / 1000;
-        const keysLength = userKeys.length - 1;
-        let sendCodeArrayKeys = [];
-        let validCodeArrayKeys = [];
-        for (let i = 0; i <= userKeys.length; i++) {
-            const log = user.Logs[userKeys[i]];
-            if (!log.Status) {
-                continue;
-            }
-            if (log.Status === SEND_CODE || log.Status === RESEND_CODE) {
-                if (currentTimestamp <= log.ExpiredAt) {
-                    sendCodeArrayKeys.push(parseInt(userKeys[i], 10));
-                }
-            }
-            if (log.Status === VALID) {
-                validCodeArrayKeys.push(parseInt(userKeys[i], 10));
-            }
-            if (i !== keysLength) {
-                continue;
-            }
-            if (sendCodeArrayKeys.length === 0) {
-                return {status: 'no_send_codes'};
-            }
-            sendCodeArrayKeysSorted = sendCodeArrayKeys.sort(sortNumber);
-            const latestCodeIndex = sendCodeArrayKeysSorted.length === 1 ? 0 : sendCodeArrayKeysSorted[sendCodeArrayKeysSorted.length - 1];
-            const latestLog = user.Logs[latestCodeIndex];
-            if (!validCodeArrayKeys.length) {
-                return {status: 'success', log: latestLog};
-            }
-            const validKeysLength = validCodeArrayKeys.length - 1;
-            for (let j = 0; j < validCodeArrayKeys.length; j++) {
-                const logValid = user.Logs[validCodeArrayKeys[j]];
-                if (logValid.Code === latestLog.Code) {
-                    return {status: 'no_code_used'};
-                }
-                if (j === validKeysLength) {
-                    return {status: 'success', log: latestLog};
-                }
-            }
-        }
-    }
-
     @Post('verify')
-    async postVerify(@Res() res, @Body() body: PostCodeDTO) {
-        console.log('body', body);
+    async postVerify(@Res() res, @Body() body: PostVerifyCodeDTO) {
         let v = new Validator(body, {
             event: 'required|string',
             lang: 'string',
@@ -369,6 +229,7 @@ export class VerificationController extends ApiController {
             embeded: 'boolean',
             // используется только при отправке мобильным приложением - для установке статуса REJECT
             status: 'string',
+            method: 'string',
             client_timestamp: 'required',
             cert: 'nullable',
         }, {'service.in': `No service with name: ${body.service}`});
@@ -382,13 +243,13 @@ export class VerificationController extends ApiController {
         }
         // начинаем слушать изменения адресов
         let addresses = [
-            this.chainService.getAddress(body.phone_number, body.service),
+            this.chainService.getAddress(user.PhoneNumber, body.service),
         ];
         let ws = this.openWsConnection(addresses);
         try {
             let rejectStatus = null;
-            if (body.status && body.status) {
-                rejectStatus = 'REJECT';
+            if (body.status && body.status === REJECT) {
+                rejectStatus = REJECT;
             }
             let log = new UserLog();
             log.ActionTime = (new Date()).getTime() / 1000;
@@ -398,28 +259,45 @@ export class VerificationController extends ApiController {
             log.Status = rejectStatus || 'VERIFY';
             log.Code = body.code;
             log.Cert = body.cert;
-            await this.chainService.verify(body.phone_number, log, body.service);
+            await this.chainService.verify(user.PhoneNumber, log, body.service);
         } catch (e) {
             console.error(`Error while getting user`, e);
             return res.status(HttpStatus.BAD_GATEWAY).json({error: 'Error checking code.'});
         }
-        ws.onmessage = mess => {
+        let responseSend = false;
+        let self = this;
+        ws.onmessage = async mess => {
             const data = JSON.parse(mess.data);
-            let responseSend = false;
-            for (let i = 0; i < data.state_changes.length; i++) {
+            for (let stateChange of data.state_changes) {
                 if (responseSend) {
                     ws.send(JSON.stringify({'action': 'unsubscribe'}));
                     break;
                 }
-                const stateChange = data.state_changes[i];
                 if (addresses.indexOf(stateChange.address) !== -1) {
                     const _user = messagesServiceClient.User.decode(new Buffer(stateChange.value, 'base64'));
                     if (_user.Logs.length === user.Logs.length) {
                         continue;
                     }
-                    if (_user.Logs[_user.Logs.length - 1].Status === VALID) {
+                    const status = _user.Logs[_user.Logs.length - 1].Status;
+                    if (status === VALID) {
+                        console.log('_user.Logs[_user.Logs.length - 1].Method', _user.Logs[_user.Logs.length - 1]);
+
+                        if (_user.Logs[_user.Logs.length - 1].Method === 'telegram') {
+                            let telegramUser;
+                            let number = user.PhoneNumber;
+                            if (number.charAt(0) === '+') {
+                                number = number.substring(1);
+                            }
+                            telegramUser = await self .telegramServer.userExists(new RegExp('^8|7' + number.substring(1) + '$', 'i'));
+                            if (telegramUser) {
+                                self .codeQueueListenerService.queueTelegram.add({
+                                    chat_id: telegramUser.chatId,
+                                    message: 'Вы успешно авторизвались на сервисе 2FA',
+                                });
+                            }
+                        }
                         // Send user to client.
-                        // todo отработать в момнет интеграции
+                        // todo отработать в момнет интеграции запросы клиентам сервисов
                         // switch (body.service) {
                         //     case 'kaztel':
                         //         request.post(EnvConfig.KAZTEL_CALLBACK_URL+ '/redirect_url', user).then(r=> console.log('redirect occur'))
@@ -433,12 +311,13 @@ export class VerificationController extends ApiController {
                         // todo make request to redirest url with user data
                         responseSend = true;
                         ws.send(JSON.stringify({'action': 'unsubscribe'}));
+
                         // responde to the view
-                        return res.status(HttpStatus.OK).json({status: 'VALID'});
+                        return res.status(HttpStatus.OK).json({status: 'VALID', user: _user});
                     } else {
                         responseSend = true;
                         ws.send(JSON.stringify({'action': 'unsubscribe'}));
-                        const status = _user.Logs[_user.Logs.length - 1].Status;
+
                         if (status === 'EXPIRED') {
                             return res.status(440).json({status: status});
                         }
@@ -449,19 +328,15 @@ export class VerificationController extends ApiController {
         };
     }
 
-    openWsConnection(addresses: string[]): any {
-        let ws = new WebSocket(`ws:${EnvConfig.VALIDATOR_REST_API_HOST_PORT}/subscriptions`);
-        ws.onopen = () => {
-            ws.send(JSON.stringify({
-                'action': 'subscribe',
-                'address_prefixes': addresses
-            }));
-        };
-        ws.onclose = () => {
-            ws.send(JSON.stringify({
-                'action': 'unsubscribe'
-            }));
-        };
-        return ws;
+    @Post('check-push-verification')
+    async checkPushVerification(@Req() req, @Res() res) {
+        let tfaUser = await this.getUser(req.body.phone_number, 'tfa');
+        const redisKey = `${tfaUser.PhoneNumber}:${REDIS_USER_PUSH_RESULT_POSTFIX}`;
+        const status = await this.redisClient.getAsync(redisKey);
+        if (status == null) {
+            return res.status(HttpStatus.OK).json({status: `NOT_VERIFIED_YET`});
+        }
+        await this.redisClient.del(redisKey);
+        return res.status(HttpStatus.OK).json({status: status});
     }
 }

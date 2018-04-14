@@ -1,9 +1,0 @@
-html
-    head
-        meta(charset='utf-8')
-        title 2FA Выбор
-        script.
-            window.opener.postMessage({ token: "$token" , spa_url:"$spa_url", expires_in: "$expires_in"}, "url($spa_url)")
-            window.close()
-
-    body
