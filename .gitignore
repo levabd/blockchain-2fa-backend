@@ -27,4 +27,5 @@ test-reports/
 vendor
 .idea
 net/data
+tmp
 

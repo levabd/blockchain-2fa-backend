@@ -3,12 +3,13 @@ import {KaztelTransactionFamily} from '../../shared/families/kaztel.transaction.
 import {TfaTransactionFamily} from '../../shared/families/tfa.transaction.family';
 import {EgovTransactionFamily} from '../../shared/families/egov.transaction.family';
 import {EnvConfig} from '../../../config/env';
-import * as WebSocket from 'ws';
+// import * as WebSocket from 'ws';
 import * as changeCase from 'change-case';
 import {sortNumber} from '../../../services/helpers/helpers';
 import * as redis from 'redis';
 import * as Promisefy from 'bluebird';
 import {REJECT, RESEND_CODE, SEND_CODE, VALID} from '../../../config/constants';
+const WebSocket = require('ws');
 
 const DICT = {
     ru: {
@@ -27,12 +28,15 @@ const DICT = {
 
 export class ApiController {
     redisClient: any;
+    endpoint: string;
     constructor(public tfaTF: TfaTransactionFamily,
                 public kaztelTF: KaztelTransactionFamily,
                 public egovTF: EgovTransactionFamily,) {
         Promisefy.promisifyAll(redis);
         const redisURL = `redis://${EnvConfig.REDIS_HOST}:${EnvConfig.REDIS_PORT}`;
         this.redisClient = redis.createClient({url: redisURL});
+        // this.endpoint = `ws://${EnvConfig.VALIDATOR_REST_API_USER}:${EnvConfig.VALIDATOR_REST_API_PASS}@${EnvConfig.VALIDATOR_REST_API_WS}/sawtooth-ws/subscriptions`;
+        this.endpoint = `ws://${EnvConfig.VALIDATOR_REST_API_WS}/subscriptions`;
     }
 
     transformLog(log: any, service: string): object {
@@ -130,7 +134,7 @@ export class ApiController {
     }
 
     openWsConnection(addresses: string[]): any {
-        let ws = new WebSocket(`ws:${EnvConfig.VALIDATOR_REST_API_HOST_PORT}/subscriptions`);
+        let ws = new WebSocket(this.endpoint);
         ws.onopen = () => {
             ws.send(JSON.stringify({
                 'action': 'subscribe',

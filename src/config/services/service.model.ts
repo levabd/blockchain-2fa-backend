@@ -1,4 +1,4 @@
-import {_hash} from '../../services/helpers/helpers';
+import {hash} from '../../services/helpers/helpers';
 
 export class Service {
 
@@ -38,6 +38,6 @@ export class Service {
     }
 
     getPrefix() {
-        return _hash(this.FamilyName).substring(0, 6);
+        return hash(this.FamilyName).substring(0, 6);
     }
 }

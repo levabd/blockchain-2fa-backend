@@ -20,7 +20,7 @@ message User {
 
     string PhoneNumber = 1;
 
-    uint32 Uin = 2;
+    string Uin = 2;
 
     string Name = 3;
 

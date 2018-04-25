@@ -1,20 +1,12 @@
 import * as crypto from 'crypto';
 
-export const _hash = (x) => crypto.createHash('sha512').update(x).digest('hex').toLowerCase()
-
-export const LOG_STATUSES = {
-    SEND_CODE: 'SEND_CODE',
-    RESEND_CODE: 'RESEND_CODE',
-    INVALID: 'INVALID',
-    VALID: 'VALID',
-    EXPIRED: 'EXPIRED',
-};
+export const hash = (x) => crypto.createHash('sha512').update(x).digest('hex').toLowerCase();
 
 export const sortNumber = (a, b) => {
     return a - b;
 };
 
-export const _getLatestIndex = (indexes) => {
+export const getLatestIndex = (indexes) => {
     indexes.sort(sortNumber);
     return indexes[indexes.length - 1];
 };
@@ -25,4 +17,16 @@ export const getRandomInt = (min, max) => {
 
 export const genCode = () => {
     return getRandomInt(9999, 99999);
+};
+
+export const decimalToHexString = (number) => {
+    if (number < 0) {
+        number = 0xFFFFFFFF + number + 1;
+    }
+
+    return number.toString(16).toLowerCase();
+};
+
+export const md5 = (contents: string) => {
+    return crypto.createHash('md5').update(contents).digest('hex');
 };

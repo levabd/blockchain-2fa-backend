@@ -1,6 +1,5 @@
 import {Middleware, NestMiddleware, ExpressMiddleware, HttpStatus} from '@nestjs/common';
 
-
 @Middleware()
 export class JsonMiddleware implements NestMiddleware {
     resolve(...args: any[]): ExpressMiddleware {

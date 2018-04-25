@@ -1,17 +1,17 @@
 import {Component} from '@nestjs/common';
-
-const {createHash} = require('crypto');
-const {protobuf} = require('sawtooth-sdk');
-const {createContext, CryptoFactory} = require('sawtooth-sdk/signing');
 import * as request from 'request-promise-native';
 import {EnvConfig} from '../../config/env';
-import {_hash} from '../helpers/helpers';
+import {hash} from '../helpers/helpers';
 import {UserLog} from '../../modules/shared/models/user.log';
 import * as fs from 'fs';
 import {Batch} from '../../modules/shared/models/batch';
 
 const protobufMe = require('protocol-buffers');
 const messagesClientService = protobufMe(fs.readFileSync('src/proto/service_client.proto'));
+const {createHash} = require('crypto');
+const {protobuf} = require('sawtooth-sdk');
+const {createContext, CryptoFactory} = require('sawtooth-sdk/signing');
+
 const AVAILABLE_TFS = {
     kaztel: {
         name: EnvConfig.KAZTEL_FAMILY_NAME,
@@ -35,7 +35,6 @@ export const CODE_VERIFY = 3;
 @Component()
 export abstract class ChainService {
 
-    // TODO: refactor
     protected signer: any;
     protected context: any;
     public abstract tf: string;
@@ -51,18 +50,18 @@ export abstract class ChainService {
     initTF(name: string) {
         this.tf = AVAILABLE_TFS[name]['name'];
         this.tfVersion = AVAILABLE_TFS[name]['version'];
-        this.prefix = _hash(name).substring(0, 6);
+        this.prefix = hash(name).substring(0, 6);
     }
 
     setPrefix(name: string) {
-        this.prefix = _hash(name).substring(0, 6);
+        this.prefix = hash(name).substring(0, 6);
     }
 
     getAddress(phoneNumber: string, prefix?: string): string {
         if (prefix) {
             this.setPrefix(prefix);
         }
-        return this.prefix + _hash(phoneNumber.toString()).slice(-64);
+        return this.prefix + hash(phoneNumber.toString()).slice(-64);
     }
 
     updateUser(phoneNumber: string, user: object, service = 'tfa'): Promise<Batch> {
@@ -94,7 +93,7 @@ export abstract class ChainService {
         return this.addTransaction(payloadData, address).then(response => {
             return JSON.parse(response);
         }).catch(error => {
-            console.log('invalid response', error);
+            console.log('error.pesponse.statusCode ', error.response.statusCode );
             throw new Error(error);
         });
     }
@@ -110,18 +109,18 @@ export abstract class ChainService {
         return this.addTransaction(payloadData, address).then(response => {
             return JSON.parse(response);
         }).catch(error => {
+            console.log('statusCode ', error.response.statusCode );
             throw new Error(error);
         });
     }
 
-    getSignedBatch(transactionList: any): any {
+     getSignedBatch(transactionList: any): any {
         const batchHeaderBytes = protobuf.BatchHeader.encode({
             signerPublicKey: this.signer.getPublicKey().asHex(),
             transactionIds: transactionList.map((txn) => txn.headerSignature),
         }).finish();
 
         const signature = this.signer.sign(batchHeaderBytes);
-
         const batch = protobuf.Batch.create({
             header: batchHeaderBytes,
             headerSignature: signature,
@@ -133,35 +132,32 @@ export abstract class ChainService {
         }).finish();
     }
 
-    addTransaction(payloadBytes: object, address: string, dependOn = ''): Promise<any> {
+    async addTransaction(payloadBytes: object, address: string, dependOn = ''): Promise<any> {
         const transactionHeaderBytes = protobuf.TransactionHeader.encode({
             familyName: this.tf,
             familyVersion: this.tfVersion,
             inputs: [address],
             outputs: [address],
             signerPublicKey: this.signer.getPublicKey().asHex(),
-            // In this example, we're signing the batch with the same private key,
-            // but the batch can be signed by another party, in which case, the
-            // public key will need to be associated with that key.
             batcherPublicKey: this.signer.getPublicKey().asHex(),
-            // In this example, there are no dependencies.  This list should include
-            // an previous transaction header signatures that must be applied for
-            // this transaction to successfully commit.
-            // For example,
             dependencies: [],
             payloadSha512: createHash('sha512').update(payloadBytes).digest('hex')
         }).finish();
         const signature = this.signer.sign(transactionHeaderBytes);
-
         const transaction = protobuf.Transaction.create({
             header: transactionHeaderBytes,
             headerSignature: signature,
             payload: payloadBytes
         });
-
+        const bodyAsBytes = await this.getSignedBatch([transaction]);
         return request.post({
+            auth: {
+                user: EnvConfig.VALIDATOR_REST_API_USER,
+                pass: EnvConfig.VALIDATOR_REST_API_PASS,
+                sendImmediately: true
+            },
             url: `${EnvConfig.VALIDATOR_REST_API}/batches`,
-            body: this.getSignedBatch([transaction]),
+            body: bodyAsBytes,
             headers: {'Content-Type': 'application/octet-stream'}
         });
     }

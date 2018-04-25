@@ -43,13 +43,19 @@ export class TfaTransactionFamily extends ChainService {
     }
 
     getStateByPhoneNumber(phoneNumber: string): Promise<TfaUserDTO|null> {
+        // console.log('`url', `${EnvConfig.VALIDATOR_REST_API}/state/${this.getAddress(phoneNumber)}`);
         return request.get({
-            uri: `${EnvConfig.VALIDATOR_REST_API}/state/${this.getAddress(phoneNumber)}`,
+            // auth: {
+            //     user: EnvConfig.VALIDATOR_REST_API_USER,
+            //     pass: EnvConfig.VALIDATOR_REST_API_PASS,
+            //     sendImmediately: true
+            // },
+            url: `${EnvConfig.VALIDATOR_REST_API}/state/${this.getAddress(phoneNumber)}`,
             json: true
         }).then(response => {
             return <TfaUserDTO>messagesService.User.decode(new Buffer(response.data, 'base64'));
         }).catch(error => {
-            if (error.error.code === 30) {
+            if (error.error.code === 30 || error.response.statusCode === 502) {
                 return null;
             }
 

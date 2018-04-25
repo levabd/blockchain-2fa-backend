@@ -23,9 +23,9 @@ export class ApplicationModule implements NestModule {
      */
     constructor(private codeQueueListenerService: CodeQueueListenerService) {
         // list env keys in cli
-        for (let propName of Object.keys(EnvConfig)) {
-            console.log(`${propName}:  ${EnvConfig[propName]}`);
-        }
+        // for (let propName of Object.keys(EnvConfig)) {
+        //     console.log(`${propName}:  ${EnvConfig[propName]}`);
+        // }
 
         // init queue listener
         this.codeQueueListenerService.listen();

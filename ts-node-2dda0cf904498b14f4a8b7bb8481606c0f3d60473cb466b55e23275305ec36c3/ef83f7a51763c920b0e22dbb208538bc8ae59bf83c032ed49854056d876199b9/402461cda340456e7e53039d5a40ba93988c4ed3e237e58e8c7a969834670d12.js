@@ -1,0 +1,7 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Services = {
+    kaztel: 'Казахелеком',
+    egov: 'Egov'
+};
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiL2hvbWUvcGVzaGtvdi9kZXYvcHJvamVjdHMvYmxvY2tjaGFpbi0yZmEtYmFja2VuZC9zcmMvc2VydmljZXMvY29kZV9zZW5kZXIvc2VydmljZXMudHMiLCJzb3VyY2VzIjpbIi9ob21lL3Blc2hrb3YvZGV2L3Byb2plY3RzL2Jsb2NrY2hhaW4tMmZhLWJhY2tlbmQvc3JjL3NlcnZpY2VzL2NvZGVfc2VuZGVyL3NlcnZpY2VzLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7O0FBQWEsUUFBQSxRQUFRLEdBQUc7SUFDcEIsTUFBTSxFQUFFLGFBQWE7SUFDckIsSUFBSSxFQUFFLE1BQU07Q0FDZixDQUFDIiwic291cmNlc0NvbnRlbnQiOlsiZXhwb3J0IGNvbnN0IFNlcnZpY2VzID0ge1xuICAgIGthenRlbDogJ9Ca0LDQt9Cw0YXQtdC70LXQutC+0LwnLFxuICAgIGVnb3Y6ICdFZ292J1xufTsiXX0=

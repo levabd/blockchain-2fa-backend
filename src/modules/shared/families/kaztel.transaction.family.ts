@@ -14,10 +14,12 @@ export class KaztelTransactionFamily extends ChainService {
     tf: string;
     tfVersion: string;
     prefix: string;
+    tryCounter: number;
 
     constructor() {
         super();
         this.initTF('kaztel');
+        this.tryCounter = 0;
     }
 
     updateUser(phoneNumber: string, user: object): Promise<Batch> {
@@ -37,20 +39,38 @@ export class KaztelTransactionFamily extends ChainService {
             });
     }
 
-    getUser(phoneNumber: string): Promise<PostClientUserDTO|null> {
+    getUser(phoneNumber: string): Promise<PostClientUserDTO | null> {
+        // console.log('`url', `${EnvConfig.VALIDATOR_REST_API}/state/${this.getAddress(phoneNumber)}`);
         return request.get({
-            uri: `${EnvConfig.VALIDATOR_REST_API}/state/${this.getAddress(phoneNumber)}`,
+            // auth: {
+            //     user: EnvConfig.VALIDATOR_REST_API_USER,
+            //     pass: EnvConfig.VALIDATOR_REST_API_PASS,
+            //     sendImmediately: true
+            // },
+            url: `${EnvConfig.VALIDATOR_REST_API}/state/${this.getAddress(phoneNumber)}`,
             json: true
         }).then(response => {
+            this.tryCounter = 0;
             return <PostClientUserDTO>messagesClientService.User.decode(new Buffer(response.data, 'base64'));
         }).catch(error => {
+            if (error.response.statusCode === 502) {
+                if (this.tryCounter <= 10) {
+                    this.tryCounter++;
+                    return this.getUser(phoneNumber);
+                } else {
+                    this.tryCounter = 0;
+                    return null;
+                }
+            }
             if (error.error.code === 30) {
                 return null;
             }
             try {
                 console.log('error', error.error);
+                return null;
             } catch (e) {
                 console.log('e', e);
+                return null;
             }
         });
     }

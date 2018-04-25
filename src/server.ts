@@ -2,15 +2,32 @@ import {EnvConfig} from './config/env';
 import {NestFactory} from '@nestjs/core';
 import {ApplicationModule} from './modules/app.module';
 import {SwaggerModule, DocumentBuilder} from '@nestjs/swagger';
-import * as express from 'express';
 import * as bodyParser from 'body-parser';
-import {AppExceptionFilter} from './modules/shared/filters/app.exception.filter';
+import {NestApplicationOptions} from '@nestjs/common/interfaces/nest-application-options.interface';
+import {HttpsOptions} from '@nestjs/common/interfaces/https-options.interface';
+const fs = require('fs');
+
+class MyHttpsOptions implements HttpsOptions {
+    key?: any;
+    cert?: any;
+    ca?: any;
+}
+
+class MyOptions implements NestApplicationOptions {
+    httpsOptions?: HttpsOptions;
+}
 
 async function bootstrap() {
+    const httpsOptions = new MyHttpsOptions();
+    httpsOptions.key = fs.readFileSync('tmp/privkey.pem');
+    httpsOptions.cert = fs.readFileSync('tmp/cert.pem');
+    httpsOptions.ca = fs.readFileSync('tmp/chain.pem');
+    let mo = new MyOptions();
+    mo.httpsOptions = httpsOptions;
 
-    const app = await NestFactory.create(ApplicationModule);
+    const app = await NestFactory.create(ApplicationModule, mo);
+    app.init();
     app.use(bodyParser.json());
-
     /**
      * Headers setup
      */
@@ -37,9 +54,9 @@ async function bootstrap() {
     /**
      *  Set up static files
      */
-    app.use(express.static(__dirname + '/modules/web/public'));
-    app.set('views', __dirname + '/modules/web/pwa/dist');
-    app.set('view engine', 'html');
+    // app.use(express.static(__dirname + '/modules/web/public'));
+    // app.set('views', __dirname + '/modules/web/pwa/dist');
+    // app.set('view engine', 'html');
 
     /**
      * Start Chainservice API
