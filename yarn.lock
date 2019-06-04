@@ -2224,7 +2224,7 @@ growly@^1.3.0:
     lodash "^4.15.0"
     nan "^2.0.0"
     node-pre-gyp "^0.6.39"
-    protobufjs "^5.0.0"
+    protobufjs "^5.0.3"
 
 grpc@^1.8.4:
   version "1.9.1"
@@ -2233,7 +2233,7 @@ grpc@^1.8.4:
     lodash "^4.15.0"
     nan "^2.0.0"
     node-pre-gyp "^0.6.39"
-    protobufjs "^5.0.0"
+    protobufjs "^5.0.3"
 
 gtoken@^1.2.1:
   version "1.2.3"
@@ -2465,7 +2465,7 @@ http-signature@~1.1.0:
   dependencies:
     assert-plus "^0.2.0"
     jsprim "^1.2.2"
-    sshpk "^1.7.0"
+    sshpk "^1.13.2"
 
 http-signature@~1.2.0:
   version "1.2.0"
@@ -2473,11 +2473,11 @@ http-signature@~1.2.0:
   dependencies:
     assert-plus "^1.0.0"
     jsprim "^1.2.2"
-    sshpk "^1.7.0"
+    sshpk "^1.13.2"
 
-https-proxy-agent@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/https-proxy-agent/-/https-proxy-agent-1.0.0.tgz#35f7da6c48ce4ddbfa264891ac593ee5ff8671e6"
+https-proxy-agent@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/https-proxy-agent/-/https-proxy-agent-2.2.0.tgz#35f7da6c48ce4ddbfa264891ac593ee5ff8671e6"
   dependencies:
     agent-base "2"
     debug "2"
@@ -3975,7 +3975,7 @@ pac-proxy-agent@^2.0.0:
     debug "^2.6.8"
     get-uri "^2.0.0"
     http-proxy-agent "^1.0.0"
-    https-proxy-agent "^1.0.0"
+    https-proxy-agent "^2.2.0"
     pac-resolver "^3.0.0"
     raw-body "^2.2.0"
     socks-proxy-agent "^3.0.0"
@@ -4211,9 +4211,9 @@ property-expr@^1.2.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/property-expr/-/property-expr-1.4.0.tgz#e28cfe4e7a5a231fb14c8ad687a93a5342e05a8c"
 
-protobufjs@^5.0.0:
-  version "5.0.2"
-  resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-5.0.2.tgz#59748d7dcf03d2db22c13da9feb024e16ab80c91"
+protobufjs@^5.0.3:
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-5.0.3.tgz#59748d7dcf03d2db22c13da9feb024e16ab80c91"
   dependencies:
     ascli "~1"
     bytebuffer "~5"
@@ -4234,7 +4234,7 @@ proxy-agent@2:
     agent-base "^4.2.0"
     debug "^2.6.8"
     http-proxy-agent "^1.0.0"
-    https-proxy-agent "^1.0.0"
+    https-proxy-agent "^2.2.0"
     lru-cache "^2.6.5"
     pac-proxy-agent "^2.0.0"
     socks-proxy-agent "^3.0.0"
@@ -4509,7 +4509,7 @@ request@2.74.0:
     qs "~6.2.0"
     stringstream "~0.0.4"
     tough-cookie "~2.3.0"
-    tunnel-agent "~0.4.1"
+    tunnel-agent "^0.6.0"
 
 request@2.81.0, request@~2.81.0:
   version "2.81.0"
@@ -4948,9 +4948,9 @@ sqs-queue-parallel@^0.1.6:
     aws-sdk "^2.0.0-rc11"
     lodash "^2.4.1"
 
-sshpk@^1.7.0:
-  version "1.13.1"
-  resolved "https://registry.yarnpkg.com/sshpk/-/sshpk-1.13.1.tgz#512df6da6287144316dc4c18fe1cf1d940739be3"
+sshpk@^1.13.2:
+  version "1.13.2"
+  resolved "https://registry.yarnpkg.com/sshpk/-/sshpk-1.13.2.tgz#512df6da6287144316dc4c18fe1cf1d940739be3"
   dependencies:
     asn1 "~0.2.3"
     assert-plus "^1.0.0"
@@ -5337,10 +5337,6 @@ tunnel-agent@^0.6.0:
   resolved "https://registry.yarnpkg.com/tunnel-agent/-/tunnel-agent-0.6.0.tgz#27a5dea06b36b04a0a9966774b290868f0fc40fd"
   dependencies:
     safe-buffer "^5.0.1"
-
-tunnel-agent@~0.4.1:
-  version "0.4.3"
-  resolved "https://registry.yarnpkg.com/tunnel-agent/-/tunnel-agent-0.4.3.tgz#6373db76909fe570e08d73583365ed828a74eeeb"
 
 tweetnacl@^0.14.3, tweetnacl@~0.14.0:
   version "0.14.5"
