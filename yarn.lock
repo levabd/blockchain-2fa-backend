@@ -3168,7 +3168,7 @@ jshint@^2.9.2:
     htmlparser2 "3.8.x"
     lodash "3.7.x"
     minimatch "~3.0.2"
-    shelljs "0.3.x"
+    shelljs "0.8.4"
     strip-json-comments "1.0.x"
 
 json-schema-traverse@^0.3.0:
@@ -4507,7 +4507,7 @@ request@2.74.0:
     node-uuid "~1.4.7"
     oauth-sign "~0.8.1"
     qs "~6.2.0"
-    stringstream "~0.0.4"
+    stringstream "^0.0.6"
     tough-cookie "~2.3.0"
     tunnel-agent "^0.6.0"
 
@@ -4533,7 +4533,7 @@ request@2.81.0, request@~2.81.0:
     performance-now "^0.2.0"
     qs "~6.4.0"
     safe-buffer "^5.0.1"
-    stringstream "~0.0.4"
+    stringstream "^0.0.6"
     tough-cookie "~2.3.0"
     tunnel-agent "^0.6.0"
     uuid "^3.0.0"
@@ -4560,7 +4560,7 @@ request@^2.72.0, request@^2.73.0, request@^2.74.0, request@^2.76.0, request@^2.7
     performance-now "^2.1.0"
     qs "~6.5.1"
     safe-buffer "^5.1.1"
-    stringstream "~0.0.5"
+    stringstream "^0.0.6"
     tough-cookie "~2.3.3"
     tunnel-agent "^0.6.0"
     uuid "^3.1.0"
@@ -4744,9 +4744,9 @@ shebang-regex@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/shebang-regex/-/shebang-regex-1.0.0.tgz#da42f49740c0b42db2ca9728571cb190c98efea3"
 
-shelljs@0.3.x:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/shelljs/-/shelljs-0.3.0.tgz#3596e6307a781544f591f37da618360f31db57b1"
+shelljs@0.8.4:
+  version "0.8.4"
+  resolved "https://registry.yarnpkg.com/shelljs/-/shelljs-0.8.4.tgz#3596e6307a781544f591f37da618360f31db57b1"
 
 shellwords@^0.1.1:
   version "0.1.1"
@@ -5026,9 +5026,9 @@ string_decoder@~1.0.3:
   dependencies:
     safe-buffer "~5.1.0"
 
-stringstream@~0.0.4, stringstream@~0.0.5:
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/stringstream/-/stringstream-0.0.5.tgz#4e484cd4de5a0bbbee18e46307710a8a81621878"
+stringstream@^0.0.6, stringstream@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/stringstream/-/stringstream-0.0.6.tgz#4e484cd4de5a0bbbee18e46307710a8a81621878"
 
 strip-ansi@^3.0.0, strip-ansi@^3.0.1:
   version "3.0.1"
