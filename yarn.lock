@@ -4177,7 +4177,7 @@ jsprim@^1.2.2:
     verror "1.10.0"
 
 jsrsasign@10.2.0:
-  version "6.2.2"
+  version "10.2.0"
   resolved "https://registry.yarnpkg.com/jsrsasign/-/jsrsasign-10.2.0.tgz#84a0f85ba4aac7a79c358badb26ed99913172dbc"
 
 jssha@^2.1.0:
