@@ -659,7 +659,7 @@ babel-core@^6.0.0, babel-core@^6.24.1, babel-core@^6.26.0:
     babel-types "^6.26.0"
     babylon "^6.18.0"
     convert-source-map "^1.5.0"
-    debug "^2.6.8"
+    debug "^2.6.9"
     json5 "^0.5.1"
     lodash "^4.17.14"
     minimatch "^3.0.4"
@@ -774,7 +774,7 @@ babel-traverse@^6.18.0, babel-traverse@^6.26.0:
     babel-runtime "^6.26.0"
     babel-types "^6.26.0"
     babylon "^6.18.0"
-    debug "^2.6.8"
+    debug "^2.6.9"
     globals "^9.18.0"
     invariant "^2.2.2"
     lodash "^4.17.14"
@@ -910,7 +910,7 @@ body-parser@1.17.2:
   dependencies:
     bytes "2.4.0"
     content-type "~1.0.2"
-    debug "2.6.7"
+    debug "2.6.9"
     depd "~1.1.0"
     http-errors "~1.6.1"
     iconv-lite "0.4.15"
@@ -1401,7 +1401,7 @@ cloudant-follow@^0.13.0:
   resolved "https://registry.yarnpkg.com/cloudant-follow/-/cloudant-follow-0.13.0.tgz#7ecead79061b00399f5ee3540368dd60657cdc2b"
   dependencies:
     browser-request "~0.3.0"
-    debug "^2.1.0"
+    debug "^2.6.9"
     request "~2.81.0"
 
 cloudant-follow@~0.17.0:
@@ -1705,12 +1705,6 @@ date-now@^0.1.4:
 debug@2, debug@2.6.9, debug@^2.1.0, debug@^2.2.0, debug@^2.3.3, debug@^2.6.8, debug@~2.6.4, debug@~2.6.6, debug@~2.6.9:
   version "2.6.9"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.9.tgz#5d128515df134ff327e90a4c93f4e077a536341f"
-  dependencies:
-    ms "2.0.0"
-
-debug@2.6.7:
-  version "2.6.7"
-  resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.7.tgz#92bad1f6d05bbb6bba22cca88bcd0ec894c2861e"
   dependencies:
     ms "2.0.0"
 
@@ -2331,7 +2325,7 @@ expand-brackets@^2.1.4:
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/expand-brackets/-/expand-brackets-2.1.4.tgz#b77735e315ce30f6b6eff0f83b04151a22449622"
   dependencies:
-    debug "^2.3.3"
+    debug "^2.6.9"
     define-property "^0.2.5"
     extend-shallow "^2.0.1"
     posix-character-classes "^0.1.0"
@@ -2845,7 +2839,7 @@ get-uri@^2.0.0:
   resolved "https://registry.yarnpkg.com/get-uri/-/get-uri-2.0.1.tgz#dbdcacacd8c608a38316869368117697a1631c59"
   dependencies:
     data-uri-to-buffer "1"
-    debug "2"
+    debug "2.6.9"
     extend "3.0.2"
     file-uri-to-path "1"
     ftp "~0.3.10"
@@ -3273,7 +3267,7 @@ http-proxy-agent@^2.1.0:
   resolved "https://registry.yarnpkg.com/http-proxy-agent/-/http-proxy-agent-2.1.0.tgz#cc1ce38e453bf984a0f7702d2dd59c73d081284a"
   dependencies:
     agent-base "2"
-    debug "2"
+    debug "2.6.9"
     extend "3.0.2"
 
 http-signature@~1.1.0:
@@ -3297,7 +3291,7 @@ https-proxy-agent@^2.2.0:
   resolved "https://registry.yarnpkg.com/https-proxy-agent/-/https-proxy-agent-2.2.0.tgz#35f7da6c48ce4ddbfa264891ac593ee5ff8671e6"
   dependencies:
     agent-base "2"
-    debug "2"
+    debug "2.6.9"
     extend "3.0.2"
 
 iconv-lite@0.4.15:
@@ -4213,7 +4207,7 @@ jwks-rsa@^1.2.1:
   resolved "https://registry.yarnpkg.com/jwks-rsa/-/jwks-rsa-1.2.1.tgz#9949100f5643821107787de2947d46f875f6ab5a"
   dependencies:
     "@types/express-jwt" "0.0.34"
-    debug "^2.2.0"
+    debug "^2.6.9"
     limiter "^1.1.0"
     lru-memoizer "^1.6.0"
     ms "^2.0.0"
@@ -4781,7 +4775,7 @@ nan@^2.12.1, nan@^2.13.2, nan@^2.14.0, nan@^2.6.2:
   resolved "https://registry.yarnpkg.com/nano/-/nano-6.4.2.tgz#b9b0fa81eb914b8b9c634a1d55e878e0f45b09bf"
   dependencies:
     cloudant-follow "^0.13.0"
-    debug "^2.2.0"
+    debug "^2.6.9"
     errs "^0.3.2"
     request "^2.76.0"
     underscore "^1.8.3"
@@ -4791,7 +4785,7 @@ nano@^6.4.4:
   resolved "https://registry.yarnpkg.com/nano/-/nano-6.4.4.tgz#4902a095e5186cfb23612c78826ea755b76fadf0"
   dependencies:
     cloudant-follow "~0.17.0"
-    debug "^2.2.0"
+    debug "^2.6.9"
     errs "^0.3.2"
     lodash.isempty "^4.4.0"
     request "^2.85.0"
@@ -5259,7 +5253,7 @@ pac-proxy-agent@^2.0.0:
   resolved "https://registry.yarnpkg.com/pac-proxy-agent/-/pac-proxy-agent-2.0.0.tgz#beb17cd2b06a20b379d57e1b2e2c29be0dfe5f9a"
   dependencies:
     agent-base "^2.1.1"
-    debug "^2.6.8"
+    debug "^2.6.9"
     get-uri "^2.0.0"
     http-proxy-agent "^2.1.0"
     https-proxy-agent "^2.2.0"
@@ -5596,7 +5590,7 @@ proxy-agent@2:
   resolved "https://registry.yarnpkg.com/proxy-agent/-/proxy-agent-2.2.0.tgz#e853cd8400013562d23c8dc9e1deaf9b0b0a153a"
   dependencies:
     agent-base "^4.2.0"
-    debug "^2.6.8"
+    debug "^2.6.9"
     http-proxy-agent "^2.1.0"
     https-proxy-agent "^2.2.0"
     lru-cache "^2.6.5"
@@ -6498,7 +6492,7 @@ snapdragon@^0.8.1:
   resolved "https://registry.yarnpkg.com/snapdragon/-/snapdragon-0.8.1.tgz#e12b5487faded3e3dea0ac91e9400bf75b401370"
   dependencies:
     base "^0.11.1"
-    debug "^2.2.0"
+    debug "^2.6.9"
     define-property "^0.2.5"
     extend-shallow "^2.0.1"
     map-cache "^0.2.2"
@@ -6530,7 +6524,7 @@ socket.io-client@2.0.4:
     base64-arraybuffer "0.1.5"
     component-bind "1.0.0"
     component-emitter "1.2.1"
-    debug "~2.6.4"
+    debug "~2.6.9"
     engine.io-client "~3.1.0"
     has-cors "1.1.0"
     indexof "0.0.1"
@@ -6545,7 +6539,7 @@ socket.io-parser@~3.1.1:
   resolved "https://registry.yarnpkg.com/socket.io-parser/-/socket.io-parser-3.1.2.tgz#dbc2282151fc4faebbe40aeedc0772eba619f7f2"
   dependencies:
     component-emitter "1.2.1"
-    debug "~2.6.4"
+    debug "~2.6.9"
     has-binary2 "~1.0.2"
     isarray "2.0.1"
 
@@ -6553,7 +6547,7 @@ socket.io@^2.0.3:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/socket.io/-/socket.io-2.0.4.tgz#c1a4590ceff87ecf13c72652f046f716b29e6014"
   dependencies:
-    debug "~2.6.6"
+    debug "~2.6.9"
     engine.io "~3.1.0"
     socket.io-adapter "~1.1.0"
     socket.io-client "2.0.4"
@@ -6631,7 +6625,7 @@ sqs-consumer@^3.7.0:
   dependencies:
     async "^2.0.1"
     aws-sdk "^2.100.0"
-    debug "^2.1.0"
+    debug "^2.6.9"
 
 sqs-queue-parallel@^0.1.6:
   version "0.1.6"
@@ -6906,7 +6900,7 @@ tar-pack@^3.4.0:
   version "3.4.1"
   resolved "https://registry.yarnpkg.com/tar-pack/-/tar-pack-3.4.1.tgz#e1dbc03a9b9d3ba07e896ad027317eb679a10a1f"
   dependencies:
-    debug "^2.2.0"
+    debug "^2.6.9"
     fstream "^1.0.12"
     fstream-ignore "^1.0.5"
     once "^1.3.3"
@@ -7244,7 +7238,7 @@ undefsafe@^2.0.2:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/undefsafe/-/undefsafe-2.0.3.tgz#6b166e7094ad46313b2202da7ecc2cd7cc6e7aae"
   dependencies:
-    debug "^2.2.0"
+    debug "^2.6.9"
 
 underscore@^1.8.3:
   version "1.8.3"
