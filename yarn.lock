@@ -271,8 +271,8 @@
     "@types/mime" "*"
 
 "@types/superagent@*":
-  version "3.5.7"
-  resolved "https://registry.yarnpkg.com/@types/superagent/-/superagent-3.5.7.tgz#c170633e7dff01425b4712bb3afac3a12be49b7b"
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/@types/superagent/-/superagent-7.0.2.tgz#c170633e7dff01425b4712bb3afac3a12be49b7b"
   dependencies:
     "@types/node" "*"
 
@@ -6169,7 +6169,7 @@ rest-facade@^1.10.0:
     bluebird "^2.10.2"
     change-case "^2.3.0"
     deepmerge "^1.5.1"
-    superagent "^3.8.0"
+    superagent "^7.0.2"
     superagent-proxy "^1.0.2"
 
 restore-cursor@^2.0.0:
@@ -6790,18 +6790,18 @@ superagent-proxy@^1.0.2:
     debug "^3.1.0"
     proxy-agent "2"
 
-superagent@0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/superagent/-/superagent-0.5.0.tgz#6460c69500948a8d84eb19ea73f6a35f49bef2c5"
+superagent@7.0.2:
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/superagent/-/superagent-7.0.2.tgz#6460c69500948a8d84eb19ea73f6a35f49bef2c5"
   dependencies:
     emitter-component "0.0.1"
     formidable "1.0.9"
     mime "1.2.5"
     qs "0.4.2"
 
-superagent@^3.8.0:
-  version "3.8.2"
-  resolved "https://registry.yarnpkg.com/superagent/-/superagent-3.8.2.tgz#e4a11b9d047f7d3efeb3bbe536d9ec0021d16403"
+superagent@^7.0.2:
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/superagent/-/superagent-7.0.2.tgz#e4a11b9d047f7d3efeb3bbe536d9ec0021d16403"
   dependencies:
     component-emitter "^1.2.0"
     cookiejar "^2.1.0"
@@ -6819,7 +6819,7 @@ superagent@^3.8.0:
   resolved "https://registry.yarnpkg.com/supertest/-/supertest-0.0.1.tgz#dfb2f55ca67e75947bddc75f24d874cf02c88559"
   dependencies:
     methods "0.0.1"
-    superagent "0.5.0"
+    superagent "7.0.2"
 
 supports-color@4.4.0:
   version "4.4.0"
