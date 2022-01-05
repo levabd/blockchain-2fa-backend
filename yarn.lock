@@ -5515,9 +5515,9 @@ promise@^7.0.1:
   dependencies:
     asap "~2.0.3"
 
-property-expr@^1.2.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/property-expr/-/property-expr-1.4.0.tgz#e28cfe4e7a5a231fb14c8ad687a93a5342e05a8c"
+property-expr@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/property-expr/-/property-expr-2.0.3.tgz#e28cfe4e7a5a231fb14c8ad687a93a5342e05a8c"
 
 protobufjs@5.0.3, protobufjs@^5.0.3:
   version "5.0.3"
@@ -7670,7 +7670,7 @@ yup@^0.23.0:
     case "^1.2.1"
     fn-name "~1.0.1"
     lodash "^4.17.14"
-    property-expr "^1.2.0"
+    property-expr "^2.0.3"
     synchronous-promise "^1.0.18"
     toposort "^0.2.10"
     type-name "^2.0.1"
