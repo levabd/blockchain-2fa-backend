@@ -58,7 +58,7 @@
     iterare "0.0.8"
     json-socket "^0.2.1"
     optional "0.1.4"
-    redis "^2.7.1"
+    redis "^3.1.1"
 
 "@nestjs/swagger@^1.1.4":
   version "1.1.4"
@@ -275,9 +275,9 @@
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/@types/query-string/-/query-string-5.1.0.tgz#7f40cdea49ddafa0ea4f3db35fb6c24d3bfd4dcc"
 
-"@types/redis@^2.8.6":
-  version "2.8.22"
-  resolved "https://registry.yarnpkg.com/@types/redis/-/redis-2.8.22.tgz#8935227cbe39080506b625276d64974ddbcb9ea4"
+"@types/redis@^3.1.1":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@types/redis/-/redis-3.1.1.tgz#8935227cbe39080506b625276d64974ddbcb9ea4"
   dependencies:
     "@types/node" "*"
 
@@ -5941,9 +5941,9 @@ redis-parser@^3.0.0:
   dependencies:
     redis-errors "^1.0.0"
 
-redis@^2.7.1:
-  version "2.8.0"
-  resolved "https://registry.yarnpkg.com/redis/-/redis-2.8.0.tgz#202288e3f58c49f6079d97af7a10e1303ae14b02"
+redis@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/redis/-/redis-3.1.1.tgz#202288e3f58c49f6079d97af7a10e1303ae14b02"
   dependencies:
     double-ended-queue "^2.1.0-0"
     redis-commands "^1.2.0"
