@@ -2985,7 +2985,7 @@ google-p12-pem@^1.0.0:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/google-p12-pem/-/google-p12-pem-1.0.5.tgz#0b4721cdfc818759d884f0c62803518decdaf0d0"
   dependencies:
-    node-forge "^0.10.0"
+    node-forge "^1.0.0"
     pify "^4.0.0"
 
 googleapis-common@^0.7.0:
@@ -4946,9 +4946,9 @@ node-fetch@^2.3.0, node-fetch@^2.6.5:
   dependencies:
     whatwg-url "^5.0.0"
 
-node-forge@^0.10.0:
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.10.0.tgz#32dea2afb3e9926f02ee5ce8794902691a676bf3"
+node-forge@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-1.0.0.tgz#32dea2afb3e9926f02ee5ce8794902691a676bf3"
 
 node-gcm@^0.14.10:
   version "0.14.10"
