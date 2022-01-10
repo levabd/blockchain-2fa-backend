@@ -2851,7 +2851,7 @@ gcp-metadata@^1.0.0:
   resolved "https://registry.yarnpkg.com/gcp-metadata/-/gcp-metadata-1.0.0.tgz#5212440229fa099fc2f7c2a5cdcb95575e9b2ca6"
   dependencies:
     gaxios "^1.0.2"
-    json-bigint "^0.3.0"
+    json-bigint "^1.0.0"
 
 generate-function@^2.0.0:
   version "2.0.0"
@@ -4141,9 +4141,9 @@ jshint@^2.9.2:
     shelljs "0.8.5"
     strip-json-comments "1.0.x"
 
-json-bigint@^0.3.0:
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/json-bigint/-/json-bigint-0.3.1.tgz#0c1729d679f580d550899d6a2226c228564afe60"
+json-bigint@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/json-bigint/-/json-bigint-1.0.0.tgz#0c1729d679f580d550899d6a2226c228564afe60"
   dependencies:
     bignumber.js "^9.0.0"
 
