@@ -3184,7 +3184,7 @@ has-values@^1.0.0:
   resolved "https://registry.yarnpkg.com/has-values/-/has-values-1.0.0.tgz#95b0b63fec2146619a6fe57fe75628d5a39efe4f"
   dependencies:
     is-number "^3.0.0"
-    kind-of "^4.0.0"
+    kind-of "^6.0.3"
 
 has@^1.0.3:
   version "1.0.3"
@@ -3467,13 +3467,13 @@ is-accessor-descriptor@^0.1.6:
   version "0.1.6"
   resolved "https://registry.yarnpkg.com/is-accessor-descriptor/-/is-accessor-descriptor-0.1.6.tgz#a9e12cb3ae8d876727eeef3843f8a0897b5c98d6"
   dependencies:
-    kind-of "^3.0.2"
+    kind-of "^6.0.3"
 
 is-accessor-descriptor@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/is-accessor-descriptor/-/is-accessor-descriptor-1.0.0.tgz#169c2f6d3df1f992618072365c9b0ea1f6878656"
   dependencies:
-    kind-of "^6.0.0"
+    kind-of "^6.0.3"
 
 is-arrayish@^0.2.1:
   version "0.2.1"
@@ -3515,13 +3515,13 @@ is-data-descriptor@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/is-data-descriptor/-/is-data-descriptor-0.1.4.tgz#0b5ee648388e2c860282e793f1856fec3f301b56"
   dependencies:
-    kind-of "^3.0.2"
+    kind-of "^6.0.3"
 
 is-data-descriptor@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/is-data-descriptor/-/is-data-descriptor-1.0.0.tgz#d84876321d0e7add03990406abbbbd36ba9268c7"
   dependencies:
-    kind-of "^6.0.0"
+    kind-of "^6.0.3"
 
 is-date-object@^1.0.1:
   version "1.0.2"
@@ -3533,7 +3533,7 @@ is-descriptor@^0.1.0:
   dependencies:
     is-accessor-descriptor "^0.1.6"
     is-data-descriptor "^0.1.4"
-    kind-of "^5.0.0"
+    kind-of "^6.0.3"
 
 is-descriptor@^1.0.0, is-descriptor@^1.0.2:
   version "1.0.2"
@@ -3541,7 +3541,7 @@ is-descriptor@^1.0.0, is-descriptor@^1.0.2:
   dependencies:
     is-accessor-descriptor "^1.0.0"
     is-data-descriptor "^1.0.0"
-    kind-of "^6.0.2"
+    kind-of "^6.0.3"
 
 is-dotfile@^1.0.0:
   version "1.0.3"
@@ -3652,7 +3652,7 @@ is-number@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/is-number/-/is-number-3.0.0.tgz#24fd6201a4782cf50561c810276afc7d12d71195"
   dependencies:
-    kind-of "^3.0.2"
+    kind-of "^6.0.3"
 
 is-obj@^1.0.0:
   version "1.0.1"
@@ -4284,25 +4284,9 @@ jwt-decode@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/jwt-decode/-/jwt-decode-2.2.0.tgz#7d86bd56679f58ce6a84704a657dd392bba81a79"
 
-kind-of@^3.0.2, kind-of@^3.0.3, kind-of@^3.2.0:
-  version "3.2.2"
-  resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-3.2.2.tgz#31ea21a734bab9bbb0f32466d893aea51e4a3c64"
-  dependencies:
-    is-buffer "^1.1.5"
-
-kind-of@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-4.0.0.tgz#20813df3d712928b207378691a45066fae72dd57"
-  dependencies:
-    is-buffer "^1.1.5"
-
-kind-of@^5.0.0, kind-of@^5.0.2:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-5.1.0.tgz#729c91e2d857b7a419a1f9aa65685c4c33f5845d"
-
-kind-of@^6.0.0, kind-of@^6.0.2:
-  version "6.0.2"
-  resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-6.0.2.tgz#01146b36a6218e64e58f3a8d66de5d7fc6f6d051"
+kind-of@^6.0.3:
+  version "6.0.3"
+  resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-6.0.3.tgz#01146b36a6218e64e58f3a8d66de5d7fc6f6d051"
 
 klaw@1.3.1, klaw@^1.0.0:
   version "1.3.1"
@@ -4615,7 +4599,7 @@ micromatch@^2.1.5, micromatch@^2.3.11:
     filename-regex "^2.0.0"
     is-extglob "^1.0.0"
     is-glob "^2.0.1"
-    kind-of "^3.0.2"
+    kind-of "^6.0.3"
     normalize-path "^2.0.1"
     object.omit "^2.0.0"
     parse-glob "^3.0.4"
@@ -4632,7 +4616,7 @@ micromatch@^3.1.10:
     extend-shallow "^3.0.2"
     extglob "^2.0.4"
     fragment-cache "^0.2.1"
-    kind-of "^6.0.2"
+    kind-of "^6.0.3"
     nanomatch "^1.2.9"
     object.pick "^1.3.0"
     regex-not "^1.0.0"
@@ -4650,7 +4634,7 @@ micromatch@^3.1.4:
     extend-shallow "^2.0.1"
     extglob "^2.0.2"
     fragment-cache "^0.2.1"
-    kind-of "^6.0.0"
+    kind-of "^6.0.3"
     nanomatch "^1.2.5"
     object.pick "^1.3.0"
     regex-not "^1.0.0"
@@ -4856,7 +4840,7 @@ nanomatch@^1.2.5:
     extend-shallow "^2.0.1"
     fragment-cache "^0.2.1"
     is-odd "^1.0.0"
-    kind-of "^5.0.2"
+    kind-of "^6.0.3"
     object.pick "^1.3.0"
     regex-not "^1.0.0"
     snapdragon "^0.8.1"
@@ -4872,7 +4856,7 @@ nanomatch@^1.2.9:
     extend-shallow "^3.0.2"
     fragment-cache "^0.2.1"
     is-windows "^1.0.2"
-    kind-of "^6.0.2"
+    kind-of "^6.0.3"
     object.pick "^1.3.0"
     regex-not "^1.0.0"
     snapdragon "^0.8.1"
@@ -5123,7 +5107,7 @@ object-copy@^0.1.0:
   dependencies:
     copy-descriptor "^0.1.0"
     define-property "^0.2.5"
-    kind-of "^3.0.3"
+    kind-of "^6.0.3"
 
 object-hash@^1.2.0:
   version "1.2.0"
@@ -6510,7 +6494,7 @@ snapdragon-util@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/snapdragon-util/-/snapdragon-util-3.0.1.tgz#f956479486f2acd79700693f6f7b805e45ab56e2"
   dependencies:
-    kind-of "^3.2.0"
+    kind-of "^6.0.3"
 
 snapdragon@^0.8.1:
   version "0.8.1"
@@ -7056,7 +7040,7 @@ to-object-path@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/to-object-path/-/to-object-path-0.3.0.tgz#297588b7b0e7e0ac08e04e672f85c1f4999e17af"
   dependencies:
-    kind-of "^3.0.2"
+    kind-of "^6.0.3"
 
 to-regex-range@^2.1.0:
   version "2.1.1"
