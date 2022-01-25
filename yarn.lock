@@ -2226,7 +2226,7 @@ eslint@^4.18.1:
     imurmurhash "^0.1.4"
     inquirer "^3.0.6"
     is-resolvable "^1.0.0"
-    js-yaml "^3.13.0"
+    js-yaml "^3.13.1"
     json-stable-stringify-without-jsonify "^1.0.1"
     levn "^0.3.0"
     lodash "^4.17.4"
@@ -2536,7 +2536,7 @@ fabric-client@^1.0.4:
     grpc "1.24.2"
     ignore-walk "^3.0.0"
     js-sha3 "^0.7.0"
-    js-yaml "^3.13.0"
+    js-yaml "^3.13.1"
     jsrsasign "^10.2.0"
     klaw "^2.0.0"
     lodash.clone "4.5.0"
@@ -4085,13 +4085,6 @@ js-tokens@^3.0.0, js-tokens@^3.0.2:
 js-yaml@^3.13.1:
   version "3.13.1"
   resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.13.1.tgz#2e78441646bd4682e963f22b6e92823c309c62dc"
-  dependencies:
-    argparse "^1.0.7"
-    esprima "^4.0.0"
-
-js-yaml@^3.13.0:
-  version "3.14.0"
-  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.14.0.tgz#a7a34170f26a21bb162424d8adacb4113a69e482"
   dependencies:
     argparse "^1.0.7"
     esprima "^4.0.0"
