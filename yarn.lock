@@ -1388,7 +1388,7 @@ class-validator@0.8.1:
   version "0.8.1"
   resolved "https://registry.yarnpkg.com/class-validator/-/class-validator-0.8.1.tgz#f5efd5c613927e3c2f68692e8f14d53a2644fb2f"
   dependencies:
-    validator "9.2.0"
+    validator "13.7.0"
 
 cli-boxes@^1.0.0:
   version "1.0.0"
