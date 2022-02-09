@@ -37,7 +37,7 @@
   dependencies:
     axios "0.21.2"
     class-transformer "0.3.1"
-    class-validator "0.8.1"
+    class-validator "0.13.2"
     cli-color "1.1.0"
 
 "@nestjs/core@^4.6.4":
@@ -1384,9 +1384,9 @@ class-utils@^0.3.5:
     isobject "^3.0.0"
     static-extend "^0.1.1"
 
-class-validator@0.8.1:
-  version "0.8.1"
-  resolved "https://registry.yarnpkg.com/class-validator/-/class-validator-0.8.1.tgz#f5efd5c613927e3c2f68692e8f14d53a2644fb2f"
+class-validator@0.13.2:
+  version "0.13.2"
+  resolved "https://registry.yarnpkg.com/class-validator/-/class-validator-0.13.2.tgz#f5efd5c613927e3c2f68692e8f14d53a2644fb2f"
   dependencies:
     validator "13.7.0"
 
