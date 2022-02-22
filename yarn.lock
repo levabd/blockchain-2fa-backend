@@ -594,23 +594,9 @@ auth0@^2.9.1:
     rest-facade "^1.10.0"
     retry "^0.10.1"
 
-aws-sdk@^2.0.0-rc11, aws-sdk@^2.100.0:
-  version "2.187.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.187.0.tgz#04cb9a333d39c09753bf3ff63ec065b32b00db18"
-  dependencies:
-    buffer "4.9.1"
-    events "^1.1.1"
-    jmespath "0.15.0"
-    querystring "0.2.0"
-    sax "1.2.1"
-    url "0.10.3"
-    uuid "3.1.0"
-    xml2js "0.4.17"
-    xmlbuilder "4.2.1"
-
-aws-sdk@^2.204.0:
-  version "2.707.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.707.0.tgz#c7506dadd1d60a73920ade9027645e166f444e25"
+aws-sdk@^2.0.0-rc11, aws-sdk@^2.100.0, aws-sdk@^2.814.0:
+  version "2.814.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.814.0.tgz#7a1c36006e0b5826f14bd2511b1d229ef6814bb0"
   dependencies:
     buffer "4.9.2"
     events "1.1.1"
@@ -1072,14 +1058,6 @@ buffer-from@^1.0.0:
 buffer-xor@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/buffer-xor/-/buffer-xor-1.0.3.tgz#26e61ed1422fb70dd42e6e36729ed51d855fe8d9"
-
-buffer@4.9.1:
-  version "4.9.1"
-  resolved "https://registry.yarnpkg.com/buffer/-/buffer-4.9.1.tgz#6d1bb601b07a4efced97094132093027c95bc298"
-  dependencies:
-    base64-js "^1.0.2"
-    ieee754 "^1.1.4"
-    isarray "^1.0.0"
 
 buffer@4.9.2:
   version "4.9.2"
@@ -2322,7 +2300,7 @@ event-emitter@~0.3.4:
     d "1"
     es5-ext "~0.10.14"
 
-events@1.1.1, events@^1.1.1:
+events@1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/events/-/events-1.1.1.tgz#9ebdb7635ad099c70dcc4c2a1f5004288e8bd924"
 
@@ -3352,13 +3330,9 @@ iconv-lite@^0.4.17, iconv-lite@^0.4.4:
   dependencies:
     safer-buffer ">= 2.1.2 < 3"
 
-ieee754@1.1.13:
+ieee754@1.1.13, ieee754@^1.1.4:
   version "1.1.13"
   resolved "https://registry.yarnpkg.com/ieee754/-/ieee754-1.1.13.tgz#ec168558e95aa181fd87d37f55c32bbcb6708b84"
-
-ieee754@^1.1.4:
-  version "1.1.8"
-  resolved "https://registry.yarnpkg.com/ieee754/-/ieee754-1.1.8.tgz#be33d40ac10ef1926701f6f08a2d86fbfd1ad3e4"
 
 ignore-by-default@^1.0.1:
   version "1.0.1"
@@ -7451,19 +7425,11 @@ utils-merge@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
 
-uuid@3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.1.0.tgz#3dd3d3e790abc24d7b0d3a034ffababe28ebbc04"
-
 uuid@3.3.2:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.2.tgz#1b4af4955eb3077c501c23872fc6513811587131"
 
-uuid@^3.0.0, uuid@^3.1.0:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.2.1.tgz#12c528bb9d58d0b9265d9a2f6f0fe8be17ff1f14"
-
-uuid@^3.0.1, uuid@^3.3.2, uuid@^3.4.0:
+uuid@^3.0.0, uuid@^3.0.1, uuid@^3.1.0, uuid@^3.3.2, uuid@^3.4.0:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.4.0.tgz#b23e4358afa8a202fe7a100af1f5f883f02007ee"
 
@@ -7671,13 +7637,6 @@ xml-name-validator@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/xml-name-validator/-/xml-name-validator-2.0.1.tgz#4d8b8f1eccd3419aa362061becef515e1e559635"
 
-xml2js@0.4.17:
-  version "0.4.17"
-  resolved "https://registry.yarnpkg.com/xml2js/-/xml2js-0.4.17.tgz#17be93eaae3f3b779359c795b419705a8817e868"
-  dependencies:
-    sax ">=0.6.0"
-    xmlbuilder "^4.1.0"
-
 xml2js@0.4.19:
   version "0.4.19"
   resolved "https://registry.yarnpkg.com/xml2js/-/xml2js-0.4.19.tgz#686c20f213209e94abf0d1bcf1efaa291c7827a7"
@@ -7691,12 +7650,6 @@ xml2js@^0.4.17:
   dependencies:
     sax ">=0.6.0"
     xmlbuilder "~11.0.0"
-
-xmlbuilder@4.2.1, xmlbuilder@^4.1.0:
-  version "4.2.1"
-  resolved "https://registry.yarnpkg.com/xmlbuilder/-/xmlbuilder-4.2.1.tgz#aa58a3041a066f90eaa16c2f5389ff19f3f461a5"
-  dependencies:
-    lodash "^4.17.14"
 
 xmlbuilder@~11.0.0:
   version "11.0.1"
