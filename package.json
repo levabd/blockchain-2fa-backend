@@ -73,7 +73,7 @@
     "sqs-queue-parallel": "^0.1.6",
     "type-util": "^0.1.5",
     "winston-daily-rotate-file": "^1.7.2",
-    "ws": "^5.0.0",
+    "ws": "^5.2.3",
     "yup": "^0.23.0",
     "zeromq": "^4.6.0"
   },
