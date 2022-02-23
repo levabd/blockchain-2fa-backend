@@ -1702,7 +1702,7 @@ date-now@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/date-now/-/date-now-0.1.4.tgz#eaf439fd4d4848ad74e5cc7dbef200672b9e345b"
 
-debug@2, debug@2.6.9, debug@^2.1.0, debug@^2.2.0, debug@^2.3.3, debug@^2.6.8, debug@~2.6.4, debug@~2.6.6, debug@~2.6.9:
+debug@2.6.9, debug@^2.6.9, debug@~2.6.9:
   version "2.6.9"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.9.tgz#5d128515df134ff327e90a4c93f4e077a536341f"
   dependencies:
@@ -1983,10 +1983,6 @@ elliptic@^6.5.2:
     inherits "^2.0.1"
     minimalistic-assert "^1.0.0"
     minimalistic-crypto-utils "^1.0.0"
-
-emitter-component@0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/emitter-component/-/emitter-component-0.0.1.tgz#26169d5aa708b82e4355102bdfa277ddda26aae2"
 
 encodeurl@~1.0.1:
   version "1.0.2"
@@ -2690,10 +2686,6 @@ form-data@~2.3.2:
     combined-stream "^1.0.6"
     mime-types "^2.1.12"
 
-formidable@1.0.9:
-  version "1.0.9"
-  resolved "https://registry.yarnpkg.com/formidable/-/formidable-1.0.9.tgz#419e3bccead3e8874d539f5b3e72a4c503b31a98"
-
 formidable@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/formidable/-/formidable-1.1.1.tgz#96b8886f7c3c3508b932d6bd70c4d3a88f35f1a9"
@@ -3021,9 +3013,9 @@ gtoken@^1.2.1:
     mime "^1.4.1"
     request "^2.72.0"
 
-handlebars@^4.0.11, handlebars@^4.0.14:
-  version "4.7.6"
-  resolved "https://registry.yarnpkg.com/handlebars/-/handlebars-4.7.6.tgz#d4c05c1baf90e9945f77aa68a7a219aa4a7df74e"
+handlebars@^4.0.14, handlebars@^4.7.7:
+  version "4.7.7"
+  resolved "https://registry.yarnpkg.com/handlebars/-/handlebars-4.7.7.tgz#9ce33416aad02dbd6c8fafa8240d5d98004945a1"
   dependencies:
     minimist "^1.2.5"
     neo-async "^2.6.0"
@@ -4174,6 +4166,10 @@ jsrsasign@10.2.0:
   version "10.2.0"
   resolved "https://registry.yarnpkg.com/jsrsasign/-/jsrsasign-10.2.0.tgz#84a0f85ba4aac7a79c358badb26ed99913172dbc"
 
+jsrsasign@^10.2.0:
+  version "10.5.7"
+  resolved "https://registry.yarnpkg.com/jsrsasign/-/jsrsasign-10.5.7.tgz#1baabde0a3a27f8f042965f47f9bf68cb4603276"
+
 jssha@^2.1.0:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/jssha/-/jssha-2.3.1.tgz#147b2125369035ca4b2f7d210dc539f009b3de9a"
@@ -4626,10 +4622,6 @@ mime-types@~2.1.19, mime-types@~2.1.24:
   dependencies:
     mime-db "1.44.0"
 
-mime@1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/mime/-/mime-1.2.5.tgz#9eed073022a8bf5e16c8566c6867b8832bfbfa13"
-
 mime@1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/mime/-/mime-1.4.1.tgz#121f9ebc49e3766f311a76e1fa1c8003c4b03aa6"
@@ -4664,11 +4656,7 @@ minimist@0.0.8:
   version "0.0.8"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-0.0.8.tgz#857fcabfc3397d2625b8228262e86aa7a011b05d"
 
-minimist@^1.1.1, minimist@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.0.tgz#a35008b20f41383eec1fb914f4cd5df79a264284"
-
-minimist@^1.2.5:
+minimist@^1.1.1, minimist@^1.2.0, minimist@^1.2.5:
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
 
@@ -5736,10 +5724,6 @@ pusher@^1.5.1:
   dependencies:
     request "2.74.0"
 
-qs@6.0.4:
-  version "6.0.4"
-  resolved "https://registry.yarnpkg.com/qs/-/qs-6.0.4.tgz#3cac4c861e371a8c9c4770ac23cda8de639b8e5f"
-
 qs@6.4.0, qs@~6.4.0:
   version "6.4.0"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.4.0.tgz#13e26d28ad6b0ffaa91312cd3bf708ed351e7233"
@@ -6790,16 +6774,7 @@ superagent-proxy@^1.0.2:
     debug "^3.1.0"
     proxy-agent "2"
 
-superagent@7.0.2:
-  version "7.0.2"
-  resolved "https://registry.yarnpkg.com/superagent/-/superagent-7.0.2.tgz#6460c69500948a8d84eb19ea73f6a35f49bef2c5"
-  dependencies:
-    emitter-component "0.0.1"
-    formidable "1.0.9"
-    mime "1.2.5"
-    qs "0.4.2"
-
-superagent@^7.0.2:
+superagent@7.0.2, superagent@^7.0.2:
   version "7.0.2"
   resolved "https://registry.yarnpkg.com/superagent/-/superagent-7.0.2.tgz#e4a11b9d047f7d3efeb3bbe536d9ec0021d16403"
   dependencies:

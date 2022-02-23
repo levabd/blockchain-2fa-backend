@@ -53,7 +53,7 @@
     "fabric-client": "^1.0.4",
     "googleapis": "^22.2.0",
     "grpc": "^1.9.1",
-    "handlebars": "^4.0.11",
+    "handlebars": "^4.7.7",
     "hlf-node-utils": "github:peshkov3/hlf-node-utils",
     "js-sha1": "^0.6.0",
     "jwks-rsa": "^1.2.1",
