@@ -39,7 +39,7 @@
     "@types/object-hash": "^1.2.0",
     "@types/query-string": "^5.1.0",
     "@types/redis": "^2.8.6",
-    "auth0": "^2.9.1",
+    "auth0": "^2.27.1",
     "aws-sdk": "^2.814.0",
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",
