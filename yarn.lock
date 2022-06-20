@@ -2524,7 +2524,7 @@ fabric-client@^1.0.4:
     nano "^6.4.4"
     nconf "0.11.4"
     promise-settle "^0.3.0"
-    protobufjs "5.0.3"
+    protobufjs "6.11.3"
     sjcl "1.0.7"
     tar-stream "1.6.1"
     url "^0.11.0"
@@ -3020,7 +3020,7 @@ grpc@1.24.4:
     lodash.clone "^4.5.0"
     nan "^2.13.2"
     node-pre-gyp "^0.16.0"
-    protobufjs "^5.0.3"
+    protobufjs "6.11.3"
 
 grpc@^1.24.11:
   version "1.24.11"
@@ -3031,7 +3031,7 @@ grpc@^1.24.11:
     lodash.camelcase "^4.3.0"
     lodash.clone "^4.5.0"
     nan "^2.13.2"
-    protobufjs "^5.0.3"
+    protobufjs "6.11.3"
 
 gtoken@^2.3.2:
   version "2.3.3"
@@ -5526,18 +5526,18 @@ property-expr@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/property-expr/-/property-expr-2.0.3.tgz#e28cfe4e7a5a231fb14c8ad687a93a5342e05a8c"
 
-protobufjs@5.0.3, protobufjs@^5.0.3:
-  version "5.0.3"
-  resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-5.0.3.tgz#59748d7dcf03d2db22c13da9feb024e16ab80c91"
+protobufjs@6.11.3:
+  version "6.11.3"
+  resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-6.11.3.tgz#59748d7dcf03d2db22c13da9feb024e16ab80c91"
   dependencies:
     ascli "~1"
     bytebuffer "~5"
     glob "^7.0.5"
     yargs "^3.10.0"
 
-protobufjs@^6.7.3:
-  version "6.9.0"
-  resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-6.9.0.tgz#c08b2bf636682598e6fabbf0edb0b1256ff090bd"
+protobufjs@6.11.3:
+  version "6.11.3"
+  resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-6.11.3.tgz#c08b2bf636682598e6fabbf0edb0b1256ff090bd"
   dependencies:
     "@protobufjs/aspromise" "^1.1.2"
     "@protobufjs/base64" "^1.1.2"
@@ -6225,7 +6225,7 @@ sawtooth-sdk@^1.0.1:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/sawtooth-sdk/-/sawtooth-sdk-1.0.5.tgz#b966a24261a4872f1400ba5aec1503e43bd173c1"
   dependencies:
-    protobufjs "^6.7.3"
+    protobufjs "6.11.3"
     secp256k1 "^3.2.5"
     uuid "^3.0.1"
     zeromq "^4.2.1"
