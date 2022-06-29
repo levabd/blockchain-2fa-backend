@@ -4716,11 +4716,11 @@ moment-timezone@^0.5.31:
   version "0.5.31"
   resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.31.tgz#9c40d8c5026f0c7ab46eda3d63e49c155148de05"
   dependencies:
-    moment "2.29.2"
+    moment "2.29.4"
 
-"moment@2.29.2":
-  version "2.29.2"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.2.tgz#8bff4e3e26a236220dfe3e36de756b6ebaa0105d"
+"moment@2.29.4":
+  version "2.29.4"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.4.tgz#8bff4e3e26a236220dfe3e36de756b6ebaa0105d"
 
 ms@2.0.0:
   version "2.0.0"
